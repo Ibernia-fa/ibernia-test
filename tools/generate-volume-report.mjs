@@ -67,13 +67,72 @@ const journeyPath = exists('reports/journeys/k6-journey-advisor-critical-summary
   : null;
 const journey = journeyPath ? readJson(journeyPath) : null;
 
-let profilePath = 'data/scenarios/profile_20u_1c_1p.json';
-if (!exists(profilePath)) {
+function resolveProfilePath() {
+  const fromManifest = manifest?.manifestProfileFile;
+  if (fromManifest && exists(fromManifest)) return fromManifest;
+  try {
+    const scenarios = readJson('config/volume-scenarios.json');
+    const manifestFile = scenarios.scenarios?.[SCENARIO]?.manifestProfileFile;
+    if (manifestFile && exists(manifestFile)) return manifestFile;
+  } catch {
+    /* optional config */
+  }
+  const fallback = 'data/scenarios/profile_20u_1c_1p.json';
+  if (exists(fallback)) return fallback;
   const dir = path.join(ROOT, 'data/scenarios');
   const profiles = fs.readdirSync(dir).filter((f) => f.startsWith('profile_') && f.endsWith('.json'));
-  profilePath = profiles.length ? `data/scenarios/${profiles[0]}` : null;
+  return profiles.length ? `data/scenarios/${profiles[0]}` : null;
 }
+
+let profilePath = resolveProfilePath();
 const profile = profilePath && exists(profilePath) ? readJson(profilePath) : null;
+
+function iterProfilePlans(prof) {
+  const rows = [];
+  for (const adv of prof?.advisors || []) {
+    for (const client of adv.clients || []) {
+      for (const cf of client.cashflows || []) {
+        rows.push({ advisor: adv, client, cashflow: cf });
+      }
+    }
+  }
+  return rows;
+}
+
+function seedSummaryRow(adv, client, cf) {
+  const seed = cf.seed;
+  const persona = cf.persona || client.persona;
+  const mio = seed?.moneyInOut;
+  const savings = seed?.savings;
+  const wealth = seed?.wealth;
+  const incomeSalary = mio?.incomes?.find((x) => x.description === 'Salary')?.amount ?? mio?.incomes?.[0]?.amount;
+  const expenseLiving = mio?.expenses?.find((x) => x.description === 'Living costs')?.amount ?? mio?.expenses?.[0]?.amount;
+  const expenseHousing = mio?.expenses?.find((x) => x.description === 'Housing')?.amount ?? mio?.expenses?.[1]?.amount;
+  const potValues = (savings?.pots || []).map((p) => p.startingPotValue).join('; ');
+  return {
+    shard_id: adv.shardId,
+    advisor_email: adv.advisorEmail || 'n/a',
+    client_id: client.clientId,
+    cashflow_id: cf.cashflowId,
+    plan_name: cf.planName || 'n/a',
+    display_name: client.displayName || persona?.firstName ? `${persona?.firstName} ${persona?.lastName}` : 'n/a',
+    birth_year: persona?.birthYear ?? 'n/a',
+    occupation: persona?.occupation ?? 'n/a',
+    salary: incomeSalary ?? 'n/a',
+    living_costs: expenseLiving ?? 'n/a',
+    housing: expenseHousing ?? 'n/a',
+    cash_balance: savings?.cashBalanceAmount ?? 'n/a',
+    saving_pots: savings?.newPotCount ?? savings?.pots?.length ?? 'n/a',
+    pot_values: potValues || 'n/a',
+    contrib_rows: seed?.flows?.contributions?.length ?? 'n/a',
+    withdraw_rows: seed?.flows?.withdrawals?.length ?? 'n/a',
+    asset_value: wealth?.asset?.value ?? 'n/a',
+    liability_outstanding: wealth?.liability?.outstanding ?? 'n/a',
+    timeline_chips: seed?.timelineGoalChipCount ?? 'n/a',
+    reports_module: seed?.reportsModule ?? 'n/a',
+    has_seed: Boolean(seed),
+  };
+}
 
 const slo = readJson('config/volume-api-slo.json');
 const w = slo.profiles.write;
@@ -164,6 +223,14 @@ lines.push(`| slo_summary_fleet_b (resolved) | ${sloBFleetPath || 'n/a'} |`);
 lines.push(`| slo_summary_b (resolved) | ${sloBPath || 'n/a'} |`);
 lines.push(`| journey_summary (resolved) | ${journeyPath || 'n/a'} |`);
 lines.push(`| profile_file (resolved) | ${profilePath || 'n/a'} |`);
+if (profile?.seedSpecVersion != null) {
+  lines.push(`| seed_spec_version | ${profile.seedSpecVersion} |`);
+  lines.push(`| seed_spec_enriched_at | ${profile.seedSpecEnrichedAt || 'n/a'} |`);
+  lines.push(`| seed_spec_source | deterministic (lib/k6-volume-realistic-data.js) — not live API GET |`);
+}
+if (profile?.runBinding?.runTag) {
+  lines.push(`| profile_run_binding | ${profile.runBinding.runTag} |`);
+}
 if (meta) {
   lines.push(`| volumeScenario | ${meta.volumeScenario} |`);
   lines.push(`| userMode | ${meta.userMode} |`);
@@ -339,6 +406,69 @@ const names = {
   'GET /api/v1/cashflows/{cashflowId}': 'Open cashflow/plan',
 };
 for (const [k, v] of Object.entries(names)) lines.push(`| ${k} | ${v} |`);
+
+const planRows = iterProfilePlans(profile);
+const seedRows = planRows.map(({ advisor, client, cashflow }) => seedSummaryRow(advisor, client, cashflow));
+const withSeed = seedRows.filter((r) => r.has_seed).length;
+
+lines.push('');
+lines.push('### 13_seed_spec_expectations');
+lines.push('| field | value |');
+lines.push('|-------|-------|');
+if (profile?.seedExpectations) {
+  for (const [k, v] of Object.entries(profile.seedExpectations)) {
+    lines.push(`| ${k} | ${v} |`);
+  }
+} else {
+  lines.push('| n/a | profile not enriched — run tools/enrich-volume-profile-seed.mjs |');
+}
+
+lines.push('');
+lines.push('### 14_seed_coverage');
+lines.push('| metric | value |');
+lines.push('|--------|-------|');
+lines.push(`| advisors_in_profile | ${profile?.advisors?.length ?? 'n/a'} |`);
+lines.push(`| plans_in_profile | ${planRows.length || 'n/a'} |`);
+lines.push(`| plans_with_seed_block | ${withSeed || 'n/a'} |`);
+lines.push(`| plans_missing_seed_block | ${planRows.length ? planRows.length - withSeed : 'n/a'} |`);
+lines.push(`| seed_enriched | ${profile?.seedSpecEnrichedAt ? 'yes' : 'no'} |`);
+
+lines.push('');
+lines.push('### 15_seed_per_plan');
+lines.push(
+  '| shard_id | advisor_email | client_id | cashflow_id | plan_name | display_name | birth_year | occupation | salary | living_costs | housing | cash_balance | saving_pots | pot_values | contrib_rows | withdraw_rows | asset_value | liability_outstanding | timeline_chips | reports_module |',
+);
+lines.push(
+  '|----------|---------------|-----------|-------------|-----------|--------------|------------|------------|--------|--------------|---------|--------------|-------------|------------|--------------|---------------|-------------|-----------------------|----------------|----------------|',
+);
+if (seedRows.length) {
+  for (const r of seedRows) {
+    lines.push(
+      `| ${r.shard_id} | ${r.advisor_email} | ${r.client_id} | ${r.cashflow_id} | ${r.plan_name} | ${r.display_name} | ${r.birth_year} | ${r.occupation} | ${r.salary} | ${r.living_costs} | ${r.housing} | ${r.cash_balance} | ${r.saving_pots} | ${r.pot_values} | ${r.contrib_rows} | ${r.withdraw_rows} | ${r.asset_value} | ${r.liability_outstanding} | ${r.timeline_chips} | ${r.reports_module} |`,
+    );
+  }
+} else {
+  lines.push('| n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a |');
+}
+
+lines.push('');
+lines.push('### 16_seed_money_in_out_detail');
+lines.push('| shard_id | cashflow_id | row_type | description | amount |');
+lines.push('|----------|-------------|----------|-------------|--------|');
+let mioCount = 0;
+for (const { advisor, client, cashflow } of planRows) {
+  const seed = cashflow.seed;
+  if (!seed?.moneyInOut) continue;
+  for (const row of seed.moneyInOut.incomes || []) {
+    lines.push(`| ${advisor.shardId} | ${cashflow.cashflowId} | income | ${row.description} | ${row.amount} |`);
+    mioCount++;
+  }
+  for (const row of seed.moneyInOut.expenses || []) {
+    lines.push(`| ${advisor.shardId} | ${cashflow.cashflowId} | expense | ${row.description} | ${row.amount} |`);
+    mioCount++;
+  }
+}
+if (!mioCount) lines.push('| n/a | n/a | n/a | n/a | n/a |');
 
 const outPath = path.join(ROOT, OUT);
 fs.mkdirSync(path.dirname(outPath), { recursive: true });

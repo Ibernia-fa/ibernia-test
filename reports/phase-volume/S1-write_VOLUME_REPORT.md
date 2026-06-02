@@ -2,21 +2,25 @@
 | field | value |
 |-------|-------|
 | scenario | S1 |
-| phase_a_run_tag (requested) | S1-write-20260602-1505 |
-| phase_b_run_tag (requested) | S1-write-20260602-1505-read-v2 |
+| phase_a_run_tag (requested) | S1-write |
+| phase_b_run_tag (requested) | S1-read |
 | phase_a_run_tag (resolved) | S1-write |
 | phase_b_run_tag (resolved) | S1-read |
-| signoff_fleet_file (requested) | n/a — not found |
+| signoff_fleet_file (requested) | reports/phase-volume/S1-write_signoff-fleet.json |
 | signoff_fleet_file (resolved) | reports/phase-volume/S1-write_signoff-fleet.json |
-| run_metadata_file (requested) | n/a — not found |
+| run_metadata_file (requested) | reports/phase-a/S1-write/run-metadata.json |
 | run_metadata_file (resolved) | reports/phase-a/S1-write/run-metadata.json |
-| slo_summary_fleet_a (requested) | n/a — not found |
+| slo_summary_fleet_a (requested) | reports/phase-a/S1-write/slo-summary-fleet.json |
 | slo_summary_fleet_a (resolved) | reports/phase-a/S1-write/slo-summary-fleet.json |
 | slo_summary_fleet_b (requested) | n/a — not found |
 | slo_summary_fleet_b (resolved) | n/a |
 | slo_summary_b (resolved) | reports/phase-b/S1-read/slo-summary.json |
 | journey_summary (resolved) | reports/journeys/k6-journey-advisor-critical-summary.json |
 | profile_file (resolved) | data/scenarios/profile_20u_1c_1p.json |
+| seed_spec_version | 1 |
+| seed_spec_enriched_at | 2026-06-02T19:10:07.633Z |
+| seed_spec_source | deterministic (lib/k6-volume-realistic-data.js) — not live API GET |
+| profile_run_binding | S1-write |
 | volumeScenario | S1 |
 | userMode | fixed |
 | advisors | 20 |
@@ -337,3 +341,151 @@
 | GET /api/v1/Clients/{advisorId}/all | List all clients for advisor |
 | GET /api/v1/client/{clientId}/cashflows | List client plans |
 | GET /api/v1/cashflows/{cashflowId} | Open cashflow/plan |
+
+### 13_seed_spec_expectations
+| field | value |
+|-------|-------|
+| clientsPerAdvisor | 1 |
+| plansPerClient | 1 |
+| timelineGoalChipCount | 5 |
+| moneyInOutIncomeRows | 3 |
+| moneyInOutExpenseRows | 2 |
+| savingPotsPerPlan | 2 |
+| reportsSeeded | false |
+
+### 14_seed_coverage
+| metric | value |
+|--------|-------|
+| advisors_in_profile | 20 |
+| plans_in_profile | 20 |
+| plans_with_seed_block | 20 |
+| plans_missing_seed_block | 0 |
+| seed_enriched | yes |
+
+### 15_seed_per_plan
+| shard_id | advisor_email | client_id | cashflow_id | plan_name | display_name | birth_year | occupation | salary | living_costs | housing | cash_balance | saving_pots | pot_values | contrib_rows | withdraw_rows | asset_value | liability_outstanding | timeline_chips | reports_module |
+|----------|---------------|-----------|-------------|-----------|--------------|------------|------------|--------|--------------|---------|--------------|-------------|------------|--------------|---------------|-------------|-----------------------|----------------|----------------|
+| advisor-00 | User01@gmail.com | 6a1f0ed6901fc6abfb012a8e | 6a1f0ed7901fc6abfb012a98 | Early career wealth plan | Matteo Russo | 1995 | Software developer | 3800 | 627 | 988 | 7544 | 2 | 42294; 9594 | 2 | 2 | 85294 | 147294 | 5 | skipped |
+| advisor-01 | User02@gmail.com | 6a1f0edb901fc6abfb012b3c | 6a1f0edc901fc6abfb012b61 | Long-term retirement plan | Marco Rossi | 1985 | Engineering manager | 5200 | 957 | 1508 | 10882 | 2 | 44632; 11932 | 2 | 2 | 88632 | 146632 | 5 | skipped |
+| advisor-02 | User03@gmail.com | 6a1f0f12901fc6abfb012f57 | 6a1f0f17901fc6abfb01313a | Business owner succession plan | Francesca Gallo | 1983 | Pharmacist (own practice) | 5600 | 1056 | 1664 | 11273 | 2 | 43773; 11073 | 2 | 2 | 85773 | 147773 | 5 | skipped |
+| advisor-03 | User04@gmail.com | 6a1f0f10901fc6abfb012ef0 | 6a1f0f14901fc6abfb012fae | Wealth accumulation plan | Giulia Bianchi | 1990 | Management consultant | 4800 | 858 | 1352 | 9945 | 2 | 44945; 12245 | 2 | 2 | 85945 | 145945 | 5 | skipped |
+| advisor-04 | User05@gmail.com | 6a1f0f11901fc6abfb012f14 | 6a1f0f15901fc6abfb013024 | Pre-retirement transition plan | Luca Ferrero | 1978 | Finance director | 6800 | 1122 | 1768 | 13270 | 2 | 43770; 11070 | 2 | 2 | 89770 | 147770 | 5 | skipped |
+| advisor-05 | User06@gmail.com | 6a1f0f13901fc6abfb012f9d | 6a1f0f18901fc6abfb013206 | Long-term retirement plan | Marco Rossi | 1985 | Engineering manager | 5200 | 957 | 1508 | 10234 | 2 | 44984; 12284 | 2 | 2 | 87984 | 147984 | 5 | skipped |
+| advisor-06 | User07@gmail.com | 6a1f0f13901fc6abfb012f9f | 6a1f0f18901fc6abfb013213 | Business owner succession plan | Francesca Gallo | 1983 | Pharmacist (own practice) | 5600 | 1056 | 1664 | 11013 | 2 | 45013; 12313 | 2 | 2 | 88013 | 145013 | 5 | skipped |
+| advisor-07 | User08@gmail.com | 6a1f0f10901fc6abfb012eda | 6a1f0f12901fc6abfb012f55 | Pre-retirement transition plan | Luca Ferrero | 1978 | Finance director | 6800 | 1122 | 1768 | 11246 | 2 | 42746; 10046 | 2 | 2 | 87746 | 147746 | 5 | skipped |
+| advisor-08 | User09@gmail.com | 6a1f0f11901fc6abfb012f12 | 6a1f0f15901fc6abfb013020 | Flexible career plan | Alessandro Conti | 1988 | Product designer | 4200 | 809 | 1274 | 8849 | 2 | 45724; 13024 | 2 | 2 | 87724 | 146724 | 5 | skipped |
+| advisor-09 | User10@gmail.com | 6a1f0f11901fc6abfb012f29 | 6a1f0f15901fc6abfb01301c | Flexible career plan | Alessandro Conti | 1988 | Product designer | 4200 | 809 | 1274 | 9913 | 2 | 45788; 13088 | 2 | 2 | 88788 | 145788 | 5 | skipped |
+| advisor-10 | User11@gmail.com | 6a1f0f11901fc6abfb012f18 | 6a1f0f15901fc6abfb013037 | Flexible career plan | Alessandro Conti | 1988 | Product designer | 4200 | 809 | 1274 | 9461 | 2 | 43836; 11136 | 2 | 2 | 85836 | 147836 | 5 | skipped |
+| advisor-11 | User12@gmail.com | 6a1f0f11901fc6abfb012f07 | 6a1f0f14901fc6abfb012fac | Long-term retirement plan | Marco Rossi | 1985 | Engineering manager | 5200 | 957 | 1508 | 11122 | 2 | 42872; 10172 | 2 | 2 | 88872 | 146872 | 5 | skipped |
+| advisor-12 | User13@gmail.com | 6a1f0f11901fc6abfb012f27 | 6a1f0f15901fc6abfb01302b | Flexible career plan | Alessandro Conti | 1988 | Product designer | 4200 | 809 | 1274 | 9081 | 2 | 44956; 12256 | 2 | 2 | 87956 | 147956 | 5 | skipped |
+| advisor-13 | User14@gmail.com | 6a1f0f11901fc6abfb012f23 | 6a1f0f15901fc6abfb01301e | Wealth accumulation plan | Giulia Bianchi | 1990 | Management consultant | 4800 | 858 | 1352 | 10809 | 2 | 45809; 13109 | 2 | 2 | 86809 | 146809 | 5 | skipped |
+| advisor-14 | User15@gmail.com | 6a1f0f12901fc6abfb012f5c | 6a1f0f17901fc6abfb013142 | Flexible career plan | Alessandro Conti | 1988 | Product designer | 4200 | 809 | 1274 | 10041 | 2 | 45916; 13216 | 2 | 2 | 88916 | 145916 | 5 | skipped |
+| advisor-15 | User16@gmail.com | 6a1f0f12901fc6abfb012f5e | 6a1f0f17901fc6abfb013138 | Early career wealth plan | Matteo Russo | 1995 | Software developer | 3800 | 627 | 988 | 9532 | 2 | 42782; 10082 | 2 | 2 | 89782 | 146782 | 5 | skipped |
+| advisor-16 | User17@gmail.com | 6a1f0f11901fc6abfb012f25 | 6a1f0f15901fc6abfb013026 | Family security plan | Elena Romano | 1992 | Secondary school teacher | 3100 | 693 | 1092 | 9149 | 2 | 42899; 10199 | 2 | 2 | 88899 | 146899 | 5 | skipped |
+| advisor-17 | User18@gmail.com | 6a1f0f11901fc6abfb012f0c | 6a1f0f15901fc6abfb013039 | Flexible career plan | Alessandro Conti | 1988 | Product designer | 4200 | 809 | 1274 | 10025 | 2 | 42900; 10200 | 2 | 2 | 88900 | 146900 | 5 | skipped |
+| advisor-18 | User19@gmail.com | 6a1f0f10901fc6abfb012ef2 | 6a1f0f13901fc6abfb012f67 | Family security plan | Elena Romano | 1992 | Secondary school teacher | 3100 | 693 | 1092 | 9537 | 2 | 45787; 13087 | 2 | 2 | 86787 | 146787 | 5 | skipped |
+| advisor-19 | User20@gmail.com | 6a1f0f13901fc6abfb012fa1 | 6a1f0f18901fc6abfb01320c | Pre-retirement transition plan | Luca Ferrero | 1978 | Finance director | 6800 | 1122 | 1768 | 11542 | 2 | 45042; 12342 | 2 | 2 | 88042 | 145042 | 5 | skipped |
+
+### 16_seed_money_in_out_detail
+| shard_id | cashflow_id | row_type | description | amount |
+|----------|-------------|----------|-------------|--------|
+| advisor-00 | 6a1f0ed7901fc6abfb012a98 | income | Salary | 3800 |
+| advisor-00 | 6a1f0ed7901fc6abfb012a98 | income | State pension | 1444 |
+| advisor-00 | 6a1f0ed7901fc6abfb012a98 | income | Inheritance | 65000 |
+| advisor-00 | 6a1f0ed7901fc6abfb012a98 | expense | Living costs | 627 |
+| advisor-00 | 6a1f0ed7901fc6abfb012a98 | expense | Housing | 988 |
+| advisor-01 | 6a1f0edc901fc6abfb012b61 | income | Salary | 5200 |
+| advisor-01 | 6a1f0edc901fc6abfb012b61 | income | State pension | 1976 |
+| advisor-01 | 6a1f0edc901fc6abfb012b61 | income | Inheritance | 65000 |
+| advisor-01 | 6a1f0edc901fc6abfb012b61 | expense | Living costs | 957 |
+| advisor-01 | 6a1f0edc901fc6abfb012b61 | expense | Housing | 1508 |
+| advisor-02 | 6a1f0f17901fc6abfb01313a | income | Salary | 5600 |
+| advisor-02 | 6a1f0f17901fc6abfb01313a | income | State pension | 2128 |
+| advisor-02 | 6a1f0f17901fc6abfb01313a | income | Inheritance | 65000 |
+| advisor-02 | 6a1f0f17901fc6abfb01313a | expense | Living costs | 1056 |
+| advisor-02 | 6a1f0f17901fc6abfb01313a | expense | Housing | 1664 |
+| advisor-03 | 6a1f0f14901fc6abfb012fae | income | Salary | 4800 |
+| advisor-03 | 6a1f0f14901fc6abfb012fae | income | State pension | 1824 |
+| advisor-03 | 6a1f0f14901fc6abfb012fae | income | Inheritance | 65000 |
+| advisor-03 | 6a1f0f14901fc6abfb012fae | expense | Living costs | 858 |
+| advisor-03 | 6a1f0f14901fc6abfb012fae | expense | Housing | 1352 |
+| advisor-04 | 6a1f0f15901fc6abfb013024 | income | Salary | 6800 |
+| advisor-04 | 6a1f0f15901fc6abfb013024 | income | State pension | 2584 |
+| advisor-04 | 6a1f0f15901fc6abfb013024 | income | Inheritance | 65000 |
+| advisor-04 | 6a1f0f15901fc6abfb013024 | expense | Living costs | 1122 |
+| advisor-04 | 6a1f0f15901fc6abfb013024 | expense | Housing | 1768 |
+| advisor-05 | 6a1f0f18901fc6abfb013206 | income | Salary | 5200 |
+| advisor-05 | 6a1f0f18901fc6abfb013206 | income | State pension | 1976 |
+| advisor-05 | 6a1f0f18901fc6abfb013206 | income | Inheritance | 65000 |
+| advisor-05 | 6a1f0f18901fc6abfb013206 | expense | Living costs | 957 |
+| advisor-05 | 6a1f0f18901fc6abfb013206 | expense | Housing | 1508 |
+| advisor-06 | 6a1f0f18901fc6abfb013213 | income | Salary | 5600 |
+| advisor-06 | 6a1f0f18901fc6abfb013213 | income | State pension | 2128 |
+| advisor-06 | 6a1f0f18901fc6abfb013213 | income | Inheritance | 65000 |
+| advisor-06 | 6a1f0f18901fc6abfb013213 | expense | Living costs | 1056 |
+| advisor-06 | 6a1f0f18901fc6abfb013213 | expense | Housing | 1664 |
+| advisor-07 | 6a1f0f12901fc6abfb012f55 | income | Salary | 6800 |
+| advisor-07 | 6a1f0f12901fc6abfb012f55 | income | State pension | 2584 |
+| advisor-07 | 6a1f0f12901fc6abfb012f55 | income | Inheritance | 65000 |
+| advisor-07 | 6a1f0f12901fc6abfb012f55 | expense | Living costs | 1122 |
+| advisor-07 | 6a1f0f12901fc6abfb012f55 | expense | Housing | 1768 |
+| advisor-08 | 6a1f0f15901fc6abfb013020 | income | Salary | 4200 |
+| advisor-08 | 6a1f0f15901fc6abfb013020 | income | State pension | 1596 |
+| advisor-08 | 6a1f0f15901fc6abfb013020 | income | Inheritance | 65000 |
+| advisor-08 | 6a1f0f15901fc6abfb013020 | expense | Living costs | 809 |
+| advisor-08 | 6a1f0f15901fc6abfb013020 | expense | Housing | 1274 |
+| advisor-09 | 6a1f0f15901fc6abfb01301c | income | Salary | 4200 |
+| advisor-09 | 6a1f0f15901fc6abfb01301c | income | State pension | 1596 |
+| advisor-09 | 6a1f0f15901fc6abfb01301c | income | Inheritance | 65000 |
+| advisor-09 | 6a1f0f15901fc6abfb01301c | expense | Living costs | 809 |
+| advisor-09 | 6a1f0f15901fc6abfb01301c | expense | Housing | 1274 |
+| advisor-10 | 6a1f0f15901fc6abfb013037 | income | Salary | 4200 |
+| advisor-10 | 6a1f0f15901fc6abfb013037 | income | State pension | 1596 |
+| advisor-10 | 6a1f0f15901fc6abfb013037 | income | Inheritance | 65000 |
+| advisor-10 | 6a1f0f15901fc6abfb013037 | expense | Living costs | 809 |
+| advisor-10 | 6a1f0f15901fc6abfb013037 | expense | Housing | 1274 |
+| advisor-11 | 6a1f0f14901fc6abfb012fac | income | Salary | 5200 |
+| advisor-11 | 6a1f0f14901fc6abfb012fac | income | State pension | 1976 |
+| advisor-11 | 6a1f0f14901fc6abfb012fac | income | Inheritance | 65000 |
+| advisor-11 | 6a1f0f14901fc6abfb012fac | expense | Living costs | 957 |
+| advisor-11 | 6a1f0f14901fc6abfb012fac | expense | Housing | 1508 |
+| advisor-12 | 6a1f0f15901fc6abfb01302b | income | Salary | 4200 |
+| advisor-12 | 6a1f0f15901fc6abfb01302b | income | State pension | 1596 |
+| advisor-12 | 6a1f0f15901fc6abfb01302b | income | Inheritance | 65000 |
+| advisor-12 | 6a1f0f15901fc6abfb01302b | expense | Living costs | 809 |
+| advisor-12 | 6a1f0f15901fc6abfb01302b | expense | Housing | 1274 |
+| advisor-13 | 6a1f0f15901fc6abfb01301e | income | Salary | 4800 |
+| advisor-13 | 6a1f0f15901fc6abfb01301e | income | State pension | 1824 |
+| advisor-13 | 6a1f0f15901fc6abfb01301e | income | Inheritance | 65000 |
+| advisor-13 | 6a1f0f15901fc6abfb01301e | expense | Living costs | 858 |
+| advisor-13 | 6a1f0f15901fc6abfb01301e | expense | Housing | 1352 |
+| advisor-14 | 6a1f0f17901fc6abfb013142 | income | Salary | 4200 |
+| advisor-14 | 6a1f0f17901fc6abfb013142 | income | State pension | 1596 |
+| advisor-14 | 6a1f0f17901fc6abfb013142 | income | Inheritance | 65000 |
+| advisor-14 | 6a1f0f17901fc6abfb013142 | expense | Living costs | 809 |
+| advisor-14 | 6a1f0f17901fc6abfb013142 | expense | Housing | 1274 |
+| advisor-15 | 6a1f0f17901fc6abfb013138 | income | Salary | 3800 |
+| advisor-15 | 6a1f0f17901fc6abfb013138 | income | State pension | 1444 |
+| advisor-15 | 6a1f0f17901fc6abfb013138 | income | Inheritance | 65000 |
+| advisor-15 | 6a1f0f17901fc6abfb013138 | expense | Living costs | 627 |
+| advisor-15 | 6a1f0f17901fc6abfb013138 | expense | Housing | 988 |
+| advisor-16 | 6a1f0f15901fc6abfb013026 | income | Salary | 3100 |
+| advisor-16 | 6a1f0f15901fc6abfb013026 | income | State pension | 1178 |
+| advisor-16 | 6a1f0f15901fc6abfb013026 | income | Inheritance | 65000 |
+| advisor-16 | 6a1f0f15901fc6abfb013026 | expense | Living costs | 693 |
+| advisor-16 | 6a1f0f15901fc6abfb013026 | expense | Housing | 1092 |
+| advisor-17 | 6a1f0f15901fc6abfb013039 | income | Salary | 4200 |
+| advisor-17 | 6a1f0f15901fc6abfb013039 | income | State pension | 1596 |
+| advisor-17 | 6a1f0f15901fc6abfb013039 | income | Inheritance | 65000 |
+| advisor-17 | 6a1f0f15901fc6abfb013039 | expense | Living costs | 809 |
+| advisor-17 | 6a1f0f15901fc6abfb013039 | expense | Housing | 1274 |
+| advisor-18 | 6a1f0f13901fc6abfb012f67 | income | Salary | 3100 |
+| advisor-18 | 6a1f0f13901fc6abfb012f67 | income | State pension | 1178 |
+| advisor-18 | 6a1f0f13901fc6abfb012f67 | income | Inheritance | 65000 |
+| advisor-18 | 6a1f0f13901fc6abfb012f67 | expense | Living costs | 693 |
+| advisor-18 | 6a1f0f13901fc6abfb012f67 | expense | Housing | 1092 |
+| advisor-19 | 6a1f0f18901fc6abfb01320c | income | Salary | 6800 |
+| advisor-19 | 6a1f0f18901fc6abfb01320c | income | State pension | 2584 |
+| advisor-19 | 6a1f0f18901fc6abfb01320c | income | Inheritance | 65000 |
+| advisor-19 | 6a1f0f18901fc6abfb01320c | expense | Living costs | 1122 |
+| advisor-19 | 6a1f0f18901fc6abfb01320c | expense | Housing | 1768 |

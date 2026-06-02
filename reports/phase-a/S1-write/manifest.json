@@ -20,9 +20,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0ed7901fc6abfb012a98",
-              "planName": "Early career wealth plan"
+              "planName": "Early career wealth plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420307927-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1995-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Matteo",
+                "lastName": "Russo",
+                "birthYear": 1995,
+                "occupation": "Software developer",
+                "planLabel": "Early career wealth plan",
+                "monthlySalary": 3800,
+                "monthlyHousehold": 1900,
+                "notes": "Renting in Milan; monthly ETF savings €600; no dependants."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 3800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1444
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 627
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 988
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 7544,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Matteo",
+                      "type": 2,
+                      "startingPotValue": 42294,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Matteo",
+                      "type": 4,
+                      "startingPotValue": 9594,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Matteo Russo [vol-fp1_g0_1780420307927-p0]",
+                      "amount": 456,
+                      "startAge": 27,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2060,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420307927-p0]",
+                      "amount": 9500,
+                      "startAge": 30,
+                      "startYear": 2025,
+                      "endAge": 65,
+                      "endYear": 2060,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420307927-p0]",
+                      "amount": 1710,
+                      "startAge": 67,
+                      "startYear": 2062,
+                      "endAge": 90,
+                      "endYear": 2085,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420307927-p0]",
+                      "amount": 11400,
+                      "startAge": 62,
+                      "startYear": 2057,
+                      "endAge": 62,
+                      "endYear": 2057,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 85294
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147294
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420307927",
+          "displayName": "Matteo Russo",
+          "clientKeywords": "Early career, Software developer, Italy, EUR",
+          "birthDateIso": "1995-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Matteo",
+            "lastName": "Russo",
+            "birthYear": 1995,
+            "occupation": "Software developer"
+          }
         }
       ],
       "counts": {
@@ -44,9 +181,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0edc901fc6abfb012b61",
-              "planName": "Long-term retirement plan"
+              "planName": "Long-term retirement plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420313689-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1985-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Marco",
+                "lastName": "Rossi",
+                "birthYear": 1985,
+                "occupation": "Engineering manager",
+                "planLabel": "Long-term retirement plan",
+                "monthlySalary": 5200,
+                "monthlyHousehold": 2900,
+                "notes": "Dual income household; target retirement at 67 with €1.2M pension pot."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 5200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1976
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 957
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1508
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 10882,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Marco",
+                      "type": 2,
+                      "startingPotValue": 44632,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Marco",
+                      "type": 4,
+                      "startingPotValue": 11932,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Marco Rossi [vol-fp1_g0_1780420313689-p0]",
+                      "amount": 624,
+                      "startAge": 37,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2050,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420313689-p0]",
+                      "amount": 13000,
+                      "startAge": 37,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2050,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420313689-p0]",
+                      "amount": 2340,
+                      "startAge": 67,
+                      "startYear": 2052,
+                      "endAge": 90,
+                      "endYear": 2075,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420313689-p0]",
+                      "amount": 17400,
+                      "startAge": 62,
+                      "startYear": 2047,
+                      "endAge": 62,
+                      "endYear": 2047,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88632
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146632
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420313689",
+          "displayName": "Marco Rossi",
+          "clientKeywords": "Long-term retirement, Engineering manager, Italy, EUR",
+          "birthDateIso": "1985-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Marco",
+            "lastName": "Rossi",
+            "birthYear": 1985,
+            "occupation": "Engineering manager"
+          }
         }
       ],
       "counts": {
@@ -68,9 +342,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f17901fc6abfb01313a",
-              "planName": "Business owner succession plan"
+              "planName": "Business owner succession plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367265-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1983-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Francesca",
+                "lastName": "Gallo",
+                "birthYear": 1983,
+                "occupation": "Pharmacist (own practice)",
+                "planLabel": "Business owner succession plan",
+                "monthlySalary": 5600,
+                "monthlyHousehold": 3200,
+                "notes": "Practice valuation and partner buy-out scenario under review."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 5600
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 2128
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 1056
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1664
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 11273,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Francesca",
+                      "type": 2,
+                      "startingPotValue": 43773,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Francesca",
+                      "type": 4,
+                      "startingPotValue": 11073,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Francesca Gallo [vol-fp1_g0_1780420367265-p0]",
+                      "amount": 672,
+                      "startAge": 39,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2048,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367265-p0]",
+                      "amount": 14000,
+                      "startAge": 39,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2048,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367265-p0]",
+                      "amount": 2520,
+                      "startAge": 67,
+                      "startYear": 2050,
+                      "endAge": 90,
+                      "endYear": 2073,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367265-p0]",
+                      "amount": 19200,
+                      "startAge": 62,
+                      "startYear": 2045,
+                      "endAge": 62,
+                      "endYear": 2045,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 85773
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147773
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367265",
+          "displayName": "Francesca Gallo",
+          "clientKeywords": "Business owner, (own practice), Italy, EUR",
+          "birthDateIso": "1983-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Francesca",
+            "lastName": "Gallo",
+            "birthYear": 1983,
+            "occupation": "Pharmacist (own practice)"
+          }
         }
       ],
       "counts": {
@@ -92,9 +503,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f14901fc6abfb012fae",
-              "planName": "Wealth accumulation plan"
+              "planName": "Wealth accumulation plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366705-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1990-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Giulia",
+                "lastName": "Bianchi",
+                "birthYear": 1990,
+                "occupation": "Management consultant",
+                "planLabel": "Wealth accumulation plan",
+                "monthlySalary": 4800,
+                "monthlyHousehold": 2600,
+                "notes": "Planning first home purchase within 3 years; moderate risk tolerance."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1824
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 858
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1352
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9945,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Giulia",
+                      "type": 2,
+                      "startingPotValue": 44945,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Giulia",
+                      "type": 4,
+                      "startingPotValue": 12245,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Giulia Bianchi [vol-fp1_g0_1780420366705-p0]",
+                      "amount": 576,
+                      "startAge": 32,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2055,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366705-p0]",
+                      "amount": 12000,
+                      "startAge": 32,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2055,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366705-p0]",
+                      "amount": 2160,
+                      "startAge": 67,
+                      "startYear": 2057,
+                      "endAge": 90,
+                      "endYear": 2080,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366705-p0]",
+                      "amount": 15600,
+                      "startAge": 62,
+                      "startYear": 2052,
+                      "endAge": 62,
+                      "endYear": 2052,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 85945
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 145945
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366705",
+          "displayName": "Giulia Bianchi",
+          "clientKeywords": "Wealth accumulation, Management consultant, Italy, EUR",
+          "birthDateIso": "1990-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Giulia",
+            "lastName": "Bianchi",
+            "birthYear": 1990,
+            "occupation": "Management consultant"
+          }
         }
       ],
       "counts": {
@@ -116,9 +664,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb013024",
-              "planName": "Pre-retirement transition plan"
+              "planName": "Pre-retirement transition plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366872-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1978-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Luca",
+                "lastName": "Ferrero",
+                "birthYear": 1978,
+                "occupation": "Finance director",
+                "planLabel": "Pre-retirement transition plan",
+                "monthlySalary": 6800,
+                "monthlyHousehold": 3400,
+                "notes": "Children in university; mortgage ends 2032; ISA and pension top-ups."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 6800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 2584
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 1122
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1768
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 13270,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Luca",
+                      "type": 2,
+                      "startingPotValue": 43770,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Luca",
+                      "type": 4,
+                      "startingPotValue": 11070,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Luca Ferrero [vol-fp1_g0_1780420366872-p0]",
+                      "amount": 816,
+                      "startAge": 44,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2043,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366872-p0]",
+                      "amount": 17000,
+                      "startAge": 44,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2043,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366872-p0]",
+                      "amount": 3060,
+                      "startAge": 67,
+                      "startYear": 2045,
+                      "endAge": 90,
+                      "endYear": 2068,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366872-p0]",
+                      "amount": 20400,
+                      "startAge": 62,
+                      "startYear": 2040,
+                      "endAge": 62,
+                      "endYear": 2040,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 89770
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147770
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366872",
+          "displayName": "Luca Ferrero",
+          "clientKeywords": "Pre-retirement transition, Finance director, Italy, EUR",
+          "birthDateIso": "1978-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Luca",
+            "lastName": "Ferrero",
+            "birthYear": 1978,
+            "occupation": "Finance director"
+          }
         }
       ],
       "counts": {
@@ -140,9 +825,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f18901fc6abfb013206",
-              "planName": "Long-term retirement plan"
+              "planName": "Long-term retirement plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367534-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1985-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Marco",
+                "lastName": "Rossi",
+                "birthYear": 1985,
+                "occupation": "Engineering manager",
+                "planLabel": "Long-term retirement plan",
+                "monthlySalary": 5200,
+                "monthlyHousehold": 2900,
+                "notes": "Dual income household; target retirement at 67 with €1.2M pension pot."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 5200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1976
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 957
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1508
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 10234,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Marco",
+                      "type": 2,
+                      "startingPotValue": 44984,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Marco",
+                      "type": 4,
+                      "startingPotValue": 12284,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Marco Rossi [vol-fp1_g0_1780420367534-p0]",
+                      "amount": 624,
+                      "startAge": 37,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2050,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367534-p0]",
+                      "amount": 13000,
+                      "startAge": 37,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2050,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367534-p0]",
+                      "amount": 2340,
+                      "startAge": 67,
+                      "startYear": 2052,
+                      "endAge": 90,
+                      "endYear": 2075,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367534-p0]",
+                      "amount": 17400,
+                      "startAge": 62,
+                      "startYear": 2047,
+                      "endAge": 62,
+                      "endYear": 2047,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 87984
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147984
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367534",
+          "displayName": "Marco Rossi",
+          "clientKeywords": "Long-term retirement, Engineering manager, Italy, EUR",
+          "birthDateIso": "1985-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Marco",
+            "lastName": "Rossi",
+            "birthYear": 1985,
+            "occupation": "Engineering manager"
+          }
         }
       ],
       "counts": {
@@ -164,9 +986,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f18901fc6abfb013213",
-              "planName": "Business owner succession plan"
+              "planName": "Business owner succession plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367526-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1983-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Francesca",
+                "lastName": "Gallo",
+                "birthYear": 1983,
+                "occupation": "Pharmacist (own practice)",
+                "planLabel": "Business owner succession plan",
+                "monthlySalary": 5600,
+                "monthlyHousehold": 3200,
+                "notes": "Practice valuation and partner buy-out scenario under review."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 5600
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 2128
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 1056
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1664
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 11013,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Francesca",
+                      "type": 2,
+                      "startingPotValue": 45013,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Francesca",
+                      "type": 4,
+                      "startingPotValue": 12313,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Francesca Gallo [vol-fp1_g0_1780420367526-p0]",
+                      "amount": 672,
+                      "startAge": 39,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2048,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367526-p0]",
+                      "amount": 14000,
+                      "startAge": 39,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2048,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367526-p0]",
+                      "amount": 2520,
+                      "startAge": 67,
+                      "startYear": 2050,
+                      "endAge": 90,
+                      "endYear": 2073,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367526-p0]",
+                      "amount": 19200,
+                      "startAge": 62,
+                      "startYear": 2045,
+                      "endAge": 62,
+                      "endYear": 2045,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88013
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 145013
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367526",
+          "displayName": "Francesca Gallo",
+          "clientKeywords": "Business owner, (own practice), Italy, EUR",
+          "birthDateIso": "1983-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Francesca",
+            "lastName": "Gallo",
+            "birthYear": 1983,
+            "occupation": "Pharmacist (own practice)"
+          }
         }
       ],
       "counts": {
@@ -188,9 +1147,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f12901fc6abfb012f55",
-              "planName": "Pre-retirement transition plan"
+              "planName": "Pre-retirement transition plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366542-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1978-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Luca",
+                "lastName": "Ferrero",
+                "birthYear": 1978,
+                "occupation": "Finance director",
+                "planLabel": "Pre-retirement transition plan",
+                "monthlySalary": 6800,
+                "monthlyHousehold": 3400,
+                "notes": "Children in university; mortgage ends 2032; ISA and pension top-ups."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 6800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 2584
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 1122
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1768
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 11246,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Luca",
+                      "type": 2,
+                      "startingPotValue": 42746,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Luca",
+                      "type": 4,
+                      "startingPotValue": 10046,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Luca Ferrero [vol-fp1_g0_1780420366542-p0]",
+                      "amount": 816,
+                      "startAge": 44,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2043,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366542-p0]",
+                      "amount": 17000,
+                      "startAge": 44,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2043,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366542-p0]",
+                      "amount": 3060,
+                      "startAge": 67,
+                      "startYear": 2045,
+                      "endAge": 90,
+                      "endYear": 2068,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366542-p0]",
+                      "amount": 20400,
+                      "startAge": 62,
+                      "startYear": 2040,
+                      "endAge": 62,
+                      "endYear": 2040,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 87746
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147746
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366542",
+          "displayName": "Luca Ferrero",
+          "clientKeywords": "Pre-retirement transition, Finance director, Italy, EUR",
+          "birthDateIso": "1978-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Luca",
+            "lastName": "Ferrero",
+            "birthYear": 1978,
+            "occupation": "Finance director"
+          }
         }
       ],
       "counts": {
@@ -212,9 +1308,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb013020",
-              "planName": "Flexible career plan"
+              "planName": "Flexible career plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367057-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1988-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Alessandro",
+                "lastName": "Conti",
+                "birthYear": 1988,
+                "occupation": "Product designer",
+                "planLabel": "Flexible career plan",
+                "monthlySalary": 4200,
+                "monthlyHousehold": 2450,
+                "notes": "Freelance side income ~€800/mo; saving for sabbatical at age 45."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1596
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 809
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1274
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 8849,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Alessandro",
+                      "type": 2,
+                      "startingPotValue": 45724,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Alessandro",
+                      "type": 4,
+                      "startingPotValue": 13024,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Alessandro Conti [vol-fp1_g0_1780420367057-p0]",
+                      "amount": 504,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367057-p0]",
+                      "amount": 10500,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367057-p0]",
+                      "amount": 1890,
+                      "startAge": 67,
+                      "startYear": 2055,
+                      "endAge": 90,
+                      "endYear": 2078,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367057-p0]",
+                      "amount": 14700,
+                      "startAge": 62,
+                      "startYear": 2050,
+                      "endAge": 62,
+                      "endYear": 2050,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 87724
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146724
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367057",
+          "displayName": "Alessandro Conti",
+          "clientKeywords": "Flexible career, Product designer, Italy, EUR",
+          "birthDateIso": "1988-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Alessandro",
+            "lastName": "Conti",
+            "birthYear": 1988,
+            "occupation": "Product designer"
+          }
         }
       ],
       "counts": {
@@ -236,9 +1469,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb01301c",
-              "planName": "Flexible career plan"
+              "planName": "Flexible career plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367486-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1988-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Alessandro",
+                "lastName": "Conti",
+                "birthYear": 1988,
+                "occupation": "Product designer",
+                "planLabel": "Flexible career plan",
+                "monthlySalary": 4200,
+                "monthlyHousehold": 2450,
+                "notes": "Freelance side income ~€800/mo; saving for sabbatical at age 45."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1596
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 809
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1274
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9913,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Alessandro",
+                      "type": 2,
+                      "startingPotValue": 45788,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Alessandro",
+                      "type": 4,
+                      "startingPotValue": 13088,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Alessandro Conti [vol-fp1_g0_1780420367486-p0]",
+                      "amount": 504,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367486-p0]",
+                      "amount": 10500,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367486-p0]",
+                      "amount": 1890,
+                      "startAge": 67,
+                      "startYear": 2055,
+                      "endAge": 90,
+                      "endYear": 2078,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367486-p0]",
+                      "amount": 14700,
+                      "startAge": 62,
+                      "startYear": 2050,
+                      "endAge": 62,
+                      "endYear": 2050,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88788
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 145788
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367486",
+          "displayName": "Alessandro Conti",
+          "clientKeywords": "Flexible career, Product designer, Italy, EUR",
+          "birthDateIso": "1988-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Alessandro",
+            "lastName": "Conti",
+            "birthYear": 1988,
+            "occupation": "Product designer"
+          }
         }
       ],
       "counts": {
@@ -260,9 +1630,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb013037",
-              "planName": "Flexible career plan"
+              "planName": "Flexible career plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367244-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1988-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Alessandro",
+                "lastName": "Conti",
+                "birthYear": 1988,
+                "occupation": "Product designer",
+                "planLabel": "Flexible career plan",
+                "monthlySalary": 4200,
+                "monthlyHousehold": 2450,
+                "notes": "Freelance side income ~€800/mo; saving for sabbatical at age 45."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1596
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 809
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1274
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9461,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Alessandro",
+                      "type": 2,
+                      "startingPotValue": 43836,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Alessandro",
+                      "type": 4,
+                      "startingPotValue": 11136,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Alessandro Conti [vol-fp1_g0_1780420367244-p0]",
+                      "amount": 504,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367244-p0]",
+                      "amount": 10500,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367244-p0]",
+                      "amount": 1890,
+                      "startAge": 67,
+                      "startYear": 2055,
+                      "endAge": 90,
+                      "endYear": 2078,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367244-p0]",
+                      "amount": 14700,
+                      "startAge": 62,
+                      "startYear": 2050,
+                      "endAge": 62,
+                      "endYear": 2050,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 85836
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147836
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367244",
+          "displayName": "Alessandro Conti",
+          "clientKeywords": "Flexible career, Product designer, Italy, EUR",
+          "birthDateIso": "1988-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Alessandro",
+            "lastName": "Conti",
+            "birthYear": 1988,
+            "occupation": "Product designer"
+          }
         }
       ],
       "counts": {
@@ -284,9 +1791,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f14901fc6abfb012fac",
-              "planName": "Long-term retirement plan"
+              "planName": "Long-term retirement plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366951-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1985-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Marco",
+                "lastName": "Rossi",
+                "birthYear": 1985,
+                "occupation": "Engineering manager",
+                "planLabel": "Long-term retirement plan",
+                "monthlySalary": 5200,
+                "monthlyHousehold": 2900,
+                "notes": "Dual income household; target retirement at 67 with €1.2M pension pot."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 5200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1976
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 957
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1508
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 11122,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Marco",
+                      "type": 2,
+                      "startingPotValue": 42872,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Marco",
+                      "type": 4,
+                      "startingPotValue": 10172,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Marco Rossi [vol-fp1_g0_1780420366951-p0]",
+                      "amount": 624,
+                      "startAge": 37,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2050,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366951-p0]",
+                      "amount": 13000,
+                      "startAge": 37,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2050,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366951-p0]",
+                      "amount": 2340,
+                      "startAge": 67,
+                      "startYear": 2052,
+                      "endAge": 90,
+                      "endYear": 2075,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366951-p0]",
+                      "amount": 17400,
+                      "startAge": 62,
+                      "startYear": 2047,
+                      "endAge": 62,
+                      "endYear": 2047,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88872
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146872
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366951",
+          "displayName": "Marco Rossi",
+          "clientKeywords": "Long-term retirement, Engineering manager, Italy, EUR",
+          "birthDateIso": "1985-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Marco",
+            "lastName": "Rossi",
+            "birthYear": 1985,
+            "occupation": "Engineering manager"
+          }
         }
       ],
       "counts": {
@@ -308,9 +1952,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb01302b",
-              "planName": "Flexible career plan"
+              "planName": "Flexible career plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367541-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1988-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Alessandro",
+                "lastName": "Conti",
+                "birthYear": 1988,
+                "occupation": "Product designer",
+                "planLabel": "Flexible career plan",
+                "monthlySalary": 4200,
+                "monthlyHousehold": 2450,
+                "notes": "Freelance side income ~€800/mo; saving for sabbatical at age 45."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1596
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 809
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1274
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9081,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Alessandro",
+                      "type": 2,
+                      "startingPotValue": 44956,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Alessandro",
+                      "type": 4,
+                      "startingPotValue": 12256,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Alessandro Conti [vol-fp1_g0_1780420367541-p0]",
+                      "amount": 504,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367541-p0]",
+                      "amount": 10500,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367541-p0]",
+                      "amount": 1890,
+                      "startAge": 67,
+                      "startYear": 2055,
+                      "endAge": 90,
+                      "endYear": 2078,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367541-p0]",
+                      "amount": 14700,
+                      "startAge": 62,
+                      "startYear": 2050,
+                      "endAge": 62,
+                      "endYear": 2050,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 87956
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 147956
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367541",
+          "displayName": "Alessandro Conti",
+          "clientKeywords": "Flexible career, Product designer, Italy, EUR",
+          "birthDateIso": "1988-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Alessandro",
+            "lastName": "Conti",
+            "birthYear": 1988,
+            "occupation": "Product designer"
+          }
         }
       ],
       "counts": {
@@ -332,9 +2113,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb01301e",
-              "planName": "Wealth accumulation plan"
+              "planName": "Wealth accumulation plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366639-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1990-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Giulia",
+                "lastName": "Bianchi",
+                "birthYear": 1990,
+                "occupation": "Management consultant",
+                "planLabel": "Wealth accumulation plan",
+                "monthlySalary": 4800,
+                "monthlyHousehold": 2600,
+                "notes": "Planning first home purchase within 3 years; moderate risk tolerance."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1824
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 858
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1352
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 10809,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Giulia",
+                      "type": 2,
+                      "startingPotValue": 45809,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Giulia",
+                      "type": 4,
+                      "startingPotValue": 13109,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Giulia Bianchi [vol-fp1_g0_1780420366639-p0]",
+                      "amount": 576,
+                      "startAge": 32,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2055,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366639-p0]",
+                      "amount": 12000,
+                      "startAge": 32,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2055,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366639-p0]",
+                      "amount": 2160,
+                      "startAge": 67,
+                      "startYear": 2057,
+                      "endAge": 90,
+                      "endYear": 2080,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366639-p0]",
+                      "amount": 15600,
+                      "startAge": 62,
+                      "startYear": 2052,
+                      "endAge": 62,
+                      "endYear": 2052,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 86809
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146809
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366639",
+          "displayName": "Giulia Bianchi",
+          "clientKeywords": "Wealth accumulation, Management consultant, Italy, EUR",
+          "birthDateIso": "1990-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Giulia",
+            "lastName": "Bianchi",
+            "birthYear": 1990,
+            "occupation": "Management consultant"
+          }
         }
       ],
       "counts": {
@@ -356,9 +2274,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f17901fc6abfb013142",
-              "planName": "Flexible career plan"
+              "planName": "Flexible career plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367442-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1988-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Alessandro",
+                "lastName": "Conti",
+                "birthYear": 1988,
+                "occupation": "Product designer",
+                "planLabel": "Flexible career plan",
+                "monthlySalary": 4200,
+                "monthlyHousehold": 2450,
+                "notes": "Freelance side income ~€800/mo; saving for sabbatical at age 45."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1596
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 809
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1274
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 10041,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Alessandro",
+                      "type": 2,
+                      "startingPotValue": 45916,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Alessandro",
+                      "type": 4,
+                      "startingPotValue": 13216,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Alessandro Conti [vol-fp1_g0_1780420367442-p0]",
+                      "amount": 504,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367442-p0]",
+                      "amount": 10500,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367442-p0]",
+                      "amount": 1890,
+                      "startAge": 67,
+                      "startYear": 2055,
+                      "endAge": 90,
+                      "endYear": 2078,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367442-p0]",
+                      "amount": 14700,
+                      "startAge": 62,
+                      "startYear": 2050,
+                      "endAge": 62,
+                      "endYear": 2050,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88916
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 145916
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367442",
+          "displayName": "Alessandro Conti",
+          "clientKeywords": "Flexible career, Product designer, Italy, EUR",
+          "birthDateIso": "1988-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Alessandro",
+            "lastName": "Conti",
+            "birthYear": 1988,
+            "occupation": "Product designer"
+          }
         }
       ],
       "counts": {
@@ -380,9 +2435,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f17901fc6abfb013138",
-              "planName": "Early career wealth plan"
+              "planName": "Early career wealth plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367374-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1995-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Matteo",
+                "lastName": "Russo",
+                "birthYear": 1995,
+                "occupation": "Software developer",
+                "planLabel": "Early career wealth plan",
+                "monthlySalary": 3800,
+                "monthlyHousehold": 1900,
+                "notes": "Renting in Milan; monthly ETF savings €600; no dependants."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 3800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1444
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 627
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 988
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9532,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Matteo",
+                      "type": 2,
+                      "startingPotValue": 42782,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Matteo",
+                      "type": 4,
+                      "startingPotValue": 10082,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Matteo Russo [vol-fp1_g0_1780420367374-p0]",
+                      "amount": 456,
+                      "startAge": 27,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2060,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367374-p0]",
+                      "amount": 9500,
+                      "startAge": 30,
+                      "startYear": 2025,
+                      "endAge": 65,
+                      "endYear": 2060,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367374-p0]",
+                      "amount": 1710,
+                      "startAge": 67,
+                      "startYear": 2062,
+                      "endAge": 90,
+                      "endYear": 2085,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367374-p0]",
+                      "amount": 11400,
+                      "startAge": 62,
+                      "startYear": 2057,
+                      "endAge": 62,
+                      "endYear": 2057,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 89782
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146782
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367374",
+          "displayName": "Matteo Russo",
+          "clientKeywords": "Early career, Software developer, Italy, EUR",
+          "birthDateIso": "1995-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Matteo",
+            "lastName": "Russo",
+            "birthYear": 1995,
+            "occupation": "Software developer"
+          }
         }
       ],
       "counts": {
@@ -404,9 +2596,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb013026",
-              "planName": "Family security plan"
+              "planName": "Family security plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366945-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1992-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Elena",
+                "lastName": "Romano",
+                "birthYear": 1992,
+                "occupation": "Secondary school teacher",
+                "planLabel": "Family security plan",
+                "monthlySalary": 3100,
+                "monthlyHousehold": 2100,
+                "notes": "Stable public-sector income; building emergency fund and pension contributions."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 3100
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1178
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 693
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1092
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9149,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Elena",
+                      "type": 2,
+                      "startingPotValue": 42899,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Elena",
+                      "type": 4,
+                      "startingPotValue": 10199,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Elena Romano [vol-fp1_g0_1780420366945-p0]",
+                      "amount": 372,
+                      "startAge": 30,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2057,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366945-p0]",
+                      "amount": 7750,
+                      "startAge": 30,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2057,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366945-p0]",
+                      "amount": 1395,
+                      "startAge": 67,
+                      "startYear": 2059,
+                      "endAge": 90,
+                      "endYear": 2082,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366945-p0]",
+                      "amount": 12600,
+                      "startAge": 62,
+                      "startYear": 2054,
+                      "endAge": 62,
+                      "endYear": 2054,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88899
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146899
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366945",
+          "displayName": "Elena Romano",
+          "clientKeywords": "Family security, school teacher, Italy, EUR",
+          "birthDateIso": "1992-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Elena",
+            "lastName": "Romano",
+            "birthYear": 1992,
+            "occupation": "Secondary school teacher"
+          }
         }
       ],
       "counts": {
@@ -428,9 +2757,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f15901fc6abfb013039",
-              "planName": "Flexible career plan"
+              "planName": "Flexible career plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366944-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1988-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Alessandro",
+                "lastName": "Conti",
+                "birthYear": 1988,
+                "occupation": "Product designer",
+                "planLabel": "Flexible career plan",
+                "monthlySalary": 4200,
+                "monthlyHousehold": 2450,
+                "notes": "Freelance side income ~€800/mo; saving for sabbatical at age 45."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 4200
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1596
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 809
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1274
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 10025,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Alessandro",
+                      "type": 2,
+                      "startingPotValue": 42900,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Alessandro",
+                      "type": 4,
+                      "startingPotValue": 10200,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Alessandro Conti [vol-fp1_g0_1780420366944-p0]",
+                      "amount": 504,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366944-p0]",
+                      "amount": 10500,
+                      "startAge": 34,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2053,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366944-p0]",
+                      "amount": 1890,
+                      "startAge": 67,
+                      "startYear": 2055,
+                      "endAge": 90,
+                      "endYear": 2078,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366944-p0]",
+                      "amount": 14700,
+                      "startAge": 62,
+                      "startYear": 2050,
+                      "endAge": 62,
+                      "endYear": 2050,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88900
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146900
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366944",
+          "displayName": "Alessandro Conti",
+          "clientKeywords": "Flexible career, Product designer, Italy, EUR",
+          "birthDateIso": "1988-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Alessandro",
+            "lastName": "Conti",
+            "birthYear": 1988,
+            "occupation": "Product designer"
+          }
         }
       ],
       "counts": {
@@ -452,9 +2918,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f13901fc6abfb012f67",
-              "planName": "Family security plan"
+              "planName": "Family security plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420366640-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1992-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Elena",
+                "lastName": "Romano",
+                "birthYear": 1992,
+                "occupation": "Secondary school teacher",
+                "planLabel": "Family security plan",
+                "monthlySalary": 3100,
+                "monthlyHousehold": 2100,
+                "notes": "Stable public-sector income; building emergency fund and pension contributions."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 3100
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 1178
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 693
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1092
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 9537,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Elena",
+                      "type": 2,
+                      "startingPotValue": 45787,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Elena",
+                      "type": 4,
+                      "startingPotValue": 13087,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Elena Romano [vol-fp1_g0_1780420366640-p0]",
+                      "amount": 372,
+                      "startAge": 30,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2057,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420366640-p0]",
+                      "amount": 7750,
+                      "startAge": 30,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2057,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420366640-p0]",
+                      "amount": 1395,
+                      "startAge": 67,
+                      "startYear": 2059,
+                      "endAge": 90,
+                      "endYear": 2082,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420366640-p0]",
+                      "amount": 12600,
+                      "startAge": 62,
+                      "startYear": 2054,
+                      "endAge": 62,
+                      "endYear": 2054,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 86787
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 146787
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420366640",
+          "displayName": "Elena Romano",
+          "clientKeywords": "Family security, school teacher, Italy, EUR",
+          "birthDateIso": "1992-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Elena",
+            "lastName": "Romano",
+            "birthYear": 1992,
+            "occupation": "Secondary school teacher"
+          }
         }
       ],
       "counts": {
@@ -476,9 +3079,146 @@
           "cashflows": [
             {
               "cashflowId": "6a1f0f18901fc6abfb01320c",
-              "planName": "Pre-retirement transition plan"
+              "planName": "Pre-retirement transition plan",
+              "planIndex": 0,
+              "seedMarker": "vol-fp1_g0_1780420367518-p0",
+              "planDurationYears": 72,
+              "birthDateIso": "1978-06-15T00:00:00.000Z",
+              "persona": {
+                "firstName": "Luca",
+                "lastName": "Ferrero",
+                "birthYear": 1978,
+                "occupation": "Finance director",
+                "planLabel": "Pre-retirement transition plan",
+                "monthlySalary": 6800,
+                "monthlyHousehold": 3400,
+                "notes": "Children in university; mortgage ends 2032; ISA and pension top-ups."
+              },
+              "seed": {
+                "modulesOrder": [
+                  "timeline",
+                  "moneyInOut",
+                  "savings",
+                  "finances",
+                  "funds",
+                  "wealth"
+                ],
+                "reportsModule": "skipped",
+                "timelineGoalChipCount": 5,
+                "moneyInOut": {
+                  "incomeRowCount": 3,
+                  "expenseRowCount": 2,
+                  "incomes": [
+                    {
+                      "description": "Salary",
+                      "amount": 6800
+                    },
+                    {
+                      "description": "State pension",
+                      "amount": 2584
+                    },
+                    {
+                      "description": "Inheritance",
+                      "amount": 65000
+                    }
+                  ],
+                  "expenses": [
+                    {
+                      "description": "Living costs",
+                      "amount": 1122
+                    },
+                    {
+                      "description": "Housing",
+                      "amount": 1768
+                    }
+                  ]
+                },
+                "savings": {
+                  "defaultCashPotLabel": "Cash",
+                  "cashBalanceAmount": 11542,
+                  "newPotCount": 2,
+                  "pots": [
+                    {
+                      "name": "Investment portfolio — Luca",
+                      "type": 2,
+                      "startingPotValue": 45042,
+                      "currencySymbol": "€"
+                    },
+                    {
+                      "name": "Other savings — Luca",
+                      "type": 4,
+                      "startingPotValue": 12342,
+                      "currencySymbol": "€"
+                    }
+                  ]
+                },
+                "flows": {
+                  "contributions": [
+                    {
+                      "description": "Monthly pension contribution — Luca Ferrero [vol-fp1_g0_1780420367518-p0]",
+                      "amount": 816,
+                      "startAge": 44,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2043,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "Annual ISA top-up (lump sum) [vol-fp1_g0_1780420367518-p0]",
+                      "amount": 17000,
+                      "startAge": 44,
+                      "startYear": 2022,
+                      "endAge": 65,
+                      "endYear": 2043,
+                      "contributionType": 2
+                    }
+                  ],
+                  "withdrawals": [
+                    {
+                      "description": "Retirement income drawdown from age 67 [vol-fp1_g0_1780420367518-p0]",
+                      "amount": 3060,
+                      "startAge": 67,
+                      "startYear": 2045,
+                      "endAge": 90,
+                      "endYear": 2068,
+                      "contributionType": 1
+                    },
+                    {
+                      "description": "One-off capital withdrawal (home improvement) [vol-fp1_g0_1780420367518-p0]",
+                      "amount": 20400,
+                      "startAge": 62,
+                      "startYear": 2040,
+                      "endAge": 62,
+                      "endYear": 2040,
+                      "contributionType": 3
+                    }
+                  ]
+                },
+                "wealth": {
+                  "asset": {
+                    "name": "Global equity ETF portfolio",
+                    "category": 2,
+                    "value": 88042
+                  },
+                  "liability": {
+                    "name": "Primary residence mortgage",
+                    "type": "Mortgage",
+                    "outstanding": 145042
+                  }
+                }
+              }
             }
-          ]
+          ],
+          "clientTag": "fp1_g0_1780420367518",
+          "displayName": "Luca Ferrero",
+          "clientKeywords": "Pre-retirement transition, Finance director, Italy, EUR",
+          "birthDateIso": "1978-06-15T00:00:00.000Z",
+          "persona": {
+            "firstName": "Luca",
+            "lastName": "Ferrero",
+            "birthYear": 1978,
+            "occupation": "Finance director"
+          }
         }
       ],
       "counts": {
@@ -523,5 +3263,27 @@
     "duplicateAdvisorOk": true,
     "duplicateAdvisorSubs": [],
     "passed": true
+  },
+  "seedSpecVersion": 1,
+  "seedSpecEnrichedAt": "2026-06-02T19:10:07.633Z",
+  "runBinding": {
+    "runTag": "S1-write",
+    "volumeScenario": "S1",
+    "userMode": "fixed",
+    "advisors": 20,
+    "clientsPerAdvisor": 1,
+    "plansPerClient": 1,
+    "runElapsedSec": 122.7,
+    "manifestCollected": 400,
+    "sloCollected": 400
+  },
+  "seedExpectations": {
+    "clientsPerAdvisor": 1,
+    "plansPerClient": 1,
+    "timelineGoalChipCount": 5,
+    "moneyInOutIncomeRows": 3,
+    "moneyInOutExpenseRows": 2,
+    "savingPotsPerPlan": 2,
+    "reportsSeeded": false
   }
 }
