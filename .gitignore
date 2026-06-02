@@ -19,6 +19,14 @@ tools/pool-cli/node_modules/
 
 # Per-module k6 handleSummary / adaptive reports (regenerated each run)
 k6/**/reports/
+reports/*-adaptive-latency-*
+
+# Phase A volume runs (regenerated; keep merged fleet outputs only in git if committed)
+reports/phase-a/*/workers/
+reports/phase-a/*/logs/
+reports/journeys/*.json
+reports/journeys/*.md
+!reports/journeys/.gitkeep
 
 # Consolidated perf (generated; keep docs/samples/)
 reports/consolidated/runs/

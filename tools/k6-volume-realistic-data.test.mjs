@@ -7,7 +7,9 @@ import test from 'node:test';
 import {
   VOLUME_CLIENT_PERSONAS,
   applyRealisticClientProfile,
+  buildRealisticClientKeywords,
   buildRealisticContributionLineItemParams,
+  buildRealisticCashflowBody,
   buildRealisticExpenseLineItemParams,
   buildRealisticIncomeLine,
   buildRealisticIncomeLineItemParams,
@@ -15,10 +17,18 @@ import {
   buildRealisticWithdrawalLineItemParams,
   countFinancialLines,
   countFundTransactions,
+  isTimelineSeedExcludedEvent,
   pickTimelineEventsFromDefaults,
   planTitleForPersona,
+  planEndYearFromDuration,
+  resolveRealisticPlanDuration,
+  resolveTimelineGoalAges,
   selectPersonaForClient,
   volumeSeedMarker,
+  countTimelineClientEvents,
+  TIMELINE_GOAL_MAX_AGE,
+  TIMELINE_GOAL_MIN_AGE,
+  VOLUME_TIMELINE_CHIP_COUNT,
 } from '../lib/k6-volume-realistic-data.js';
 
 test('personas are distinct and amounts are realistic', () => {
@@ -32,20 +42,68 @@ test('personas are distinct and amounts are realistic', () => {
   }
 });
 
+test('resolveRealisticPlanDuration extends plan past today and retirement', () => {
+  const ref = 2026;
+  // Francesca Gallo (1983) — fixed 40y put plan end in 2023 while client is 43 in 2026.
+  assert.equal(resolveRealisticPlanDuration(1983, ref), 72);
+  assert.ok(planEndYearFromDuration(1983, 72) > ref);
+  // Young client still reaches retirement horizon.
+  assert.equal(resolveRealisticPlanDuration(1995, ref), 72);
+  assert.ok(planEndYearFromDuration(1995, 72) >= 1995 + 67);
+});
+
+test('buildRealisticCashflowBody uses dynamic planDuration from persona birth year', () => {
+  const persona = VOLUME_CLIENT_PERSONAS.find((p) => p.birthYear === 1983);
+  assert.ok(persona);
+  const body = buildRealisticCashflowBody({
+    clientId: 'c1',
+    clientName: `${persona.firstName} ${persona.lastName}`,
+    advisorSub: 'adv',
+    advisorName: 'Advisor',
+    planName: persona.planLabel,
+    clientBirthDateIso: `${persona.birthYear}-06-15T00:00:00.000Z`,
+    persona,
+  });
+  assert.equal(body.planDuration, resolveRealisticPlanDuration(persona.birthYear, 2026));
+  assert.ok(body.planDuration > 40);
+});
+
 test('selectPersonaForClient is stable for a tag', () => {
   const a = selectPersonaForClient('fp1_g0_123', 0, 0);
   const b = selectPersonaForClient('fp1_g0_123', 0, 0);
   assert.equal(a.firstName, b.firstName);
 });
 
-test('applyRealisticClientProfile keeps cleanup needle in last name', () => {
+test('applyRealisticClientProfile uses clean name and short keyword notes', () => {
   const persona = VOLUME_CLIENT_PERSONAS[0];
   const model = applyRealisticClientProfile(
     { ClientDetails: { FirstName: 'X', LastName: 'Y' } },
     { persona, uniqueTag: 'fp1_g0_999' },
   );
   assert.equal(model.ClientDetails.FirstName, persona.firstName);
-  assert.match(model.ClientDetails.LastName, /fp1_g0_999/);
+  assert.equal(model.ClientDetails.LastName, persona.lastName);
+  assert.doesNotMatch(model.ClientDetails.LastName, /fp1_g0/);
+  assert.doesNotMatch(model.Notes, /volume-seed/);
+  assert.doesNotMatch(model.Notes, /k6 lifecycle/);
+  assert.equal(model.Notes, buildRealisticClientKeywords(persona));
+});
+
+test('applyRealisticClientProfile patches camelCase GET model (API PUT shape)', () => {
+  const persona = VOLUME_CLIENT_PERSONAS[3];
+  const model = applyRealisticClientProfile(
+    {
+      clientDetails: {
+        firstName: 'Elena',
+        lastName: 'Romano-fp1_g0_1780410485984',
+        birthDate: '1985-06-15T00:00:00Z',
+      },
+      notes: 'k6 lifecycle fp1_g0_1780410485984 no-partner=1',
+    },
+    { persona, uniqueTag: 'fp1_g0_1780410485984' },
+  );
+  assert.equal(model.clientDetails.lastName, 'Romano');
+  assert.doesNotMatch(model.clientDetails.lastName, /fp1_g0/);
+  assert.equal(model.notes, buildRealisticClientKeywords(persona));
 });
 
 test('income and expense line params use occupation, marker, and multi-line sets', () => {
@@ -121,16 +179,73 @@ test('countFundTransactions reads contributions and withdrawals', () => {
   assert.equal(counts.withdrawalCount, 2);
 });
 
-test('pickTimelineEventsFromDefaults chooses up to two goals', () => {
+test('resolveTimelineGoalAges uses young-life band 11-34 when client is under 35 and viewport allows', () => {
+  const birthYear = 2010;
+  const planDuration = 72;
+  const ages = resolveTimelineGoalAges(birthYear, planDuration, VOLUME_TIMELINE_CHIP_COUNT, 2026);
+  assert.equal(ages.length, VOLUME_TIMELINE_CHIP_COUNT);
+  for (const age of ages) {
+    assert.ok(age >= 38, `age ${age} must be on-screen (>= 38)`);
+    assert.ok(age < planDuration - 1, `age ${age} must be within plan duration`);
+  }
+  assert.equal(new Set(ages).size, ages.length);
+});
+
+test('resolveTimelineGoalAges respects UI viewport floor (38+) for older clients', () => {
+  const birthYear = 1983;
+  const planDuration = 72;
+  const refYear = 2026;
+  const currentAge = refYear - birthYear;
+  const ages = resolveTimelineGoalAges(birthYear, planDuration, VOLUME_TIMELINE_CHIP_COUNT, refYear);
+  assert.equal(ages.length, VOLUME_TIMELINE_CHIP_COUNT);
+  for (const age of ages) {
+    assert.ok(age >= 38, `age ${age} must be on-screen (>= 38)`);
+    assert.ok(age > currentAge, `age ${age} must be ahead of current age ${currentAge}`);
+    assert.ok(age < planDuration - 1, `age ${age} must be within plan duration`);
+  }
+  assert.equal(new Set(ages).size, ages.length);
+});
+
+test('pickTimelineEventsFromDefaults seeds five goals at unique visible ages', () => {
   const defaults = [
-    { name: 'Retirement', behaviorKey: 'retirement', type: 2, isDefault: true },
-    { name: 'Buy a home', behaviorKey: 'home_purchase', type: 2, isDefault: true },
-    { name: 'Other', behaviorKey: 'other', type: 2, isDefault: true },
+    { name: 'Retirement age', behaviorKey: 'retirement_age', type: 1, isDefault: true },
+    { name: 'Birth', behaviorKey: 'birth', type: 2, isDefault: true },
+    { name: 'Education', behaviorKey: 'education', type: 2, isDefault: true },
+    { name: 'Home', behaviorKey: 'home', type: 2, isDefault: true },
+    { name: 'Wedding', behaviorKey: 'wedding', type: 2, isDefault: true },
+    { name: 'Car', behaviorKey: 'car', type: 2, isDefault: true },
+    { name: 'Travel', behaviorKey: 'travel', type: 2, isDefault: true },
   ];
-  const picked = pickTimelineEventsFromDefaults(defaults, 1985);
-  assert.ok(picked.length >= 1 && picked.length <= 2);
-  assert.ok(picked[0].name);
-  assert.ok(picked[0].start.age >= 18);
+  const birthYear = 1983;
+  const planDuration = 72;
+  const referenceYear = 2026;
+  const currentAge = referenceYear - birthYear;
+  const picked = pickTimelineEventsFromDefaults(defaults, birthYear, {
+    maxEvents: VOLUME_TIMELINE_CHIP_COUNT,
+    planDuration,
+    referenceYear,
+  });
+  assert.equal(picked.length, VOLUME_TIMELINE_CHIP_COUNT);
+  const keys = picked.map((p) => p.behaviorKey);
+  assert.ok(!keys.some((k) => String(k).includes('retire')));
+  assert.ok(keys.includes('education'));
+  assert.ok(keys.includes('home'));
+  assert.ok(keys.includes('wedding'));
+  assert.ok(keys.includes('car'));
+  assert.ok(keys.includes('travel'));
+  const ages = picked.map((p) => p.start.age);
+  assert.equal(new Set(ages).size, ages.length);
+  for (const p of picked) {
+    assert.ok(p.start.age >= 38, `goal age ${p.start.age} must be on-screen (>= 38)`);
+    assert.ok(p.start.age > currentAge, `goal age ${p.start.age} must be ahead of today (${currentAge})`);
+    assert.equal(p.start.year, birthYear + p.start.age);
+    assert.equal(p.end.year, birthYear + p.end.age);
+  }
+});
+
+test('countTimelineClientEvents reads clientEvents array', () => {
+  assert.equal(countTimelineClientEvents({ clientEvents: [{ id: '1' }, { id: '2' }] }), 2);
+  assert.equal(countTimelineClientEvents(null), 0);
 });
 
 test('countFinancialLines reads incomes and expenses', () => {

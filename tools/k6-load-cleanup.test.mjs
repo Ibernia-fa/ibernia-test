@@ -4,6 +4,9 @@ import {
   isK6ManagedClientRow,
   clientNotesFromListRow,
   clientLastNameFromListRow,
+  clientRowMatchesUniqueTag,
+  lastNameMatchesUniqueTag,
+  notesMatchUniqueTag,
   resolvePreRunCleanupEnabledFromEnv,
   resolvePreRunCleanupDeleteAllFromEnv,
 } from '../lib/k6-load-cleanup-core.js';
@@ -71,4 +74,21 @@ test('clientNotesFromListRow supports PascalCase', () => {
 
 test('clientLastNameFromListRow supports PascalCase', () => {
   assert.equal(clientLastNameFromListRow({ ClientDetails: { LastName: 'Cli-x' } }), 'Cli-x');
+});
+
+test('lastNameMatchesUniqueTag exact suffix — c1 does not match c10', () => {
+  const base = 'fp1_g0_1780409206686';
+  assert.equal(lastNameMatchesUniqueTag(`Ferrero-${base}c1`, `${base}c1`), true);
+  assert.equal(lastNameMatchesUniqueTag(`Ferrero-${base}c10`, `${base}c1`), false);
+  assert.equal(lastNameMatchesUniqueTag(`Ferrero-${base}c10`, `${base}c10`), true);
+});
+
+test('clientRowMatchesUniqueTag uses notes', () => {
+  assert.equal(
+    clientRowMatchesUniqueTag(
+      { notes: 'k6 lifecycle fp1_g0_99 no-partner=1', clientDetails: { lastName: 'X' } },
+      'fp1_g0_99',
+    ),
+    true,
+  );
 });

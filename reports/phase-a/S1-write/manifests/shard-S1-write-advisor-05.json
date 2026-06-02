@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write",
+  "shardId": "advisor-05",
+  "advisorSub": "43f0ec86-a91c-48cb-907e-3e046da61b3d",
+  "advisorEmail": "User06@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ef788901fc6abfb0066ef",
+      "uniqueTag": "fp1_g0_1780414342703",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ef78a901fc6abfb006774",
+          "planName": "Flexible career plan"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T15:33:02.349Z"
+}

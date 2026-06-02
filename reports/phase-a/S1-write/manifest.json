@@ -1,0 +1,450 @@
+{
+  "reportType": "phase-a-manifest",
+  "generatedAt": "2026-06-02T15:36:23.012Z",
+  "runTag": "S1-write",
+  "scenario": "S1",
+  "phaseBScenario": "phase-b-read-default",
+  "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+  "shardCount": 20,
+  "advisors": [
+    {
+      "shardId": "advisor-00",
+      "advisorSub": "a0cc6646-8253-4fab-b539-387c5d5a5335",
+      "advisorEmail": "User01@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef80b901fc6abfb00805c",
+          "uniqueTag": "fp1_g0_1780414473454",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef80c901fc6abfb008066",
+              "planName": "Early career wealth plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:34:47.827Z"
+    },
+    {
+      "shardId": "advisor-01",
+      "advisorSub": "10066169-5ecd-4b9f-8300-457596f14e66",
+      "advisorEmail": "User02@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef811901fc6abfb00812b",
+          "uniqueTag": "fp1_g0_1780414479239",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef812901fc6abfb008147",
+              "planName": "Business owner succession plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:34:54.752Z"
+    },
+    {
+      "shardId": "advisor-02",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:09.618Z"
+    },
+    {
+      "shardId": "advisor-03",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:09.822Z"
+    },
+    {
+      "shardId": "advisor-04",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:10.249Z"
+    },
+    {
+      "shardId": "advisor-05",
+      "advisorSub": "43f0ec86-a91c-48cb-907e-3e046da61b3d",
+      "advisorEmail": "User06@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef788901fc6abfb0066ef",
+          "uniqueTag": "fp1_g0_1780414342703",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78a901fc6abfb006774",
+              "planName": "Flexible career plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:02.349Z"
+    },
+    {
+      "shardId": "advisor-06",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:09.635Z"
+    },
+    {
+      "shardId": "advisor-07",
+      "advisorSub": "886a217d-9441-4c0d-8167-b8a780e9287b",
+      "advisorEmail": "User08@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef78b901fc6abfb006808",
+          "uniqueTag": "fp1_g0_1780414344014",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78f901fc6abfb006931",
+              "planName": "Family security plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:07.285Z"
+    },
+    {
+      "shardId": "advisor-08",
+      "advisorSub": "9c790737-0701-4517-9a7e-7ccec87a7f2d",
+      "advisorEmail": "User09@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef844901fc6abfb00837b",
+          "uniqueTag": "fp1_g0_1780414530828",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef847901fc6abfb0083f4",
+              "planName": "Mid-life financial review"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:36:09.616Z"
+    },
+    {
+      "shardId": "advisor-09",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:09.854Z"
+    },
+    {
+      "shardId": "advisor-10",
+      "advisorSub": "c05ec07d-4b13-4152-b817-e9b58fd98e1b",
+      "advisorEmail": "User11@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef788901fc6abfb0066fb",
+          "uniqueTag": "fp1_g0_1780414342849",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78b901fc6abfb0067cd",
+              "planName": "Mid-life financial review"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:01.185Z"
+    },
+    {
+      "shardId": "advisor-11",
+      "advisorSub": "7c279937-b833-46df-8519-c70329933419",
+      "advisorEmail": "User12@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef844901fc6abfb008351",
+          "uniqueTag": "fp1_g0_1780414530740",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef847901fc6abfb0083f2",
+              "planName": "Flexible career plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:36:09.621Z"
+    },
+    {
+      "shardId": "advisor-12",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:09.656Z"
+    },
+    {
+      "shardId": "advisor-13",
+      "advisorSub": "55f48d17-4864-48a2-8d39-62386f58b805",
+      "advisorEmail": "User14@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef78b901fc6abfb006806",
+          "uniqueTag": "fp1_g0_1780414344069",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78f901fc6abfb00692d",
+              "planName": "Family security plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:08.215Z"
+    },
+    {
+      "shardId": "advisor-14",
+      "advisorSub": "e72826bc-4308-4a45-ace0-5be830b8c7d3",
+      "advisorEmail": "User15@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef844901fc6abfb008366",
+          "uniqueTag": "fp1_g0_1780414530753",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef848901fc6abfb008454",
+              "planName": "Early career wealth plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:36:12.716Z"
+    },
+    {
+      "shardId": "advisor-15",
+      "advisorSub": "15b535cc-9756-4383-9beb-3ee755f102c0",
+      "advisorEmail": "User16@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef78a901fc6abfb0067c0",
+          "uniqueTag": "fp1_g0_1780414343936",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78e901fc6abfb0068fd",
+              "planName": "Business owner succession plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:07.285Z"
+    },
+    {
+      "shardId": "advisor-16",
+      "advisorSub": "fc51bc25-540a-44ed-bd48-acfc87a293d5",
+      "advisorEmail": "User17@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef78b901fc6abfb00680e",
+          "uniqueTag": "fp1_g0_1780414344234",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78f901fc6abfb00692c",
+              "planName": "Family security plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:08.212Z"
+    },
+    {
+      "shardId": "advisor-17",
+      "advisorSub": "",
+      "advisorEmail": "",
+      "vu": null,
+      "iteration": null,
+      "clients": [],
+      "counts": {
+        "clients": 0,
+        "plans": 0
+      },
+      "generatedAt": "2026-06-02T15:33:08.478Z"
+    },
+    {
+      "shardId": "advisor-18",
+      "advisorSub": "a6d7e691-ce76-48ec-8c44-e9bdb65b13f2",
+      "advisorEmail": "User19@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef788901fc6abfb0066f4",
+          "uniqueTag": "fp1_g0_1780414342721",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef78b901fc6abfb0067cf",
+              "planName": "Long-term retirement plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:33:05.361Z"
+    },
+    {
+      "shardId": "advisor-19",
+      "advisorSub": "8966f0dd-4d47-445e-abae-4d01ffb37434",
+      "advisorEmail": "User20@gmail.com",
+      "vu": 1,
+      "iteration": 0,
+      "clients": [
+        {
+          "clientId": "6a1ef846901fc6abfb0083d9",
+          "uniqueTag": "fp1_g0_1780414531857",
+          "cashflows": [
+            {
+              "cashflowId": "6a1ef84a901fc6abfb008542",
+              "planName": "Pre-retirement transition plan"
+            }
+          ]
+        }
+      ],
+      "counts": {
+        "clients": 1,
+        "plans": 1
+      },
+      "generatedAt": "2026-06-02T15:36:14.667Z"
+    }
+  ],
+  "totals": {
+    "clients": 13,
+    "plans": 13
+  },
+  "validation": {
+    "scenario": {
+      "scenarioName": "S1",
+      "profile": "write",
+      "readOnly": false,
+      "advisors": 20,
+      "clientsPerAdvisor": 1,
+      "plansPerClient": 1,
+      "iterations": 1,
+      "manifestProfileFile": "data/scenarios/profile_20u_1c_1p.json",
+      "phaseBScenario": "phase-b-read-default",
+      "sloOverridesFile": null,
+      "source": {
+        "advisors": "scenario",
+        "clientsPerAdvisor": "scenario",
+        "plansPerClient": "scenario"
+      }
+    },
+    "iterations": 1,
+    "expectedClients": 20,
+    "expectedPlans": 20,
+    "expectedShards": 20,
+    "actualClients": 13,
+    "actualPlans": 13,
+    "actualShards": 20,
+    "clientCountOk": false,
+    "planCountOk": false,
+    "shardCountOk": true,
+    "duplicateAdvisorOk": true,
+    "duplicateAdvisorSubs": [],
+    "passed": false
+  }
+}

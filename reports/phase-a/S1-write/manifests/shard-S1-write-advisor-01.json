@@ -1,0 +1,26 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S1-write",
+  "shardId": "advisor-01",
+  "advisorSub": "10066169-5ecd-4b9f-8300-457596f14e66",
+  "advisorEmail": "User02@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1ef811901fc6abfb00812b",
+      "uniqueTag": "fp1_g0_1780414479239",
+      "cashflows": [
+        {
+          "cashflowId": "6a1ef812901fc6abfb008147",
+          "planName": "Business owner succession plan"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 1,
+    "plans": 1
+  },
+  "generatedAt": "2026-06-02T15:34:54.752Z"
+}

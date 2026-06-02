@@ -61,6 +61,15 @@ if (-not $RunTag) {
   $RunTag = "phase-a-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
 }
 
+# Fixed-advisor S1 writes reuse stable output paths (overwrite manifest, profile, slices).
+$stableFixedRunTag = 'S1-write'
+if ($UseFixedAdvisors -and $VolumeScenario -eq 'S1') {
+  if ($RunTag -ne $stableFixedRunTag) {
+    Write-Host "  fixed advisors: reusing stable runTag=$stableFixedRunTag (was RunId=$RunTag)"
+  }
+  $RunTag = $stableFixedRunTag
+}
+
 $poolCli = Join-Path $RepoRoot 'tools/pool-cli/bin/pool-cli.js'
 $mergeCli = Join-Path $RepoRoot 'tools/merge-phase-a-manifest.mjs'
 $mergeSloCli = Join-Path $RepoRoot 'tools/merge-phase-a-slo.mjs'
@@ -153,7 +162,7 @@ if ($userCount -lt $advisorsCount) {
 }
 
 $userSliceDir = if ($UseFixedAdvisors) {
-  Join-Path $RepoRoot "data/scenarios/user-slices-$RunTag"
+  Join-Path $RepoRoot 'data/scenarios/user-slices-fixed-dev'
 } else {
   Join-Path $RepoRoot "data/user-pool/$PoolEnv/user-slices-$RunTag"
 }
