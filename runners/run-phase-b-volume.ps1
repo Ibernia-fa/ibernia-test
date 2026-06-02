@@ -134,8 +134,8 @@ $k6Args = @(
   '-e', "VOLUME_SLO_RUN_ID=$RunTag",
   '-e', "VUS=$vusCount",
   '-e', "DURATION=$Duration",
-  '-e', 'VOLUME_SLO_FILE=../../config/volume-api-slo.json',
-  '-e', 'VOLUME_SCENARIOS_FILE=../../config/volume-scenarios.json',
+  '-e', 'VOLUME_SLO_FILE=config/volume-api-slo.json',
+  '-e', 'VOLUME_SCENARIOS_FILE=config/volume-scenarios.json',
   '-e', 'SIGNUP_ROPC_CLIENT_ID=k6-load-test-client',
   '-e', "SIGNUP_ROPC_CLIENT_SECRET=$secret",
   '-e', 'CONSOLIDATED_PERF=1'
@@ -151,6 +151,7 @@ if ($UseFixedAdvisors) {
 
 $runRoot = Join-Path $RepoRoot "reports/phase-b/$RunTag"
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
+New-Item -ItemType Directory -Path (Join-Path $RepoRoot 'reports/volume-slo') -Force | Out-Null
 $k6Log = Join-Path $runRoot 'k6.log'
 if (Test-Path -LiteralPath $k6Log) {
   try {
@@ -182,7 +183,7 @@ try {
 }
 
 Write-Host "=== Phase B complete exit=$code log=$k6Log ==="
-Write-Host "After run: node tools/extract-phase-b-signoff-from-k6-log.mjs --log $k6Log --run-tag $RunTag"
+Write-Host "After run: node tools/extract-phase-b-signoff-from-k6-log.mjs --log $k6Log --run-tag $RunTag --phase-a-run-tag $PhaseARunTag"
 Write-Host "Then: node tools/generate-volume-signoff.mjs --pair-run-tag $PhaseARunTag --phase-a-run-tag $PhaseARunTag --phase-b-run-tag $RunTag --expected-shards $vusCount"
 
 exit $code

@@ -30,6 +30,27 @@ import {
   readK6LogText as readLogAlt,
 } from './extract-phase-a-manifest-from-k6-log.mjs';
 
+/**
+ * k6 log lines wrap console output: msg="VOLUME_SIGNOFF_SHARD:{\"...\"}" source=console
+ * @param {string} line
+ * @param {number} markerIdx
+ */
+export function parseSignoffShardFromK6LogLine(line, markerIdx) {
+  const braceStart = line.indexOf('{', markerIdx + VOLUME_SIGNOFF_SHARD_MARKER.length);
+  if (braceStart < 0) return null;
+  let braceEnd = line.indexOf('" source=console', braceStart);
+  if (braceEnd < 0) braceEnd = line.length;
+  let raw = line.slice(braceStart, braceEnd).trim();
+  if (raw.endsWith('"')) raw = raw.slice(0, -1);
+  raw = raw.replace(/\\"/g, '"');
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && parsed.reportType === 'volume-signoff-shard' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..');
 
@@ -238,12 +259,21 @@ export function extractSignoffShardFromK6Log(text) {
 
 export function extractAllSignoffShardsFromK6Log(text) {
   const shards = [];
+  const seen = new Set();
   const lines = text.split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
     const idx = lines[i].indexOf(VOLUME_SIGNOFF_SHARD_MARKER);
     if (idx < 0) continue;
-    const shard = parseJsonObjectAfterMarker(lines[i], idx, VOLUME_SIGNOFF_SHARD_MARKER);
-    if (shard && shard.reportType === 'volume-signoff-shard') shards.push(shard);
+    const shard =
+      parseSignoffShardFromK6LogLine(lines[i], idx) ||
+      parseJsonObjectAfterMarker(lines[i], idx, VOLUME_SIGNOFF_SHARD_MARKER);
+    if (shard && shard.reportType === 'volume-signoff-shard') {
+      const key = `${shard.shardId || ''}|${shard.generatedAt || ''}|${shard.advisorEmail || ''}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        shards.push(shard);
+      }
+    }
   }
   if (shards.length) return shards;
 

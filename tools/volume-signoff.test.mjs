@@ -31,11 +31,11 @@ test('buildSignoffRow computes over and margin', () => {
   assert.equal(row.marginMs, -500);
 });
 
-test('Phase A templates include GET Reports write default budget 3000', () => {
+test('Phase A templates use write POST cashflows budget 4000', () => {
   const templates = buildSignoffRowTemplates(PHASE_A_SIGNOFF_SPECS, 'write', config);
-  const reports = templates.find((r) => r.metric === 'GET /api/v1/Reports/{cashflowId}');
-  assert.ok(reports);
-  assert.equal(reports.budgetMs, 3000);
+  const cashflows = templates.find((r) => r.metric === 'POST /api/v1/cashflows');
+  assert.ok(cashflows);
+  assert.equal(cashflows.budgetMs, 4000);
 });
 
 test('applySamples and fleet section under/over counts', () => {

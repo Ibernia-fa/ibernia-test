@@ -1,0 +1,87 @@
+{
+  "reportType": "volume-signoff-shard",
+  "generatedAt": "2026-06-02T18:15:43.934Z",
+  "phase": "B",
+  "profile": "read",
+  "runTag": "S1-read",
+  "shardId": "advisor-09",
+  "advisorEmail": "User10@gmail.com",
+  "k6ExitCode": null,
+  "source": "k6-marker",
+  "rows": [
+    {
+      "metric": "journey_dashboard_load_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": null,
+      "actualMs": 316,
+      "actualLabel": "p95",
+      "over": false,
+      "marginMs": 2184,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "full_journey_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": null,
+      "actualMs": 12058,
+      "actualLabel": "p95",
+      "over": true,
+      "marginMs": -9558,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/Clients/{advisorId}/all",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 7500,
+      "actualMs": 446.2,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 2054,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/client/{clientId}/cashflows",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 7500,
+      "actualMs": 353,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 2147,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/cashflows/{cashflowId}",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 3000,
+      "maxMs": 9000,
+      "actualMs": 1983,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 1017,
+      "overHardMax": false,
+      "note": null
+    }
+  ],
+  "summary": {
+    "totalRows": 5,
+    "rowsWithActual": 5,
+    "underBudget": 4,
+    "overBudget": 1,
+    "failedShard": true,
+    "worstMarginMs": 1017,
+    "worstOverMs": 9558
+  }
+}

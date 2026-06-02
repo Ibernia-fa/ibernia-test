@@ -41,12 +41,10 @@ import {
   journeyTimelineLoadDuration,
   journeyIncomeExpensesLoadDuration,
   journeySavingPotsLoadDuration,
-  journeyProjectionLoadDuration,
   fullJourneyDuration,
   dashboardResponseSize,
   clientPlansResponseSize,
   cashflowResponseSize,
-  projectionResponseSize,
   startJourneyTimer,
   completeJourneyStep,
   failJourneyStep,
@@ -206,7 +204,6 @@ const EP = {
   timelines: '/api/v1/cashflows/{cashflowId}/timelines',
   financial: '/api/v1/cashflows/{cashflowId}/financial',
   incomeExpenseFinancial: '/api/v1/cashflows/{cashflowId}/income-expense/financial',
-  reports: '/api/v1/Reports/{cashflowId}',
   wealth: '/api/v1/wealth/{cashflowId}',
   eventsDefault: '/api/v1/Events/default',
   eventsCustom: '/api/v1/Events/custom',
@@ -578,7 +575,6 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
   const t0 = startJourneyTimer();
   const hdrs = apiHeaders(accessToken);
   const cf = encodeURIComponent(cashflowId);
-  const inflationRate = 2.5;
 
   const batch = http.batch([
     {
@@ -639,20 +635,6 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
     },
     {
       method: 'GET',
-      url: `${base}/api/v1/Reports/${cf}?inflationRate=${inflationRate}`,
-      params: {
-        headers: enrichHeaders(hdrs, 'cashflow_load', 'cashflow_load'),
-        tags: standardRequestTags({
-          journey: 'cashflow_load',
-          screen: 'cashflows/reports',
-          critical: true,
-          name: 'journey_cf_reports',
-        }),
-        timeout: HTTP_TIMEOUT,
-      },
-    },
-    {
-      method: 'GET',
       url: `${base}/api/v1/wealth/${cf}`,
       params: {
         headers: enrichHeaders(hdrs, 'cashflow_load', 'cashflow_load'),
@@ -699,10 +681,9 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
   const rTl = batch[1];
   const rFin = batch[2];
   const rIe = batch[3];
-  const rRep = batch[4];
-  const rWd = batch[5];
-  const rEvDef = batch[6];
-  const rEvCust = batch[7];
+  const rWd = batch[4];
+  const rEvDef = batch[5];
+  const rEvCust = batch[6];
 
   recordJourneyEndpoint(rCf, { endpoint: EP.cashflow, method: 'GET', k6Name: 'journey_cf_get' });
   recordJourneyEndpoint(rTl, { endpoint: EP.timelines, method: 'GET', k6Name: 'journey_cf_timelines' });
@@ -712,7 +693,6 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
     method: 'GET',
     k6Name: 'journey_cf_income_expense_financial',
   });
-  recordJourneyEndpoint(rRep, { endpoint: EP.reports, method: 'GET', k6Name: 'journey_cf_reports' });
   recordJourneyEndpoint(rWd, { endpoint: EP.wealth, method: 'GET', k6Name: 'journey_cf_wealth' });
   recordJourneyEndpoint(rEvDef, { endpoint: EP.eventsDefault, method: 'GET', k6Name: 'journey_cf_events_default' });
   recordJourneyEndpoint(rEvCust, { endpoint: EP.eventsCustom, method: 'GET', k6Name: 'journey_cf_events_custom' });
@@ -721,7 +701,6 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
   const tlOk = rTl.status === 200;
   const finOk = rFin.status === 200;
   const ieOk = rIe.status === 200;
-  const repOk = rRep.status === 200 || rRep.status === 204;
   const wdOk = rWd.status === 200;
   let evDefOk = rEvDef.status === 204;
   if (rEvDef.status === 200) {
@@ -737,19 +716,16 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
   recordHttpStep(journeyTimelineLoadDuration, rTl, tlOk);
   recordHttpStep(journeyIncomeExpensesLoadDuration, rIe, ieOk);
   recordHttpStep(journeySavingPotsLoadDuration, rWd, wdOk);
-  recordHttpStep(journeyProjectionLoadDuration, rRep, repOk);
   if (cfOk) cashflowResponseSize.add(responseBodyBytes(rCf));
-  if (repOk) projectionResponseSize.add(responseBodyBytes(rRep));
 
-  const criticalOk = cfOk && tlOk && finOk && ieOk && repOk;
+  const criticalOk = cfOk && tlOk && finOk && ieOk;
   check(batch[0], { 'journey: GET cashflow 200': () => cfOk });
   check(batch[1], { 'journey: GET timelines 200': () => tlOk });
   check(batch[2], { 'journey: GET financial 200': () => finOk });
   check(batch[3], { 'journey: GET income-expense/financial 200': () => ieOk });
-  check(batch[4], { 'journey: GET Reports 200/204': () => repOk });
-  check(batch[5], { 'journey: GET wealth 200': () => wdOk });
-  check(batch[6], { 'journey: GET Events/default ok': () => evDefOk });
-  check(batch[7], { 'journey: GET Events/custom 200': () => evCustOk });
+  check(batch[4], { 'journey: GET wealth 200': () => wdOk });
+  check(batch[5], { 'journey: GET Events/default ok': () => evDefOk });
+  check(batch[6], { 'journey: GET Events/custom 200': () => evCustOk });
 
   if (!criticalOk) {
     failJourneyStep(journeyCashflowLoadDuration, t0, { ok: false });
@@ -924,13 +900,11 @@ const JOURNEY_METRICS = [
   'journey_timeline_load_duration',
   'journey_income_expenses_load_duration',
   'journey_saving_pots_load_duration',
-  'journey_projection_load_duration',
   'journey_cashflow_load_duration',
   'full_journey_duration',
   'dashboard_response_size',
   'client_plans_response_size',
   'cashflow_response_size',
-  'projection_response_size',
 ];
 
 export function handleSummary(data) {

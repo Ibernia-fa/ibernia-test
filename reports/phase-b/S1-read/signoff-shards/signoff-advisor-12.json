@@ -1,0 +1,87 @@
+{
+  "reportType": "volume-signoff-shard",
+  "generatedAt": "2026-06-02T18:15:44.391Z",
+  "phase": "B",
+  "profile": "read",
+  "runTag": "S1-read",
+  "shardId": "advisor-12",
+  "advisorEmail": "User13@gmail.com",
+  "k6ExitCode": null,
+  "source": "k6-marker",
+  "rows": [
+    {
+      "metric": "journey_dashboard_load_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": null,
+      "actualMs": 298,
+      "actualLabel": "p95",
+      "over": false,
+      "marginMs": 2202,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "full_journey_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": null,
+      "actualMs": 10313,
+      "actualLabel": "p95",
+      "over": true,
+      "marginMs": -7813,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/Clients/{advisorId}/all",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 7500,
+      "actualMs": 470.2,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 2030,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/client/{clientId}/cashflows",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 7500,
+      "actualMs": 740.1,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 1760,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/cashflows/{cashflowId}",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 3000,
+      "maxMs": 9000,
+      "actualMs": 1308,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 1692,
+      "overHardMax": false,
+      "note": null
+    }
+  ],
+  "summary": {
+    "totalRows": 5,
+    "rowsWithActual": 5,
+    "underBudget": 4,
+    "overBudget": 1,
+    "failedShard": true,
+    "worstMarginMs": 1692,
+    "worstOverMs": 7813
+  }
+}
