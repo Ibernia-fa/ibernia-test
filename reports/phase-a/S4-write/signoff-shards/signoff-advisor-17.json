@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-03T18:56:23.149Z",
+  "generatedAt": "2026-06-03T22:28:49.549Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S4-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 300,
+      "actualMs": 258,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 3700,
+      "marginMs": 3742,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 278,
+      "actualMs": 246,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 4722,
+      "marginMs": 4754,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 7500,
-      "actualMs": 866.8,
+      "actualMs": 944.4,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 2133,
+      "marginMs": 2056,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 10000,
-      "actualMs": 3956.9,
+      "actualMs": 4122.6,
       "actualLabel": "max",
-      "over": false,
-      "marginMs": 43,
+      "over": true,
+      "marginMs": -123,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": true,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 45340,
+      "actualMs": 37041,
       "actualLabel": "p95",
       "over": true,
-      "marginMs": -40340,
+      "marginMs": -32041,
       "overHardMax": null,
       "note": null
     }
@@ -78,10 +78,10 @@
   "summary": {
     "totalRows": 5,
     "rowsWithActual": 5,
-    "underBudget": 4,
-    "overBudget": 1,
-    "failedShard": false,
-    "worstMarginMs": 43,
-    "worstOverMs": 40340
+    "underBudget": 3,
+    "overBudget": 2,
+    "failedShard": true,
+    "worstMarginMs": 2056,
+    "worstOverMs": 32041
   }
 }

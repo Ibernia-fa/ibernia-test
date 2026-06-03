@@ -421,6 +421,28 @@ function getCachedTokenBundle(email, password, row) {
   return bundle;
 }
 
+function makeRefreshVolumeAccessToken(email, password, row) {
+  return function refreshVolumeAccessToken(force = false) {
+    const vu = typeof __VU !== 'undefined' ? __VU : 1;
+    const key = `${vu}:${String(email).toLowerCase()}`;
+    if (!force && globalThis.__k6FpTokenCache) {
+      const cached = globalThis.__k6FpTokenCache[key];
+      if (cached && cached.accessToken && !refreshTokenIfNeeded(cached.accessToken, tokenSkewSec)) {
+        return cached.accessToken;
+      }
+    }
+    if (globalThis.__k6FpTokenCache) delete globalThis.__k6FpTokenCache[key];
+    const bundle = obtainAccessTokenAndAdvisor(email, password, row);
+    if (bundle) {
+      if (!globalThis.__k6FpTokenCache) globalThis.__k6FpTokenCache = {};
+      globalThis.__k6FpTokenCache[key] = bundle;
+      return bundle.accessToken;
+    }
+    const stale = globalThis.__k6FpTokenCache && globalThis.__k6FpTokenCache[key];
+    return stale && stale.accessToken ? stale.accessToken : null;
+  };
+}
+
 function advisorIdFromRow(row) {
   if (!row) return undefined;
   if (row.advisorId != null && String(row.advisorId).trim() !== '') return String(row.advisorId).trim();
@@ -555,6 +577,7 @@ export default function () {
   executeFullPlatformSequence({
     base: API_BASE,
     accessToken,
+    refreshAccessToken: makeRefreshVolumeAccessToken(email, password, row),
     advisorSub,
     advisorName,
     uniqueTag,

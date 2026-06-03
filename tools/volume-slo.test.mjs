@@ -385,6 +385,26 @@ test('S1 scenario resolves 20 advisors and profile path', () => {
   assert.equal(scenario.manifestProfileFile, 'data/scenarios/profile_20u_1c_1p.json');
 });
 
+test('S2–S5 volume ladder matches expected user/client/plan totals', () => {
+  const table = [
+    { id: 'S2', advisors: 20, clientsPerAdvisor: 5, plansPerClient: 2, totalClients: 100, totalPlans: 200 },
+    { id: 'S3', advisors: 20, clientsPerAdvisor: 10, plansPerClient: 4, totalClients: 200, totalPlans: 800 },
+    { id: 'S4', advisors: 20, clientsPerAdvisor: 20, plansPerClient: 8, totalClients: 400, totalPlans: 3200 },
+    { id: 'S5', advisors: 20, clientsPerAdvisor: 30, plansPerClient: 8, totalClients: 600, totalPlans: 4800 },
+  ];
+  for (const row of table) {
+    const { name, scenario } = resolveVolumeScenario(repoScenarios, row.id);
+    assert.equal(name, row.id);
+    assert.equal(scenario.advisors, row.advisors);
+    assert.equal(scenario.clientsPerAdvisor, row.clientsPerAdvisor);
+    assert.equal(scenario.plansPerClient, row.plansPerClient);
+    const clients = row.advisors * row.clientsPerAdvisor;
+    const plans = clients * row.plansPerClient;
+    assert.equal(clients, row.totalClients);
+    assert.equal(plans, row.totalPlans);
+  }
+});
+
 test('buildManifestShardFromK6SummaryMetrics rebuilds shard from tagged counters', () => {
   const data = {
     metrics: {

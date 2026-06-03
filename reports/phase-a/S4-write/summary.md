@@ -1,5 +1,5 @@
 # Phase A volume summary — S4-write
-Generated: 2026-06-03T18:56:34.486Z
+Generated: 2026-06-03T20:19:51.485Z
 ## Scenario
 | Field | Value |
 |-------|-------|
@@ -12,8 +12,8 @@ Generated: 2026-06-03T18:56:34.486Z
 ## Data gates
 | Gate | Expected | Actual | Result |
 |------|----------|--------|--------|
-| Clients | 400 | 279 | FAIL |
-| Plans | 3200 | 2147 | FAIL |
+| Clients | 400 | 280 | FAIL |
+| Plans | 3200 | 2166 | FAIL |
 | Shards | 20 | 20 | PASS |
 | Manifest validation | — | — | FAIL |
 ## SLO gates

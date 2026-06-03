@@ -23,7 +23,9 @@ param(
   [bool] $UseFixedAdvisors = $false,
   [bool] $VolumeSloGate = $false,
   [string] $AdvisorIndex = '',
-  [string] $MaxDuration = ''
+  [string] $MaxDuration = '',
+  [bool] $TopUpMode = $false,
+  [string] $K6LogName = 'k6.log'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,9 +43,9 @@ function Resolve-PhaseAMaxDuration {
   )
   $clients = [Math]::Max(1, $ClientsPerAdvisor)
   $plans = [Math]::Max(1, $PlansPerClient)
-  # ~75s per plan build (S3 observed ~43–55s; parallel fleet adds headroom) + 15m overhead.
+  # ~95s per plan build under parallel fleet load + 15m overhead.
   $units = $clients * $plans
-  $seconds = 900 + ($units * 75)
+  $seconds = 900 + ($units * 95)
   $minutes = [Math]::Ceiling($seconds / 60.0)
   $minutes = [Math]::Min(300, [Math]::Max(20, $minutes))
   return "${minutes}m"
@@ -57,9 +59,11 @@ $maxDuration = if ($MaxDuration) { $MaxDuration } else { Resolve-PhaseAMaxDurati
 
 New-Item -ItemType Directory -Path $RunOutDir, $LogDir -Force | Out-Null
 
-$k6LogFile = Join-Path $LogDir 'k6.log'
+$k6LogFile = Join-Path $LogDir $K6LogName
 $workerMetaPath = Join-Path $RunOutDir 'run-metadata-worker.json'
-foreach ($stale in @($k6LogFile, $workerMetaPath)) {
+$staleLogs = @($workerMetaPath)
+if (-not $TopUpMode) { $staleLogs += $k6LogFile }
+foreach ($stale in $staleLogs) {
   if (Test-Path -LiteralPath $stale) { Remove-Item -LiteralPath $stale -Force }
 }
 Get-ChildItem -LiteralPath (Join-Path $RunOutDir 'manifests') -Filter '*.json' -File -ErrorAction SilentlyContinue |
@@ -72,7 +76,7 @@ if ($AdvisorIndex -ne '') {
   $k6RestPort = 6570 + [int]$AdvisorIndex
 }
 
-Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort preRunCleanup=True"
+Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort topUpMode=$TopUpMode log=$K6LogName"
 
 $sliceForK6 = $PoolSliceFile -replace '\\', '/'
 $sloConfig = (Join-Path $RepoRoot 'config/volume-api-slo.json') -replace '\\', '/'
@@ -87,6 +91,7 @@ $k6Args = @(
   '-e', 'USER_COUNT=1',
   '-e', 'PHASE_A_SINGLE_EXECUTION=1',
   '-e', "MAX_DURATION=$maxDuration",
+  '-e', 'HTTP_TIMEOUT=240s',
   '-e', 'VOLUME_SLO=1',
   '-e', 'VOLUME_SLO_PROFILE=write',
   '-e', "VOLUME_SLO_FILE=$sloConfig",
@@ -117,10 +122,15 @@ if ($ExportManifest) { $k6Args += @('-e', 'PHASE_A_EXPORT_MANIFEST=1') }
 if ($SkipTeardown) {
   $k6Args += @('-e', 'FULL_PLATFORM_SKIP_TEARDOWN=1', '-e', 'FULL_PLATFORM_SKIP_CLEANUP=1')
 }
-$k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP=1')
-if ($UseFixedAdvisors) {
+if ($TopUpMode) {
+  $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP=0')
   Remove-Item Env:FULL_PLATFORM_PRE_RUN_CLEANUP_ALL -ErrorAction SilentlyContinue
-  $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1')
+} else {
+  $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP=1')
+  if ($UseFixedAdvisors) {
+    Remove-Item Env:FULL_PLATFORM_PRE_RUN_CLEANUP_ALL -ErrorAction SilentlyContinue
+    $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1')
+  }
 }
 if ($ClientsPerAdvisor) {
   $k6Args += @(

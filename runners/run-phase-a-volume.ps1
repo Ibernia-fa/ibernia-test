@@ -49,7 +49,9 @@ param(
 
   [string] $FixedAdvisorsFile = 'data/scenarios/fixed-advisors-dev-20.json',
 
-  [switch] $VolumeSloGate
+  [switch] $VolumeSloGate,
+
+  [switch] $SkipAutoTopUp
 )
 
 $ErrorActionPreference = 'Stop'
@@ -121,7 +123,7 @@ function Resolve-PhaseAMaxDuration {
   $clients = [Math]::Max(1, $ClientsPerAdvisor)
   $plans = [Math]::Max(1, $PlansPerClient)
   $units = $clients * $plans
-  $seconds = 900 + ($units * 75)
+  $seconds = 900 + ($units * 95)
   $minutes = [Math]::Ceiling($seconds / 60.0)
   $minutes = [Math]::Min(300, [Math]::Max(20, $minutes))
   return "${minutes}m"
@@ -131,6 +133,9 @@ $phaseAMaxDuration = Resolve-PhaseAMaxDuration $clientsPerAdvisor $plansPerClien
 
 # Default: all advisors in parallel (same as S1–S3). Override with -ParallelJobs N if needed.
 $concurrency = if ($ParallelJobs -gt 0) { $ParallelJobs } else { $advisorsCount }
+$autoTopUpEnabled = (-not $SkipAutoTopUp.IsPresent) -and ($VolumeScenario -in @('S4', 'S5')) -and ($clientsPerAdvisor -ge 20)
+$topUpConcurrency = 5
+$extractCli = Join-Path $RepoRoot 'tools/extract-phase-a-manifest-from-k6-log.mjs'
 
 if ($advisorsCount -lt 1) { throw 'AdvisorCount must be >= 1' }
 
@@ -159,6 +164,7 @@ Write-Host "  scenario=$VolumeScenario runTag=$RunTag userMode=$userMode"
 Write-Host "  advisors=$advisorsCount concurrency=$concurrency clientsPerAdvisor=$clientsPerAdvisor plansPerClient=$plansPerClient"
 Write-Host "  expectedClients=$expectedClients expectedPlans=$expectedPlans expectedShards=$expectedShards"
 Write-Host "  maxDurationPerAdvisor=$phaseAMaxDuration"
+if ($autoTopUpEnabled) { Write-Host "  autoTopUp=enabled (resume wave at $topUpConcurrency parallel if manifest fails)" }
 if ($profileOutPath) { Write-Host "  profileOut=$profileOutPath" }
 
 $allUsers = @()
@@ -257,7 +263,9 @@ try {
       [bool]$UseFixedAdvisors,
       [bool]$volumeSloGate,
       [string]$i,
-      $phaseAMaxDuration
+      $phaseAMaxDuration,
+      $false,
+      'k6.log'
     )
 
     while (@($jobs | Where-Object { $_.State -eq 'Running' }).Count -ge $concurrency) {
@@ -268,7 +276,6 @@ try {
   Write-Host "=== waiting for $($jobs.Count) advisor jobs ==="
   $results = $jobs | Wait-Job
 
-  $extractCli = Join-Path $RepoRoot 'tools/extract-phase-a-manifest-from-k6-log.mjs'
   Get-ChildItem -LiteralPath $logsRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object {
     $k6Log = Join-Path $_.FullName 'k6.log'
     if (Test-Path -LiteralPath $k6Log) {
@@ -359,6 +366,103 @@ try {
     if ($profileOutPath) { $mergeArgs += @('--profile-out', $profileOutPath) }
     node @mergeArgs
     if ($LASTEXITCODE -ne 0 -and -not $ContinueOnError) { $failed['manifest-merge'] = $true }
+  }
+
+  if ($autoTopUpEnabled -and (Test-Path -LiteralPath $manifestOut) -and -not $ContinueOnError) {
+    $manifestCheck = $null
+    try { $manifestCheck = Get-Content -LiteralPath $manifestOut -Raw | ConvertFrom-Json } catch { $manifestCheck = $null }
+    if ($manifestCheck -and $manifestCheck.validation -and -not $manifestCheck.validation.passed) {
+      Write-Host ('=== Manifest validation failed (clients={0} plans={1}) - resume top-up at {2} parallel ===' -f $manifestCheck.totals.clients, $manifestCheck.totals.plans, $topUpConcurrency)
+      $topUpStart = Get-Date
+      $topUpJobs = @()
+      for ($i = 0; $i -lt $advisorsCount; $i++) {
+        $user = $allUsers[$i]
+        $userKey = ('advisor-{0:D2}' -f $i)
+        $shardId = $userKey
+        $singleSlice = Join-Path $userSliceDir "slice-$userKey.json"
+        $workerOut = Join-Path $workersRoot $userKey
+        $workerLog = Join-Path $logsRoot $userKey
+        Write-Host "Top-up job $userKey email=$($user.email)"
+        $topUpJobs += Start-Job -Name "${userKey}-topup" -FilePath $workerScript -ArgumentList @(
+          $RepoRoot,
+          $singleSlice,
+          $user.email,
+          $RunTag,
+          $shardId,
+          $userKey,
+          $Duration,
+          $workerOut,
+          $workerLog,
+          $secret,
+          $VolumeScenario,
+          [string]$clientsPerAdvisor,
+          [string]$plansPerClient,
+          [bool]$SkipTeardown,
+          [bool](-not $NoManifest.IsPresent),
+          [bool]$UseFixedAdvisors,
+          [bool]$volumeSloGate,
+          [string]$i,
+          $phaseAMaxDuration,
+          $true,
+          'k6-topup.log'
+        )
+        while (@($topUpJobs | Where-Object { $_.State -eq 'Running' }).Count -ge $topUpConcurrency) {
+          Start-Sleep -Seconds 3
+        }
+      }
+      Write-Host "=== waiting for $($topUpJobs.Count) top-up advisor jobs ==="
+      $topUpResults = $topUpJobs | Wait-Job
+      Get-ChildItem -LiteralPath $logsRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+        $k6Log = Join-Path $_.FullName 'k6-topup.log'
+        if (Test-Path -LiteralPath $k6Log) {
+          & node $extractCli --log $k6Log --repo-root $RepoRoot | Out-Null
+        }
+      }
+      foreach ($r in $topUpResults) {
+        Receive-Job -Job $r -Keep -ErrorAction SilentlyContinue | Out-Null
+        $baseName = ($r.Name -replace '-topup$', '')
+        $workerMetaFile = Join-Path (Join-Path $workersRoot $baseName) 'run-metadata-worker.json'
+        $metaExit = $null
+        if (Test-Path -LiteralPath $workerMetaFile) {
+          $wm = Get-Content -LiteralPath $workerMetaFile -Raw | ConvertFrom-Json
+          $metaExit = $wm.exitCode
+          $metaStart = $null
+          if ($wm.startTime) {
+            try { $metaStart = [datetime]::Parse($wm.startTime).ToUniversalTime() } catch { $metaStart = $null }
+          }
+          $metaStale = ($null -ne $metaStart) -and ($metaStart -lt $topUpStart.ToUniversalTime().AddMinutes(-1))
+          if ($metaStale) {
+            Write-Warning "Stale top-up metadata for $baseName; treating as failed"
+            $metaExit = $null
+          }
+        }
+        $jobFailed = ($null -eq $metaExit) -or ($metaExit -ne 0)
+        if ($jobFailed) { $failed[$baseName] = $true } else { $failed.Remove($baseName) | Out-Null }
+        Write-Host "Top-up job ${baseName}: exitCode=$metaExit failed=$jobFailed"
+      }
+      $jobs += $topUpJobs
+
+      $manifestCollected = 0
+      Get-ChildItem -LiteralPath $workersRoot -Directory | ForEach-Object {
+        $advisorKey = $_.Name
+        $shardDir = Join-Path $_.FullName 'manifests'
+        if (Test-Path -LiteralPath $shardDir) {
+          $ownManifest = Get-ChildItem -LiteralPath $shardDir -Filter "*-$advisorKey.json" -File -ErrorAction SilentlyContinue |
+            Select-Object -First 1
+          if ($ownManifest) {
+            Copy-Item -LiteralPath $ownManifest.FullName -Destination (Join-Path $manifestsRoot $ownManifest.Name) -Force
+            $manifestCollected++
+          }
+        }
+      }
+
+      if (@(Get-ChildItem -LiteralPath $manifestsRoot -Filter '*.json' -ErrorAction SilentlyContinue).Count -gt 0) {
+        $failed.Remove('manifest-merge') | Out-Null
+        node @mergeArgs
+        if ($LASTEXITCODE -ne 0 -and -not $ContinueOnError) { $failed['manifest-merge'] = $true }
+        else { Write-Host "=== Top-up merge complete: clients/plans re-validated ===" }
+      }
+    }
   }
 
   $sloFiles = @(Get-ChildItem -LiteralPath $sloShardsRoot -Filter '*.json' -ErrorAction SilentlyContinue)
