@@ -1,0 +1,87 @@
+{
+  "reportType": "volume-signoff-shard",
+  "generatedAt": "2026-06-03T05:25:41.689Z",
+  "phase": "B",
+  "profile": "read",
+  "runTag": "S3-read",
+  "shardId": "advisor-19",
+  "advisorEmail": "User20@gmail.com",
+  "k6ExitCode": 0,
+  "source": "retro-k6-log",
+  "rows": [
+    {
+      "metric": "journey_dashboard_load_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": null,
+      "actualMs": 438.3,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 2062,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "full_journey_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 15000,
+      "maxMs": null,
+      "actualMs": 9092,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 5908,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/Clients/{advisorId}/all",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 5000,
+      "actualMs": 438.3,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 2062,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/client/{clientId}/cashflows",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 2500,
+      "maxMs": 4000,
+      "actualMs": 621.4,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 1879,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "GET /api/v1/cashflows/{cashflowId}",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 3000,
+      "maxMs": 4000,
+      "actualMs": 822.6,
+      "actualLabel": "max (retro)",
+      "over": false,
+      "marginMs": 2177,
+      "overHardMax": false,
+      "note": null
+    }
+  ],
+  "summary": {
+    "totalRows": 5,
+    "rowsWithActual": 5,
+    "underBudget": 5,
+    "overBudget": 0,
+    "failedShard": false,
+    "worstMarginMs": 1879,
+    "worstOverMs": null
+  }
+}
