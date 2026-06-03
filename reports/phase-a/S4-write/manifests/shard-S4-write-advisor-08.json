@@ -1,0 +1,556 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S4-write",
+  "shardId": "advisor-08",
+  "advisorSub": "9c790737-0701-4517-9a7e-7ccec87a7f2d",
+  "advisorEmail": "User09@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a2069d9d6592c976563c628",
+      "uniqueTag": "S4-advisor-08c1",
+      "cashflows": [
+        {
+          "cashflowId": "6a2069ddd6592c976563c84d",
+          "planName": "Primary financial plan ΓÇö Laura Colombo"
+        },
+        {
+          "cashflowId": "6a2069fed6592c976563e589",
+          "planName": "Retirement income scenario ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a206a22d6592c9765640591",
+          "planName": "Property & mortgage plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a206a44d6592c976564240c",
+          "planName": "Education funding plan ΓÇö Federica Ricci"
+        },
+        {
+          "cashflowId": "6a206a6bd6592c976564469a",
+          "planName": "Inheritance & legacy plan ΓÇö Laura Colombo"
+        },
+        {
+          "cashflowId": "6a206a91d6592c9765646814",
+          "planName": "Business exit scenario ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a206ab4d6592c976564871c",
+          "planName": "Career transition plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a206ad8d6592c976564a714",
+          "planName": "Tax optimisation review ΓÇö Federica Ricci"
+        }
+      ]
+    },
+    {
+      "clientId": "6a206afdd6592c976564c6b2",
+      "uniqueTag": "S4-advisor-08c2",
+      "cashflows": [
+        {
+          "cashflowId": "6a206b01d6592c976564c9f2",
+          "planName": "Primary financial plan ΓÇö Davide Greco"
+        },
+        {
+          "cashflowId": "6a206b24d6592c976564e89a",
+          "planName": "Retirement income scenario ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a206b67d6592c9765651ffe",
+          "planName": "Property & mortgage plan ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a206b8bd6592c9765653f4d",
+          "planName": "Education funding plan ΓÇö Claudia Fontana"
+        },
+        {
+          "cashflowId": "6a206baed6592c9765655d18",
+          "planName": "Inheritance & legacy plan ΓÇö Giuseppe Lombardi"
+        },
+        {
+          "cashflowId": "6a206bd6d6592c9765657fe1",
+          "planName": "Business exit scenario ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a206bfbd6592c976565a10e",
+          "planName": "Career transition plan ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a206c1dd6592c976565bd7f",
+          "planName": "Tax optimisation review ΓÇö Claudia Fontana"
+        }
+      ]
+    },
+    {
+      "clientId": "6a206c3fd6592c976565db5c",
+      "uniqueTag": "S4-advisor-08c3",
+      "cashflows": [
+        {
+          "cashflowId": "6a206c42d6592c976565dd15",
+          "planName": "Primary financial plan ΓÇö Simona Costa"
+        },
+        {
+          "cashflowId": "6a206c62d6592c976565f96b",
+          "planName": "Retirement income scenario ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a206c84d6592c9765661881",
+          "planName": "Property & mortgage plan ΓÇö Monica Vitale"
+        },
+        {
+          "cashflowId": "6a206ca7d6592c9765663605",
+          "planName": "Education funding plan ΓÇö Davide Greco"
+        },
+        {
+          "cashflowId": "6a206ccad6592c97656654fb",
+          "planName": "Inheritance & legacy plan ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a206cebd6592c9765667299",
+          "planName": "Business exit scenario ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a206d0ed6592c97656691b0",
+          "planName": "Career transition plan ΓÇö Monica Vitale"
+        },
+        {
+          "cashflowId": "6a206d32d6592c976566afc5",
+          "planName": "Tax optimisation review ΓÇö Davide Greco"
+        }
+      ]
+    },
+    {
+      "clientId": "6a206d56d6592c976566ceab",
+      "uniqueTag": "S4-advisor-08c4",
+      "cashflows": [
+        {
+          "cashflowId": "6a206d5ad6592c976566d177",
+          "planName": "Primary financial plan ΓÇö Giuseppe Lombardi"
+        },
+        {
+          "cashflowId": "6a206d7ad6592c976566ed31",
+          "planName": "Retirement income scenario ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a206d9bd6592c9765670a63",
+          "planName": "Property & mortgage plan ΓÇö Roberto Barbieri"
+        },
+        {
+          "cashflowId": "6a206dc1d6592c9765672a61",
+          "planName": "Education funding plan ΓÇö Valentina Caruso"
+        },
+        {
+          "cashflowId": "6a206de5d6592c9765674925",
+          "planName": "Inheritance & legacy plan ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a206e0ad6592c9765676848",
+          "planName": "Business exit scenario ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a206e2fd6592c976567882a",
+          "planName": "Career transition plan ΓÇö Roberto Barbieri"
+        },
+        {
+          "cashflowId": "6a206e52d6592c976567a5f6",
+          "planName": "Tax optimisation review ΓÇö Valentina Caruso"
+        }
+      ]
+    },
+    {
+      "clientId": "6a206e75d6592c976567c3d8",
+      "uniqueTag": "S4-advisor-08c5",
+      "cashflows": [
+        {
+          "cashflowId": "6a206e77d6592c976567c5bb",
+          "planName": "Primary financial plan ΓÇö Valentina Caruso"
+        },
+        {
+          "cashflowId": "6a206e9bd6592c976567e403",
+          "planName": "Retirement income scenario ΓÇö Paolo Neri"
+        },
+        {
+          "cashflowId": "6a206ebed6592c9765680244",
+          "planName": "Property & mortgage plan ΓÇö Simona Costa"
+        },
+        {
+          "cashflowId": "6a206ee2d6592c976568210a",
+          "planName": "Education funding plan ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a206f04d6592c9765683eb7",
+          "planName": "Inheritance & legacy plan ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a206f29d6592c9765685ea5",
+          "planName": "Business exit scenario ΓÇö Paolo Neri"
+        },
+        {
+          "cashflowId": "6a206f4fd6592c9765687f0d",
+          "planName": "Career transition plan ΓÇö Simona Costa"
+        },
+        {
+          "cashflowId": "6a206f74d6592c9765689f24",
+          "planName": "Tax optimisation review ΓÇö Luca Ferrero"
+        }
+      ]
+    },
+    {
+      "clientId": "6a206f96d6592c976568bd6f",
+      "uniqueTag": "S4-advisor-08c6",
+      "cashflows": [
+        {
+          "cashflowId": "6a206f9ad6592c976568c07f",
+          "planName": "Primary financial plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a206fbcd6592c976568de32",
+          "planName": "Retirement income scenario ΓÇö Laura Colombo"
+        },
+        {
+          "cashflowId": "6a206fdfd6592c976568fb0c",
+          "planName": "Property & mortgage plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a207005d6592c9765691b5f",
+          "planName": "Education funding plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a207030d6592c9765693f01",
+          "planName": "Inheritance & legacy plan ΓÇö Federica Ricci"
+        },
+        {
+          "cashflowId": "6a207055d6592c9765695d0c",
+          "planName": "Business exit scenario ΓÇö Laura Colombo"
+        },
+        {
+          "cashflowId": "6a20707bd6592c9765697dbc",
+          "planName": "Career transition plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a2070a0d6592c9765699d89",
+          "planName": "Tax optimisation review ΓÇö Francesca Gallo"
+        }
+      ]
+    },
+    {
+      "clientId": "6a2070c7d6592c976569bf45",
+      "uniqueTag": "S4-advisor-08c7",
+      "cashflows": [
+        {
+          "cashflowId": "6a2070cad6592c976569c1ee",
+          "planName": "Primary financial plan ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a2070f0d6592c976569e29d",
+          "planName": "Retirement income scenario ΓÇö Giuseppe Lombardi"
+        },
+        {
+          "cashflowId": "6a207115d6592c97656a02f9",
+          "planName": "Property & mortgage plan ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a207139d6592c97656a2237",
+          "planName": "Education funding plan ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a20715bd6592c97656a3f8e",
+          "planName": "Inheritance & legacy plan ΓÇö Claudia Fontana"
+        },
+        {
+          "cashflowId": "6a20717bd6592c97656a5b84",
+          "planName": "Business exit scenario ΓÇö Giuseppe Lombardi"
+        },
+        {
+          "cashflowId": "6a20719bd6592c97656a781f",
+          "planName": "Career transition plan ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a2071bdd6592c97656a9645",
+          "planName": "Tax optimisation review ΓÇö Sofia Valenti"
+        }
+      ]
+    },
+    {
+      "clientId": "6a2071e1d6592c97656ab5c2",
+      "uniqueTag": "S4-advisor-08c8",
+      "cashflows": [
+        {
+          "cashflowId": "6a2071e5d6592c97656ab92d",
+          "planName": "Primary financial plan ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a207206d6592c97656ad582",
+          "planName": "Retirement income scenario ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a20722ad6592c97656af548",
+          "planName": "Property & mortgage plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a20724dd6592c97656b1401",
+          "planName": "Education funding plan ΓÇö Monica Vitale"
+        },
+        {
+          "cashflowId": "6a207271d6592c97656b32b9",
+          "planName": "Inheritance & legacy plan ΓÇö Davide Greco"
+        },
+        {
+          "cashflowId": "6a207297d6592c97656b525f",
+          "planName": "Business exit scenario ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a2072b9d6592c97656b6fb8",
+          "planName": "Career transition plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a2072e1d6592c97656b90de",
+          "planName": "Tax optimisation review ΓÇö Monica Vitale"
+        }
+      ]
+    },
+    {
+      "clientId": "6a207305d6592c97656bb035",
+      "uniqueTag": "S4-advisor-08c9",
+      "cashflows": [
+        {
+          "cashflowId": "6a207309d6592c97656bb2bc",
+          "planName": "Primary financial plan ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a20732dd6592c97656bd22c",
+          "planName": "Retirement income scenario ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a207351d6592c97656bf1f9",
+          "planName": "Property & mortgage plan ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a207373d6592c97656c0fdd",
+          "planName": "Education funding plan ΓÇö Roberto Barbieri"
+        },
+        {
+          "cashflowId": "6a207399d6592c97656c30b8",
+          "planName": "Inheritance & legacy plan ΓÇö Valentina Caruso"
+        },
+        {
+          "cashflowId": "6a2073bad6592c97656c4d4a",
+          "planName": "Business exit scenario ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a2073ddd6592c97656c6c0c",
+          "planName": "Career transition plan ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a207400d6592c97656c8a64",
+          "planName": "Tax optimisation review ΓÇö Roberto Barbieri"
+        }
+      ]
+    },
+    {
+      "clientId": "6a207427d6592c97656cad26",
+      "uniqueTag": "S4-advisor-08c10",
+      "cashflows": [
+        {
+          "cashflowId": "6a20742ad6592c97656cafd1",
+          "planName": "Primary financial plan ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a20744bd6592c97656ccc6b",
+          "planName": "Retirement income scenario ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a20746cd6592c97656ce8c8",
+          "planName": "Property & mortgage plan ΓÇö Paolo Neri"
+        },
+        {
+          "cashflowId": "6a20748dd6592c97656d058d",
+          "planName": "Education funding plan ΓÇö Simona Costa"
+        },
+        {
+          "cashflowId": "6a2074b1d6592c97656d2522",
+          "planName": "Inheritance & legacy plan ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a2074d5d6592c97656d449c",
+          "planName": "Business exit scenario ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a2074f9d6592c97656d6474",
+          "planName": "Career transition plan ΓÇö Paolo Neri"
+        },
+        {
+          "cashflowId": "6a20751dd6592c97656d83cd",
+          "planName": "Tax optimisation review ΓÇö Simona Costa"
+        }
+      ]
+    },
+    {
+      "clientId": "6a207542d6592c97656da402",
+      "uniqueTag": "S4-advisor-08c11",
+      "cashflows": [
+        {
+          "cashflowId": "6a207544d6592c97656da6dd",
+          "planName": "Primary financial plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a207568d6592c97656dc546",
+          "planName": "Retirement income scenario ΓÇö Federica Ricci"
+        },
+        {
+          "cashflowId": "6a20758fd6592c97656de843",
+          "planName": "Property & mortgage plan ΓÇö Laura Colombo"
+        },
+        {
+          "cashflowId": "6a2075b6d6592c97656e0a65",
+          "planName": "Education funding plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a2075dbd6592c97656e2aee",
+          "planName": "Inheritance & legacy plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a2075fdd6592c97656e4907",
+          "planName": "Business exit scenario ΓÇö Federica Ricci"
+        },
+        {
+          "cashflowId": "6a20761fd6592c97656e65f5",
+          "planName": "Career transition plan ΓÇö Laura Colombo"
+        },
+        {
+          "cashflowId": "6a207643d6592c97656e8526",
+          "planName": "Tax optimisation review ΓÇö Marco Rossi"
+        }
+      ]
+    },
+    {
+      "clientId": "6a207665d6592c97656ea389",
+      "uniqueTag": "S4-advisor-08c12",
+      "cashflows": [
+        {
+          "cashflowId": "6a207669d6592c97656ea61f",
+          "planName": "Primary financial plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a20768dd6592c97656ec597",
+          "planName": "Retirement income scenario ΓÇö Claudia Fontana"
+        },
+        {
+          "cashflowId": "6a2076afd6592c97656ee37f",
+          "planName": "Property & mortgage plan ΓÇö Giuseppe Lombardi"
+        },
+        {
+          "cashflowId": "6a2076d2d6592c97656f022b",
+          "planName": "Education funding plan ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a2076f6d6592c97656f2193",
+          "planName": "Inheritance & legacy plan ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a20771ad6592c97656f40e4",
+          "planName": "Business exit scenario ΓÇö Claudia Fontana"
+        },
+        {
+          "cashflowId": "6a207742d6592c97656f62bc",
+          "planName": "Career transition plan ΓÇö Giuseppe Lombardi"
+        },
+        {
+          "cashflowId": "6a207769d6592c97656f8397",
+          "planName": "Tax optimisation review ΓÇö Elena Romano"
+        }
+      ]
+    },
+    {
+      "clientId": "6a20778dd6592c97656fa367",
+      "uniqueTag": "S4-advisor-08c13",
+      "cashflows": [
+        {
+          "cashflowId": "6a207790d6592c97656fa606",
+          "planName": "Primary financial plan ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a2077b7d6592c97656fc5a8",
+          "planName": "Retirement income scenario ΓÇö Davide Greco"
+        },
+        {
+          "cashflowId": "6a2077ded6592c97656fe687",
+          "planName": "Property & mortgage plan ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a207802d6592c9765700443",
+          "planName": "Education funding plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a207827d6592c976570237e",
+          "planName": "Inheritance & legacy plan ΓÇö Monica Vitale"
+        },
+        {
+          "cashflowId": "6a20784cd6592c97657040f3",
+          "planName": "Business exit scenario ΓÇö Davide Greco"
+        },
+        {
+          "cashflowId": "6a20786ed6592c9765705e4e",
+          "planName": "Career transition plan ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a207891d6592c9765707bba",
+          "planName": "Tax optimisation review ΓÇö Matteo Russo"
+        }
+      ]
+    },
+    {
+      "clientId": "6a2078b0d6592c9765709709",
+      "uniqueTag": "S4-advisor-08c14",
+      "cashflows": [
+        {
+          "cashflowId": "6a2078b3d6592c976570999f",
+          "planName": "Primary financial plan ΓÇö Sofia Valenti"
+        }
+      ]
+    },
+    {
+      "clientId": "",
+      "uniqueTag": "S4-advisor-08c15",
+      "cashflows": [],
+      "error": "client_create_failed"
+    },
+    {
+      "clientId": "",
+      "uniqueTag": "S4-advisor-08c16",
+      "cashflows": [],
+      "error": "client_create_failed"
+    },
+    {
+      "clientId": "",
+      "uniqueTag": "S4-advisor-08c17",
+      "cashflows": [],
+      "error": "client_create_failed"
+    },
+    {
+      "clientId": "",
+      "uniqueTag": "S4-advisor-08c18",
+      "cashflows": [],
+      "error": "client_create_failed"
+    },
+    {
+      "clientId": "",
+      "uniqueTag": "S4-advisor-08c19",
+      "cashflows": [],
+      "error": "client_create_failed"
+    },
+    {
+      "clientId": "",
+      "uniqueTag": "S4-advisor-08c20",
+      "cashflows": [],
+      "error": "client_create_failed"
+    }
+  ],
+  "counts": {
+    "clients": 14,
+    "plans": 105
+  },
+  "generatedAt": "2026-06-03T18:56:29.483Z"
+}

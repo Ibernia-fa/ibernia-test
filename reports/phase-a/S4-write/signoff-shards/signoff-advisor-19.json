@@ -1,0 +1,87 @@
+{
+  "reportType": "volume-signoff-shard",
+  "generatedAt": "2026-06-03T18:56:15.044Z",
+  "phase": "A",
+  "profile": "write",
+  "runTag": "S4-write",
+  "shardId": "advisor-19",
+  "advisorEmail": "User20@gmail.com",
+  "k6ExitCode": null,
+  "source": "k6-marker",
+  "rows": [
+    {
+      "metric": "journey_create_client_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 4000,
+      "maxMs": null,
+      "actualMs": 274,
+      "actualLabel": "p95",
+      "over": false,
+      "marginMs": 3726,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "journey_create_base_plan_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 5000,
+      "maxMs": null,
+      "actualMs": 262,
+      "actualLabel": "p95",
+      "over": false,
+      "marginMs": 4738,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "POST /api/v1/Clients",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 3000,
+      "maxMs": 7500,
+      "actualMs": 836.3,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 2164,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "POST /api/v1/cashflows",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 4000,
+      "maxMs": 10000,
+      "actualMs": 3912,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 88,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "journey_calculate_projection_duration",
+      "kind": "step",
+      "optional": true,
+      "budgetMs": 5000,
+      "maxMs": null,
+      "actualMs": 44015,
+      "actualLabel": "p95",
+      "over": true,
+      "marginMs": -39015,
+      "overHardMax": null,
+      "note": null
+    }
+  ],
+  "summary": {
+    "totalRows": 5,
+    "rowsWithActual": 5,
+    "underBudget": 4,
+    "overBudget": 1,
+    "failedShard": false,
+    "worstMarginMs": 88,
+    "worstOverMs": 39015
+  }
+}

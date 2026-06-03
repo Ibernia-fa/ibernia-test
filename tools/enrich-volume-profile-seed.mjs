@@ -76,7 +76,7 @@ function simplifyFlowRows(rows) {
 }
 
 function buildPlanSeedSnapshot(clientTag, clientIndex, planIndex, plansPerClient) {
-  const persona = selectPersonaForClient(clientTag, clientIndex, planIndex);
+  const persona = selectPersonaForClient(clientTag, clientIndex, 0);
   const birthYear = persona.birthYear;
   const birthDateIso = birthDateIsoFromYear(birthYear);
   const planDuration = resolveRealisticPlanDuration(birthYear);

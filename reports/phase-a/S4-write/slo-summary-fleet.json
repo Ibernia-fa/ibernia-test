@@ -1,0 +1,2750 @@
+{
+  "reportType": "phase-a-slo-fleet",
+  "generatedAt": "2026-06-03T18:56:34.391Z",
+  "runTag": "S4-write",
+  "shardCount": 20,
+  "shards": [
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:55:25.359Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-00"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:55:41.474Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-01"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:17.319Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-02"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:18.172Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-03"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:28.475Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-04"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:29.710Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-05"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:25.369Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-06"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:22.292Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-07"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:29.801Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-08"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:29.209Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-09"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:23.966Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-10"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:28.657Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-11"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:13.763Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-12"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:28.559Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-13"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:27.432Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-14"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:27.034Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-15"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:24.018Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-16"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:23.360Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-17"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:26.658Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-18"
+    },
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-03T18:56:15.254Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-write",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-write",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-19"
+    }
+  ],
+  "fleet": {
+    "gatePassed": 0,
+    "gateFailed": 0
+  },
+  "validation": {
+    "expectedShards": 20,
+    "actualShards": 20,
+    "shardCountOk": true,
+    "passed": true
+  },
+  "signoff": {
+    "phase": "A",
+    "fleet": {
+      "expectedShards": 20,
+      "actualShards": 20,
+      "shardsAllUnder": 16,
+      "shardsAnyOver": 4,
+      "failedShardIds": [
+        "advisor-07",
+        "advisor-10",
+        "advisor-12",
+        "advisor-14"
+      ],
+      "byMetric": {
+        "journey_create_client_duration": {
+          "under": 20,
+          "over": 0,
+          "failedShards": [],
+          "worstMarginMs": 3698,
+          "worstOverMs": null
+        },
+        "journey_create_base_plan_duration": {
+          "under": 20,
+          "over": 0,
+          "failedShards": [],
+          "worstMarginMs": 3178,
+          "worstOverMs": null
+        },
+        "POST /api/v1/Clients": {
+          "under": 20,
+          "over": 0,
+          "failedShards": [],
+          "worstMarginMs": 1910,
+          "worstOverMs": null
+        },
+        "POST /api/v1/cashflows": {
+          "under": 16,
+          "over": 4,
+          "failedShards": [
+            "advisor-07",
+            "advisor-10",
+            "advisor-12",
+            "advisor-14"
+          ],
+          "worstMarginMs": 35,
+          "worstOverMs": 889
+        }
+      },
+      "shards": [
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:55:25.149Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-00",
+          "advisorEmail": "User01@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 263,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3737,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 240,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4760,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 792.4,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2208,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3901.7,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 98,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 47537,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -42537,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 98,
+            "worstOverMs": 42537
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:55:41.264Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-01",
+          "advisorEmail": "User02@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 270,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3730,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 268,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4732,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 850.1,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2150,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3867.3,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 133,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 35230,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -30230,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 133,
+            "worstOverMs": 30230
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:17.110Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-02",
+          "advisorEmail": "User03@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 295,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3705,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 293,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4707,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 816.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2183,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3848.6,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 151,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 35610,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -30610,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 151,
+            "worstOverMs": 30610
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:17.955Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-03",
+          "advisorEmail": "User04@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 273,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3727,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 274,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4726,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 930,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2070,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3918.4,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 82,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 47114,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -42114,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 82,
+            "worstOverMs": 42114
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:28.263Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-04",
+          "advisorEmail": "User05@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 280,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3720,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 273,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4727,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 1006.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 1993,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3869.6,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 130,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 33393,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -28393,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 130,
+            "worstOverMs": 28393
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:29.479Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-05",
+          "advisorEmail": "User06@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 291,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3709,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 305,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4695,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 844.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2156,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3925.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 74,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 43915,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -38915,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 74,
+            "worstOverMs": 38915
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:25.159Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-06",
+          "advisorEmail": "User07@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 278,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3722,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 286,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4714,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 981.4,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2019,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3944.5,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 55,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 45696,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -40696,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 55,
+            "worstOverMs": 40696
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:22.081Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-07",
+          "advisorEmail": "User08@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 278,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3722,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 262,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4738,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 882.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2118,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 4056.6,
+              "actualLabel": "max",
+              "over": true,
+              "marginMs": -57,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 46784,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -41784,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 3,
+            "overBudget": 2,
+            "failedShard": true,
+            "worstMarginMs": 2118,
+            "worstOverMs": 41784
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:29.486Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-08",
+          "advisorEmail": "User09@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 287,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3713,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 287,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4713,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 984.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2016,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3942.8,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 57,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 37803,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -32803,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 57,
+            "worstOverMs": 32803
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:28.999Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-09",
+          "advisorEmail": "User10@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 284,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3716,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 276,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4724,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 820.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2179,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3965.1,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 35,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 33849,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -28849,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 35,
+            "worstOverMs": 28849
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:23.738Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-10",
+          "advisorEmail": "User11@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 286,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3714,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 272,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4728,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 860.4,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2140,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 4758.3,
+              "actualLabel": "max",
+              "over": true,
+              "marginMs": -758,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 43179,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -38179,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 3,
+            "overBudget": 2,
+            "failedShard": true,
+            "worstMarginMs": 2140,
+            "worstOverMs": 38179
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:28.445Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-11",
+          "advisorEmail": "User12@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 279,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3721,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 273,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4727,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 850.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2149,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3907.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 93,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 43861,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -38861,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 93,
+            "worstOverMs": 38861
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:13.554Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-12",
+          "advisorEmail": "User13@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 277,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3723,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 270,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4730,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 891.8,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2108,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 4888.8,
+              "actualLabel": "max",
+              "over": true,
+              "marginMs": -889,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 44789,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -39789,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 3,
+            "overBudget": 2,
+            "failedShard": true,
+            "worstMarginMs": 2108,
+            "worstOverMs": 39789
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:28.350Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-13",
+          "advisorEmail": "User14@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 273,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3727,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 256,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4744,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 837,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2163,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3861.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 139,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 34315,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -29315,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 139,
+            "worstOverMs": 29315
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:27.219Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-14",
+          "advisorEmail": "User15@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 271,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3729,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 281,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4719,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 881.6,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2118,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 4743.1,
+              "actualLabel": "max",
+              "over": true,
+              "marginMs": -743,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 33005,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -28005,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 3,
+            "overBudget": 2,
+            "failedShard": true,
+            "worstMarginMs": 2118,
+            "worstOverMs": 28005
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:26.824Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-15",
+          "advisorEmail": "User16@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 273,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3727,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 272,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4728,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 1026.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 1974,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3925.3,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 75,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 42156,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -37156,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 75,
+            "worstOverMs": 37156
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:23.810Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-16",
+          "advisorEmail": "User17@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 302,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3698,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 1822,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3178,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 1038.4,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 1962,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3883.5,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 116,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 48045,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -43045,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 116,
+            "worstOverMs": 43045
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:23.149Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-17",
+          "advisorEmail": "User18@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 300,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3700,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 278,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4722,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 866.8,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2133,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3956.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 43,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 45340,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -40340,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 43,
+            "worstOverMs": 40340
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:26.447Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-18",
+          "advisorEmail": "User19@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 265,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3735,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 269,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4731,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 1090,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 1910,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3925.9,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 74,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 38098,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -33098,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 74,
+            "worstOverMs": 33098
+          }
+        },
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-03T18:56:15.044Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-write",
+          "shardId": "advisor-19",
+          "advisorEmail": "User20@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 274,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3726,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 262,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 4738,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 836.3,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2164,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": 3912,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 88,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": 44015,
+              "actualLabel": "p95",
+              "over": true,
+              "marginMs": -39015,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 5,
+            "underBudget": 4,
+            "overBudget": 1,
+            "failedShard": false,
+            "worstMarginMs": 88,
+            "worstOverMs": 39015
+          }
+        }
+      ]
+    }
+  }
+}

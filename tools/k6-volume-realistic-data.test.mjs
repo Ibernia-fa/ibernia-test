@@ -31,6 +31,7 @@ import {
   isTimelineSeedExcludedEvent,
   pickTimelineEventsFromDefaults,
   planTitleForPersona,
+  planDescriptionForPersona,
   planEndYearFromDuration,
   resolveRealisticPlanDuration,
   resolveTimelineGoalAges,
@@ -439,4 +440,29 @@ test('planTitleForPersona varies with multi-plan clients', () => {
   const persona = VOLUME_CLIENT_PERSONAS[0];
   assert.equal(planTitleForPersona(persona, 0, 1), persona.planLabel);
   assert.notEqual(planTitleForPersona(persona, 0, 2), planTitleForPersona(persona, 1, 2));
+});
+
+test('planTitleForPersona yields 8 unique titles per client (S4/S5)', () => {
+  const clientTag = 'S4-advisor-00c1';
+  for (const clientIndex of [0, 1, 10]) {
+    const clientPersona = selectPersonaForClient(clientTag, clientIndex, 0);
+    const titles = new Set();
+    for (let planIndex = 0; planIndex < 8; planIndex++) {
+      titles.add(planTitleForPersona(clientPersona, planIndex, 8));
+    }
+    assert.equal(titles.size, 8, `expected 8 distinct plan names for clientIndex=${clientIndex}`);
+    for (const title of titles) {
+      assert.ok(!title.includes('—'), `plan title should not include client name suffix: ${title}`);
+    }
+  }
+});
+
+test('planDescriptionForPersona yields 8 unique descriptions per client (S4/S5)', () => {
+  const clientTag = 'S4-advisor-00c1';
+  const clientPersona = selectPersonaForClient(clientTag, 0, 0);
+  const descriptions = new Set();
+  for (let planIndex = 0; planIndex < 8; planIndex++) {
+    descriptions.add(planDescriptionForPersona(clientPersona, planIndex, 8));
+  }
+  assert.equal(descriptions.size, 8);
 });
