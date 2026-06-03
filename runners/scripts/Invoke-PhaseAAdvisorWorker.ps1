@@ -57,7 +57,22 @@ $maxDuration = if ($MaxDuration) { $MaxDuration } else { Resolve-PhaseAMaxDurati
 
 New-Item -ItemType Directory -Path $RunOutDir, $LogDir -Force | Out-Null
 
-Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration"
+$k6LogFile = Join-Path $LogDir 'k6.log'
+$workerMetaPath = Join-Path $RunOutDir 'run-metadata-worker.json'
+foreach ($stale in @($k6LogFile, $workerMetaPath)) {
+  if (Test-Path -LiteralPath $stale) { Remove-Item -LiteralPath $stale -Force }
+}
+Get-ChildItem -LiteralPath (Join-Path $RunOutDir 'manifests') -Filter '*.json' -File -ErrorAction SilentlyContinue |
+  Remove-Item -Force -ErrorAction SilentlyContinue
+Get-ChildItem -LiteralPath (Join-Path $RunOutDir 'slo-shards') -Filter '*.json' -File -ErrorAction SilentlyContinue |
+  Remove-Item -Force -ErrorAction SilentlyContinue
+
+$k6RestPort = 6570
+if ($AdvisorIndex -ne '') {
+  $k6RestPort = 6570 + [int]$AdvisorIndex
+}
+
+Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort"
 
 $sliceForK6 = $PoolSliceFile -replace '\\', '/'
 $sloConfig = 'config/volume-api-slo.json'
@@ -65,7 +80,7 @@ $scenariosConfig = 'config/volume-scenarios.json'
 
 $k6Args = @(
   'run', 'k6/full-platform/k6-full-platform-orchestrator.js',
-  '--address', '',
+  '--address', "127.0.0.1:${k6RestPort}",
   '-e', 'SIGNUP_ROPC_CLIENT_ID=k6-load-test-client',
   '-e', 'VUS=1',
   '-e', 'K6_DEFAULT_VUS=1',
@@ -122,7 +137,6 @@ if ($Secret) { $k6Args += @('-e', "SIGNUP_ROPC_CLIENT_SECRET=$Secret") }
 
 Write-Host "[PhaseAWorker] mode=$userMode VOLUME_SLO_GATE=$VolumeSloGate CONSOLIDATED_PERF=1"
 
-$k6LogFile = Join-Path $LogDir 'k6.log'
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
 $writer = [System.IO.StreamWriter]::new($k6LogFile, $false, $utf8NoBom)
 $code = 1

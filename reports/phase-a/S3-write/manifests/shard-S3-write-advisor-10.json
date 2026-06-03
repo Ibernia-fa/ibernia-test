@@ -1,18 +1,236 @@
 {
   "reportType": "phase-a-manifest-shard",
-  "generatedAt": "2026-06-03T04:15:15.807Z",
   "runTag": "S3-write",
   "shardId": "advisor-10",
-  "scenario": "S3",
-  "runId": "S3-write",
-  "advisorIndex": null,
-  "advisorSub": "",
-  "advisorEmail": "",
-  "vu": null,
-  "iteration": null,
-  "clients": [],
-  "counts": {
-      "clients": 0,
-      "plans": 0
+  "advisorSub": "c05ec07d-4b13-4152-b817-e9b58fd98e1b",
+  "advisorEmail": "User11@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1fafbe901fc6abfb1113e8",
+      "uniqueTag": "fp1_g0_1780461445701c1",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fafc3901fc6abfb11155f",
+          "planName": "Primary financial plan ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a1faff2901fc6abfb11323f",
+          "planName": "Retirement income scenario ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a1fb024901fc6abfb115166",
+          "planName": "Property & mortgage plan ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a1fb052901fc6abfb116ea9",
+          "planName": "Education funding plan ΓÇö Andrea Moretti"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb081901fc6abfb118c22",
+      "uniqueTag": "fp1_g0_1780461445701c2",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb086901fc6abfb118e64",
+          "planName": "Primary financial plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a1fb0b1901fc6abfb11a982",
+          "planName": "Retirement income scenario ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a1fb0e2901fc6abfb11c870",
+          "planName": "Property & mortgage plan ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a1fb10f901fc6abfb11e4f8",
+          "planName": "Education funding plan ΓÇö Luca Ferrero"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb13b901fc6abfb120085",
+      "uniqueTag": "fp1_g0_1780461445701c3",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb13f901fc6abfb120287",
+          "planName": "Primary financial plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a1fb16c901fc6abfb121dfe",
+          "planName": "Retirement income scenario ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a1fb19a901fc6abfb123a8a",
+          "planName": "Property & mortgage plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a1fb1cb901fc6abfb125996",
+          "planName": "Education funding plan ΓÇö Francesca Gallo"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb1fa901fc6abfb12776f",
+      "uniqueTag": "fp1_g0_1780461445701c4",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb1fe901fc6abfb1278f2",
+          "planName": "Primary financial plan ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a1fb22e901fc6abfb1296e4",
+          "planName": "Retirement income scenario ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a1fb25d901fc6abfb12b450",
+          "planName": "Property & mortgage plan ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a1fb289901fc6abfb12d00c",
+          "planName": "Education funding plan ΓÇö Sofia Valenti"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb2bb901fc6abfb12eee4",
+      "uniqueTag": "fp1_g0_1780461445701c5",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb2bf901fc6abfb12f13c",
+          "planName": "Primary financial plan ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a1fb2ef901fc6abfb130ef1",
+          "planName": "Retirement income scenario ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a1fb31b901fc6abfb132a4c",
+          "planName": "Property & mortgage plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a1fb347901fc6abfb1345dc",
+          "planName": "Education funding plan ΓÇö Giulia Bianchi"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb378901fc6abfb1363de",
+      "uniqueTag": "fp1_g0_1780461445701c6",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb37a901fc6abfb136566",
+          "planName": "Primary financial plan ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a1fb3a6901fc6abfb138074",
+          "planName": "Retirement income scenario ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a1fb3d5901fc6abfb139deb",
+          "planName": "Property & mortgage plan ΓÇö Andrea Moretti"
+        },
+        {
+          "cashflowId": "6a1fb401901fc6abfb13ba0e",
+          "planName": "Education funding plan ΓÇö Alessandro Conti"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb42c901fc6abfb13d459",
+      "uniqueTag": "fp1_g0_1780461445701c7",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb430901fc6abfb13d6de",
+          "planName": "Primary financial plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a1fb45c901fc6abfb13f152",
+          "planName": "Retirement income scenario ΓÇö Chiara Marini"
+        },
+        {
+          "cashflowId": "6a1fb48a901fc6abfb140dcf",
+          "planName": "Property & mortgage plan ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a1fb4b9901fc6abfb142b80",
+          "planName": "Education funding plan ΓÇö Chiara Marini"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb4e9901fc6abfb144a1b",
+      "uniqueTag": "fp1_g0_1780461445701c8",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb4ee901fc6abfb144c55",
+          "planName": "Primary financial plan ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a1fb51b901fc6abfb146852",
+          "planName": "Retirement income scenario ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a1fb547901fc6abfb1483bf",
+          "planName": "Property & mortgage plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a1fb575901fc6abfb14a08c",
+          "planName": "Education funding plan ΓÇö Marco Rossi"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb5a0901fc6abfb14bbe8",
+      "uniqueTag": "fp1_g0_1780461445701c9",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb5a4901fc6abfb14bd80",
+          "planName": "Primary financial plan ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a1fb5d0901fc6abfb14d8be",
+          "planName": "Retirement income scenario ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a1fb603901fc6abfb14f8be",
+          "planName": "Property & mortgage plan ΓÇö Sofia Valenti"
+        },
+        {
+          "cashflowId": "6a1fb631901fc6abfb1515b3",
+          "planName": "Education funding plan ΓÇö Elena Romano"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1fb65d901fc6abfb153182",
+      "uniqueTag": "fp1_g0_1780461445701c10",
+      "cashflows": [
+        {
+          "cashflowId": "6a1fb661901fc6abfb153381",
+          "planName": "Primary financial plan ΓÇö Elena Romano"
+        },
+        {
+          "cashflowId": "6a1fb68a901fc6abfb154ca7",
+          "planName": "Retirement income scenario ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a1fb6b3901fc6abfb15659a",
+          "planName": "Property & mortgage plan ΓÇö Giulia Bianchi"
+        },
+        {
+          "cashflowId": "6a1fb6e0901fc6abfb1581c4",
+          "planName": "Education funding plan ΓÇö Matteo Russo"
+        }
+      ]
     }
+  ],
+  "counts": {
+    "clients": 10,
+    "plans": 40
+  },
+  "generatedAt": "2026-06-03T05:09:25.077Z"
 }

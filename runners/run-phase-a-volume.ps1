@@ -137,6 +137,14 @@ $scenarioJsonPath = Join-Path $runRoot 'scenario-resolved.json'
 $volumeSloGate = [bool]$VolumeSloGate.IsPresent
 
 New-Item -ItemType Directory -Path $runRoot, $manifestsRoot, $sloShardsRoot, $workersRoot, $logsRoot -Force | Out-Null
+Get-ChildItem -LiteralPath $manifestsRoot -Filter '*.json' -File -ErrorAction SilentlyContinue |
+  Remove-Item -Force -ErrorAction SilentlyContinue
+Get-ChildItem -LiteralPath $sloShardsRoot -Filter '*.json' -File -ErrorAction SilentlyContinue |
+  Remove-Item -Force -ErrorAction SilentlyContinue
+$signoffShardsRoot = Join-Path $runRoot 'signoff-shards'
+New-Item -ItemType Directory -Path $signoffShardsRoot -Force | Out-Null
+Get-ChildItem -LiteralPath $signoffShardsRoot -Filter '*.json' -File -ErrorAction SilentlyContinue |
+  Remove-Item -Force -ErrorAction SilentlyContinue
 [System.IO.File]::WriteAllText(
   $scenarioJsonPath,
   (($scenarioResolved | ConvertTo-Json -Compress -Depth 10) + "`n"),
@@ -272,6 +280,15 @@ try {
     if (Test-Path -LiteralPath $workerMetaFile) {
       $wm = Get-Content -LiteralPath $workerMetaFile -Raw | ConvertFrom-Json
       $metaExit = $wm.exitCode
+      $metaStart = $null
+      if ($wm.startTime) {
+        try { $metaStart = [datetime]::Parse($wm.startTime).ToUniversalTime() } catch { $metaStart = $null }
+      }
+      $metaStale = ($null -ne $metaStart) -and ($metaStart -lt $runStartTime.ToUniversalTime().AddMinutes(-1))
+      if ($metaStale) {
+        Write-Warning "Stale worker metadata for $($r.Name) (startTime=$($wm.startTime)); treating as failed"
+        $metaExit = $null
+      }
       $advisorRuns += [ordered]@{
         advisorKey    = $wm.advisorKey
         shardId       = $wm.shardId
