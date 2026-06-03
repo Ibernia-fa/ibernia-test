@@ -198,7 +198,7 @@ test('evaluateVolumeSloGate fails when phase A step p95 exceeds budget', () => {
 });
 
 test('parseVolumeSloConfig includes Phase A write step budgets', () => {
-  assert.equal(repoConfig.profiles.write.stepBudgetMs.journey_full_plan_build_duration, 30000);
+  assert.equal(repoConfig.profiles.write.stepBudgetMs.journey_full_plan_build_duration, 45000);
 });
 
 test('parseVolumeScenariosConfig loads phase-a and phase-b scenarios', () => {

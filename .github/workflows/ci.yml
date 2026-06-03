@@ -1,0 +1,21 @@
+# Static checks for load-testing-k6 (no k6 runs against dev — those are local/manual).
+name: CI
+
+on:
+  push:
+    branches: [load-testing-k6, main]
+  pull_request:
+    branches: [load-testing-k6, main]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run unit tests
+        run: node --test tools/*.test.mjs
