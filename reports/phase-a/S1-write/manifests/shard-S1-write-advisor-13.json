@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f0f11901fc6abfb012f23",
-      "uniqueTag": "fp1_g0_1780420366639",
+      "clientId": "6a1f8ff8901fc6abfb096d4f",
+      "uniqueTag": "fp1_g0_1780453350707",
       "cashflows": [
         {
-          "cashflowId": "6a1f0f15901fc6abfb01301e",
-          "planName": "Wealth accumulation plan"
+          "cashflowId": "6a1f8ffc901fc6abfb096f05",
+          "planName": "Early career wealth plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T17:13:39.515Z"
+  "generatedAt": "2026-06-03T02:23:26.572Z"
 }

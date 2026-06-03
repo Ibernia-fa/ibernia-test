@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-02T18:15:42.770Z",
+  "generatedAt": "2026-06-03T02:34:02.067Z",
   "phase": "B",
   "profile": "read",
   "runTag": "S1-read",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": null,
-      "actualMs": 277,
+      "actualMs": 271,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 2223,
+      "marginMs": 2229,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": null,
-      "actualMs": 13432,
+      "actualMs": 9958,
       "actualLabel": "p95",
       "over": true,
-      "marginMs": -10932,
+      "marginMs": -7458,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": 7500,
-      "actualMs": 429.7,
+      "actualMs": 285.2,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 2070,
+      "marginMs": 2215,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": 7500,
-      "actualMs": 335,
+      "actualMs": 1114.7,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 2165,
+      "marginMs": 1385,
       "overHardMax": false,
       "note": null
     },
@@ -67,21 +67,21 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 953,
+      "actualMs": 19439.8,
       "actualLabel": "max",
-      "over": false,
-      "marginMs": 2047,
-      "overHardMax": false,
+      "over": true,
+      "marginMs": -16440,
+      "overHardMax": true,
       "note": null
     }
   ],
   "summary": {
     "totalRows": 5,
     "rowsWithActual": 5,
-    "underBudget": 4,
-    "overBudget": 1,
+    "underBudget": 3,
+    "overBudget": 2,
     "failedShard": true,
-    "worstMarginMs": 2047,
-    "worstOverMs": 10932
+    "worstMarginMs": 1385,
+    "worstOverMs": 16440
   }
 }

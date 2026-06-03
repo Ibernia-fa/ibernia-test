@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f0f10901fc6abfb012ef0",
-      "uniqueTag": "fp1_g0_1780420366705",
+      "clientId": "6a1f8fdf901fc6abfb0966ce",
+      "uniqueTag": "fp1_g0_1780453336733",
       "cashflows": [
         {
-          "cashflowId": "6a1f0f14901fc6abfb012fae",
-          "planName": "Wealth accumulation plan"
+          "cashflowId": "6a1f8fe0901fc6abfb0966e2",
+          "planName": "Mid-life financial review"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T17:13:38.880Z"
+  "generatedAt": "2026-06-03T02:22:43.436Z"
 }

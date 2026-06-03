@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f0f11901fc6abfb012f25",
-      "uniqueTag": "fp1_g0_1780420366945",
+      "clientId": "6a1f8ff9901fc6abfb096da8",
+      "uniqueTag": "fp1_g0_1780453350650",
       "cashflows": [
         {
-          "cashflowId": "6a1f0f15901fc6abfb013026",
-          "planName": "Family security plan"
+          "cashflowId": "6a1f8ffc901fc6abfb096efe",
+          "planName": "Wealth accumulation plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-02T17:13:41.044Z"
+  "generatedAt": "2026-06-03T02:23:26.562Z"
 }
