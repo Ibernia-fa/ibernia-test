@@ -4,6 +4,7 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { buildMinimalFundTransactionLineItem } from '../lib/k6-fund-transaction-line-item.js';
 import {
   VOLUME_CLIENT_PERSONAS,
   applyRealisticClientProfile,
@@ -227,6 +228,36 @@ test('contribution and withdrawal fund params include markers and realistic amou
   assert.ok(contributions[0].amount >= 300);
   assert.match(withdrawals[0].description, /drawdown/i);
   assert.ok(withdrawals[1].amount >= 10000);
+  assert.equal(contributions[0].cycleDescription, 'Every month');
+  assert.equal(contributions[1].cycleDescription, 'Every year');
+  assert.equal(withdrawals[0].cycleDescription, 'Every month');
+  assert.equal(withdrawals[1].cycleDescription, 'One-off');
+});
+
+test('buildMinimalFundTransactionLineItem includes amount.cycle.description for UI', () => {
+  const monthly = buildMinimalFundTransactionLineItem({
+    description: 'Monthly pension contribution',
+    amount: 500,
+    startAge: 40,
+    startYear: 2025,
+    endAge: 65,
+    endYear: 2050,
+    contributionType: 1,
+    cycleDescription: 'Every month',
+  });
+  assert.equal(monthly.amount.cycle.description, 'Every month');
+
+  const oneOff = buildMinimalFundTransactionLineItem({
+    description: 'One-off capital withdrawal',
+    amount: 12000,
+    startAge: 60,
+    startYear: 2045,
+    endAge: 60,
+    endYear: 2045,
+    contributionType: 3,
+    cycleDescription: 'One-off',
+  });
+  assert.equal(oneOff.amount.cycle.description, 'One-off');
 });
 
 test('buildRealisticSavingPotPayload creates two distinct non-cash pots', () => {

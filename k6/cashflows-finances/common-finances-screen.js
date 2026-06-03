@@ -14,6 +14,8 @@ import http from 'k6/http';
 import { sleep } from 'k6';
 import { HTTP_TIMEOUT, buildMinimalIncomeLineItem } from '../cashflows-income/common-income-screen.js';
 
+export { AMOUNT_CYCLE_DESCRIPTION, buildMinimalFundTransactionLineItem } from '../../lib/k6-fund-transaction-line-item.js';
+
 const DEFAULT_RESOLVE_ATTEMPTS = Math.max(
   1,
   parseInt((__ENV.INCOME_LINE_RESOLVE_MAX_ATTEMPTS || '10').trim(), 10) || 10,
@@ -171,32 +173,6 @@ export function contributionsPostUrl(base, cashflowId) {
 
 export function withdrawalsPostUrl(base, cashflowId) {
   return `${base}/api/v1/cashflows/${encodeURIComponent(cashflowId)}/funds/withdrawals`;
-}
-
-/**
- * Minimal **FundTransactionLineItem** for POST/PUT/DELETE on funds contributions/withdrawals.
- */
-export function buildMinimalFundTransactionLineItem(p) {
-  const desc = p.description;
-  const amountVal = p.amount != null ? p.amount : 500;
-  const startAge = p.startAge != null ? p.startAge : 30;
-  const startYear = p.startYear != null ? p.startYear : new Date().getFullYear();
-  const endAge = p.endAge != null ? p.endAge : 65;
-  const endYear = p.endYear != null ? p.endYear : startYear + 35;
-  const line = {
-    description: desc,
-    amount: { amount: amountVal, currencySymbol: '€' },
-    start: { age: startAge, year: startYear },
-    end: { age: endAge, year: endYear },
-    contributionType: p.contributionType != null ? p.contributionType : 1,
-  };
-  if (p.id != null && String(p.id).trim() !== '') {
-    line.id = String(p.id).trim();
-  }
-  if (p.associatedSavingPotId != null && String(p.associatedSavingPotId).trim() !== '') {
-    line.associatedSavingPotId = String(p.associatedSavingPotId).trim();
-  }
-  return line;
 }
 
 function fundRowsFromGet(res, arrayKey) {
