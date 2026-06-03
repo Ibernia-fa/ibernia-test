@@ -203,10 +203,9 @@ test('wealth payloads embed volume marker for dashboard resolve', () => {
   assert.ok(asset.value >= 50000);
 });
 
-test('contribution and withdrawal fund params include markers and realistic amounts', () => {
+test('contribution and withdrawal fund params use clean descriptions without volume tags', () => {
   const persona = VOLUME_CLIENT_PERSONAS[2];
   const tag = 'fp1_g0_77';
-  const marker = volumeSeedMarker(tag, 0);
   const contributions = buildRealisticContributionLineItemParams({
     persona,
     birthYear: persona.birthYear,
@@ -222,8 +221,11 @@ test('contribution and withdrawal fund params include markers and realistic amou
   });
   assert.equal(contributions.length, 2);
   assert.equal(withdrawals.length, 2);
-  assert.match(contributions[0].description, /pension contribution/i);
-  assert.match(contributions[0].description, new RegExp(marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+  assert.equal(contributions[0].description, 'Monthly pension contribution');
+  assert.doesNotMatch(contributions[0].description, /\[vol-/);
+  assert.doesNotMatch(contributions[1].description, /\[vol-/);
+  assert.doesNotMatch(withdrawals[0].description, /\[vol-/);
+  assert.doesNotMatch(withdrawals[1].description, /\[vol-/);
   assert.equal(contributions[0].associatedSavingPotId, 'pot-abc');
   assert.ok(contributions[0].amount >= 300);
   assert.match(withdrawals[0].description, /drawdown/i);
@@ -232,6 +234,8 @@ test('contribution and withdrawal fund params include markers and realistic amou
   assert.equal(contributions[1].cycleDescription, 'Every year');
   assert.equal(withdrawals[0].cycleDescription, 'Every month');
   assert.equal(withdrawals[1].cycleDescription, 'One-off');
+  assert.equal(withdrawals[0].contributionType, 0);
+  assert.equal(withdrawals[1].contributionType, 0);
 });
 
 test('buildMinimalFundTransactionLineItem includes amount.cycle.description for UI', () => {
@@ -254,10 +258,14 @@ test('buildMinimalFundTransactionLineItem includes amount.cycle.description for 
     startYear: 2045,
     endAge: 60,
     endYear: 2045,
-    contributionType: 3,
+    isWithdrawal: true,
+    contributionType: 0,
     cycleDescription: 'One-off',
   });
   assert.equal(oneOff.amount.cycle.description, 'One-off');
+  assert.equal(oneOff.contributionType, 0);
+  assert.equal(oneOff.hasCommission, false);
+  assert.deepEqual(oneOff.escalationRate, { description: '', value: 0 });
 });
 
 test('buildRealisticSavingPotPayload creates two distinct non-cash pots', () => {

@@ -1,6 +1,6 @@
 {
   "reportType": "volume-slo-summary",
-  "generatedAt": "2026-06-03T14:53:10.896Z",
+  "generatedAt": "2026-06-03T16:29:06.000Z",
   "configVersion": 1,
   "defaultProfile": "write",
   "gates": null,

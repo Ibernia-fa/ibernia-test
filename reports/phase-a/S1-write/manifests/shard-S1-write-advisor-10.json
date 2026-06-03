@@ -8,11 +8,11 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a203fb0d6592c9765559dfb",
+      "clientId": "6a20562fd6592c976556bfc7",
       "uniqueTag": "S1-advisor-10",
       "cashflows": [
         {
-          "cashflowId": "6a203fb7d6592c976555a188",
+          "cashflowId": "6a205633d6592c976556c1c1",
           "planName": "Studio succession plan"
         }
       ]
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T14:53:10.478Z"
+  "generatedAt": "2026-06-03T16:29:06.688Z"
 }

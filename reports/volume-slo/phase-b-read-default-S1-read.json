@@ -1,6 +1,6 @@
 {
   "reportType": "volume-slo-summary",
-  "generatedAt": "2026-06-03T15:15:11.573Z",
+  "generatedAt": "2026-06-03T16:39:40.709Z",
   "configVersion": 1,
   "defaultProfile": "read",
   "gates": null,
@@ -11,7 +11,7 @@
           "endpointViolationRate": null,
           "stepViolationRate": null,
           "hardMaxViolationRate": null,
-          "userLagRate": 0.0069568883735638245
+          "userLagRate": 0.025960890087660147
         },
   "totals": {
           "endpointSamples": 0,
@@ -29,7 +29,7 @@
   "sloProfile": "read",
   "readOnly": true,
   "manifestDriven": true,
-  "userLagRate": 0.0069568883735638245,
+  "userLagRate": 0.025960890087660147,
   "scenarioMetadata": {
           "scenario": "phase-b-read-default",
           "phaseBScenario": null,

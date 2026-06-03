@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-03T14:53:09.528Z",
+  "generatedAt": "2026-06-03T16:29:06.669Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 1861,
+      "actualMs": 3081,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 2139,
+      "marginMs": 919,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 6026,
+      "actualMs": 4015,
       "actualLabel": "p95",
-      "over": true,
-      "marginMs": -1026,
+      "over": false,
+      "marginMs": 985,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 7500,
-      "actualMs": 725.5,
+      "actualMs": 1037.9,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 2275,
+      "marginMs": 1962,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 10000,
-      "actualMs": 6018.2,
+      "actualMs": 4007.1,
       "actualLabel": "max",
       "over": true,
-      "marginMs": -2018,
+      "marginMs": -7,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": true,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 27103,
+      "actualMs": 27338,
       "actualLabel": "p95",
       "over": true,
-      "marginMs": -22103,
+      "marginMs": -22338,
       "overHardMax": null,
       "note": null
     }
@@ -78,10 +78,10 @@
   "summary": {
     "totalRows": 5,
     "rowsWithActual": 5,
-    "underBudget": 2,
-    "overBudget": 3,
+    "underBudget": 3,
+    "overBudget": 2,
     "failedShard": true,
-    "worstMarginMs": 2139,
-    "worstOverMs": 22103
+    "worstMarginMs": 919,
+    "worstOverMs": 22338
   }
 }

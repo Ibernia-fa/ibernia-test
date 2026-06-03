@@ -8,11 +8,11 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a203fafd6592c9765559deb",
+      "clientId": "6a20562ed6592c976556bf88",
       "uniqueTag": "S1-advisor-03",
       "cashflows": [
         {
-          "cashflowId": "6a203fb0d6592c9765559e10",
+          "cashflowId": "6a205631d6592c976556c0bf",
           "planName": "Hospitality business plan"
         }
       ]
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T14:53:06.069Z"
+  "generatedAt": "2026-06-03T16:29:03.645Z"
 }
