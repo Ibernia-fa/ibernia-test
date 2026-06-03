@@ -137,12 +137,24 @@ if (Test-Path -LiteralPath $k6LogFile) {
 
 $manifestSrc = Join-Path $RepoRoot "reports/phase-a/$RunTag/manifests"
 if (Test-Path -LiteralPath $manifestSrc) {
-  Copy-Item -LiteralPath $manifestSrc -Destination $RunOutDir -Recurse -Force
+  $ownManifest = Get-ChildItem -LiteralPath $manifestSrc -Filter "shard-*-$ShardId.json" -File -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+  if ($ownManifest) {
+    $destManifests = Join-Path $RunOutDir 'manifests'
+    New-Item -ItemType Directory -Path $destManifests -Force | Out-Null
+    Copy-Item -LiteralPath $ownManifest.FullName -Destination (Join-Path $destManifests $ownManifest.Name) -Force
+  }
 }
 
 $sloShardSrc = Join-Path $RepoRoot "reports/phase-a/$RunTag/slo-shards"
 if (Test-Path -LiteralPath $sloShardSrc) {
-  Copy-Item -LiteralPath $sloShardSrc -Destination (Join-Path $RunOutDir 'slo-shards') -Recurse -Force
+  $ownSlo = Get-ChildItem -LiteralPath $sloShardSrc -Filter "slo-$ShardId.json" -File -ErrorAction SilentlyContinue |
+    Select-Object -First 1
+  if ($ownSlo) {
+    $destSlo = Join-Path $RunOutDir 'slo-shards'
+    New-Item -ItemType Directory -Path $destSlo -Force | Out-Null
+    Copy-Item -LiteralPath $ownSlo.FullName -Destination (Join-Path $destSlo $ownSlo.Name) -Force
+  }
 }
 
 $endTime = Get-Date

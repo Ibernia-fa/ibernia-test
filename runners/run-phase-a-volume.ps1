@@ -263,22 +263,31 @@ try {
     Write-Host "Job $($r.Name): state=$($r.State) exitCode=$exitCode failed=$jobFailed"
   }
 
-  # Collect shards
+  # Collect shards — each worker folder holds only its own manifest/SLO file (see Invoke-PhaseAAdvisorWorker.ps1).
   $manifestCollected = 0
   $sloCollected = 0
   Get-ChildItem -LiteralPath $workersRoot -Directory | ForEach-Object {
+    $advisorKey = $_.Name
     $shardDir = Join-Path $_.FullName 'manifests'
     if (Test-Path -LiteralPath $shardDir) {
-      Get-ChildItem -LiteralPath $shardDir -Filter '*.json' -File | ForEach-Object {
-        Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $manifestsRoot $_.Name) -Force
+      $ownManifest = Get-ChildItem -LiteralPath $shardDir -Filter "*-$advisorKey.json" -File -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+      if ($ownManifest) {
+        Copy-Item -LiteralPath $ownManifest.FullName -Destination (Join-Path $manifestsRoot $ownManifest.Name) -Force
         $manifestCollected++
+      } else {
+        Write-Warning "No manifest shard for $advisorKey under $shardDir"
       }
     }
     $workerSloDir = Join-Path $_.FullName 'slo-shards'
     if (Test-Path -LiteralPath $workerSloDir) {
-      Get-ChildItem -LiteralPath $workerSloDir -Filter '*.json' -File | ForEach-Object {
-        Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $sloShardsRoot $_.Name) -Force
+      $ownSlo = Get-ChildItem -LiteralPath $workerSloDir -Filter "slo-$advisorKey.json" -File -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+      if ($ownSlo) {
+        Copy-Item -LiteralPath $ownSlo.FullName -Destination (Join-Path $sloShardsRoot $ownSlo.Name) -Force
         $sloCollected++
+      } else {
+        Write-Warning "No SLO shard for $advisorKey under $workerSloDir"
       }
     }
   }

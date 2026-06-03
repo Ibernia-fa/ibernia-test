@@ -1,0 +1,86 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "runTag": "S2-write",
+  "shardId": "advisor-04",
+  "advisorSub": "2b9a7110-ef78-484d-a588-490f261bc699",
+  "advisorEmail": "User05@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a1f83be901fc6abfb06d740",
+      "uniqueTag": "fp1_g0_1780450220779c1",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f83c2901fc6abfb06d812",
+          "planName": "Primary financial plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a1f83ef901fc6abfb06f2e3",
+          "planName": "Retirement income scenario ΓÇö Giulia Bianchi"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1f841f901fc6abfb071110",
+      "uniqueTag": "fp1_g0_1780450220779c2",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f8423901fc6abfb071274",
+          "planName": "Primary financial plan ΓÇö Alessandro Conti"
+        },
+        {
+          "cashflowId": "6a1f8453901fc6abfb073012",
+          "planName": "Retirement income scenario ΓÇö Chiara Marini"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1f8480901fc6abfb074cb6",
+      "uniqueTag": "fp1_g0_1780450220779c3",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f8484901fc6abfb074e2b",
+          "planName": "Primary financial plan ΓÇö Luca Ferrero"
+        },
+        {
+          "cashflowId": "6a1f84b3901fc6abfb076b38",
+          "planName": "Retirement income scenario ΓÇö Francesca Gallo"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1f84dc901fc6abfb078435",
+      "uniqueTag": "fp1_g0_1780450220779c4",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f84df901fc6abfb07867a",
+          "planName": "Primary financial plan ΓÇö Marco Rossi"
+        },
+        {
+          "cashflowId": "6a1f8508901fc6abfb079e62",
+          "planName": "Retirement income scenario ΓÇö Elena Romano"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1f852d901fc6abfb07b61f",
+      "uniqueTag": "fp1_g0_1780450220779c5",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f8530901fc6abfb07b737",
+          "planName": "Primary financial plan ΓÇö Matteo Russo"
+        },
+        {
+          "cashflowId": "6a1f855a901fc6abfb07d0a4",
+          "planName": "Retirement income scenario ΓÇö Giulia Bianchi"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "clients": 5,
+    "plans": 10
+  },
+  "generatedAt": "2026-06-03T01:38:08.685Z"
+}

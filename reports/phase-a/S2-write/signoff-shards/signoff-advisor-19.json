@@ -1,0 +1,87 @@
+{
+  "reportType": "volume-signoff-shard",
+  "generatedAt": "2026-06-03T01:38:32.739Z",
+  "phase": "A",
+  "profile": "write",
+  "runTag": "S2-write",
+  "shardId": "advisor-19",
+  "advisorEmail": "User20@gmail.com",
+  "k6ExitCode": null,
+  "source": "k6-marker",
+  "rows": [
+    {
+      "metric": "journey_create_client_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 4000,
+      "maxMs": null,
+      "actualMs": 2926,
+      "actualLabel": "p95",
+      "over": false,
+      "marginMs": 1074,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "journey_create_base_plan_duration",
+      "kind": "step",
+      "optional": false,
+      "budgetMs": 5000,
+      "maxMs": null,
+      "actualMs": 2823,
+      "actualLabel": "p95",
+      "over": false,
+      "marginMs": 2177,
+      "overHardMax": null,
+      "note": null
+    },
+    {
+      "metric": "POST /api/v1/Clients",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 3000,
+      "maxMs": 9000,
+      "actualMs": 949.8,
+      "actualLabel": "max",
+      "over": false,
+      "marginMs": 2050,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "POST /api/v1/cashflows",
+      "kind": "http",
+      "optional": false,
+      "budgetMs": 4000,
+      "maxMs": 12000,
+      "actualMs": 5935.3,
+      "actualLabel": "max",
+      "over": true,
+      "marginMs": -1935,
+      "overHardMax": false,
+      "note": null
+    },
+    {
+      "metric": "journey_calculate_projection_duration",
+      "kind": "step",
+      "optional": true,
+      "budgetMs": 3000,
+      "maxMs": null,
+      "actualMs": 27149,
+      "actualLabel": "p95",
+      "over": true,
+      "marginMs": -24149,
+      "overHardMax": null,
+      "note": null
+    }
+  ],
+  "summary": {
+    "totalRows": 5,
+    "rowsWithActual": 5,
+    "underBudget": 3,
+    "overBudget": 2,
+    "failedShard": true,
+    "worstMarginMs": 1074,
+    "worstOverMs": 24149
+  }
+}
