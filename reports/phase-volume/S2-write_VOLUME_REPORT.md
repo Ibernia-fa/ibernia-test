@@ -3,9 +3,9 @@
 |-------|-------|
 | scenario | S2 |
 | phase_a_run_tag (requested) | S2-write |
-| phase_b_run_tag (requested) | S2-read |
+| phase_b_run_tag (requested) | S2-read-validation |
 | phase_a_run_tag (resolved) | S2-write |
-| phase_b_run_tag (resolved) | S2-read |
+| phase_b_run_tag (resolved) | S2-read-validation |
 | signoff_fleet_file (requested) | reports/phase-volume/S2-write_signoff-fleet.json |
 | signoff_fleet_file (resolved) | reports/phase-volume/S2-write_signoff-fleet.json |
 | run_metadata_file (requested) | reports/phase-a/S2-write/run-metadata.json |
@@ -14,7 +14,7 @@
 | slo_summary_fleet_a (resolved) | reports/phase-a/S2-write/slo-summary-fleet.json |
 | slo_summary_fleet_b (requested) | n/a — not found |
 | slo_summary_fleet_b (resolved) | n/a |
-| slo_summary_b (resolved) | reports/phase-b/S2-read/slo-summary.json |
+| slo_summary_b (resolved) | reports/phase-b/S2-read-validation/slo-summary.json |
 | journey_summary (resolved) | reports/journeys/k6-journey-advisor-critical-summary.json |
 | profile_file (resolved) | data/scenarios/profile_20u_5c_2p.json |
 | seed_spec_version | 1 |
@@ -295,13 +295,13 @@
 | phase | auth_failure_rate | business_failure_rate | http_req_failed |
 |-------|-------------------|----------------------|-----------------|
 | A | n/a | n/a | n/a |
-| B | 0 | 0.2379102738395805 | 0 |
+| B | 0 | 0 | 0 |
 
 ### 8_exits
 | phase | runner_exit_code | k6_exit_0 | k6_exit_99 | failed_job_ids |
 |-------|------------------|-----------|------------|----------------|
 | A | n/a | 20 | 0 |  |
-| B | 99 | 0 | 1 | |
+| B | n/a | 0 | 1 | |
 
 ### 9_fleet_slo_gate
 | phase | passed | failed | failed_shard_ids |
@@ -1568,3 +1568,53 @@
 | advisor-19 | 6a1f95f9901fc6abfb0b91b3 | income | Inheritance | 70000 |
 | advisor-19 | 6a1f95f9901fc6abfb0b91b3 | expense | Living costs | 1049 |
 | advisor-19 | 6a1f95f9901fc6abfb0b91b3 | expense | Housing | 1654 |
+
+### 17_concurrency
+| metric | value |
+|--------|-------|
+| peak_active_users | 1 |
+| avg_active_users | n/a |
+| peak_in_flight_requests | 7 |
+| avg_in_flight_requests | n/a |
+| avg_calls_per_iteration | 11 |
+| max_calls_per_iteration | 11 |
+
+### 18_throughput
+| metric | value |
+|--------|-------|
+| avg_req_per_sec | 17.61 |
+| total_http_requests | 5464 |
+| total_iterations | 495 |
+| requests_per_user | 273 |
+| vus_max | 20 |
+
+### 19_breaking_point
+| field | value |
+|-------|-------|
+| reached | yes |
+| status | Reached |
+| reasons | none |
+
+### 20_capacity_assessment
+| field | value |
+|-------|-------|
+| status | Saturated |
+| detail | none |
+
+### 21_endpoint_slowest
+| rank | endpoint | count | p95_ms | avg_ms | max_ms |
+|------|----------|------:|-------:|-------:|-------:|
+| 1 | GET /api/v1/cashflows/{cashflowId}/income-expense/financial | n/a | 1216 | 655 | 1932 |
+| 2 | GET /api/v1/wealth/{cashflowId} | n/a | 1083 | 572 | 1849 |
+| 3 | GET /api/v1/cashflows/{cashflowId}/timelines | n/a | 1057 | 513 | 1849 |
+| 4 | GET /api/v1/cashflows/{cashflowId}/financial | n/a | 1029 | 471 | 2025 |
+| 5 | GET /api/v1/Events/default | n/a | 1004 | 411 | 1782 |
+
+### 22_endpoint_fastest
+| rank | endpoint | count | p95_ms | avg_ms | max_ms |
+|------|----------|------:|-------:|-------:|-------:|
+| 1 | GET /api/v1/Clients/{id} | n/a | 320 | 281 | 1527 |
+| 2 | GET /api/v1/client/{clientId}/cashflows | n/a | 333 | 281 | 874 |
+| 3 | GET /api/v1/Clients/{advisorId}/all | n/a | 448 | 320 | 940 |
+| 4 | GET /api/v1/cashflows/{cashflowId} | n/a | 794 | 388 | 1782 |
+| 5 | GET /api/v1/Events/custom | n/a | 800 | 380 | 1999 |

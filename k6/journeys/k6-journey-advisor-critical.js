@@ -14,7 +14,6 @@
  * node tools/pool-cli/bin/pool-cli.js release --run-id journey-adv --env dev
  * ```
  */
-import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { SharedArray } from 'k6/data';
 import { textSummary } from 'https://jslib.k6.io/k6-summary/0.0.1/index.js';
@@ -51,10 +50,14 @@ import {
   recordJourneyDuration,
   recordAuthFailure,
   recordBusinessFailure,
+  recordBreakingPoint,
   standardRequestTags,
   buildJourneySummaryReport,
   buildJourneyThresholdRows,
   formatJourneyThresholdMarkdown,
+  buildBreakingPointAssessment,
+  buildCapacityAssessment,
+  freezeLagBudgetsAtInit,
   lagBudgetMs,
 } from '../../lib/k6-journey-metrics.js';
 import {
@@ -63,13 +66,25 @@ import {
   buildDashboardMetaReport,
   recordDashboardMeta,
   formatEndpointStatsMarkdown,
+  formatEndpointDistributionMarkdown,
+  splitEndpointRowsBySpeed,
   journeyHeaders,
 } from '../../lib/k6-journey-endpoint-stats.js';
+import {
+  beginJourneyIteration,
+  endJourneyIteration,
+  journeyHttpGet,
+  journeyHttpPost,
+  journeyHttpBatch,
+  recordJourneyHttpCall,
+  buildConcurrencyReport,
+} from '../../lib/k6-journey-concurrency.js';
 import {
   attachPhaseBSloToSummary,
   buildPhaseBThresholds,
   isVolumeSloEnabled,
   isVolumeSloGateEnabled,
+  loadVolumeSloConfig,
   volumeSloConfigFromEnv,
 } from '../../lib/volume-slo.js';
 import {
@@ -147,6 +162,24 @@ function assertDevHosts() {
 }
 
 assertDevHosts();
+
+const DURATION_METRICS = [
+  'journey_login_duration',
+  'journey_dashboard_load_duration',
+  'journey_open_client_duration',
+  'journey_client_plans_load_duration',
+  'journey_open_plan_duration',
+  'journey_timeline_load_duration',
+  'journey_income_expenses_load_duration',
+  'journey_saving_pots_load_duration',
+  'journey_cashflow_load_duration',
+  'full_journey_duration',
+];
+
+if (isVolumeSloEnabled()) {
+  loadVolumeSloConfig();
+  freezeLagBudgetsAtInit(DURATION_METRICS);
+}
 
 function journeyThresholds() {
   const base = {
@@ -351,7 +384,7 @@ function seedClientAndCashflow(base, row, runTag) {
     clientEmail,
   });
 
-  const resCreate = http.post(`${base}/api/v1/Clients`, JSON.stringify(createBody), {
+  const resCreate = journeyHttpPost(`${base}/api/v1/Clients`, JSON.stringify(createBody), {
     headers: enrichHeaders(hdrs, 'seed', 'seed'),
     tags: standardRequestTags({
       journey: 'seed',
@@ -377,7 +410,7 @@ function seedClientAndCashflow(base, row, runTag) {
     planName: `Journey-${uniqueTag}`,
     clientBirthDateIso: birthDateIsoFromModel(modelRaw),
   });
-  const resCf = http.post(`${base}/api/v1/cashflows`, JSON.stringify(cfBody), {
+  const resCf = journeyHttpPost(`${base}/api/v1/cashflows`, JSON.stringify(cfBody), {
     headers: enrichHeaders(hdrs, 'seed', 'seed'),
     tags: standardRequestTags({
       journey: 'seed',
@@ -409,6 +442,7 @@ function seedClientAndCashflow(base, row, runTag) {
 
 function runLogin(row) {
   const t0 = startJourneyTimer();
+  recordJourneyHttpCall(1);
   const auth = lifecycleLoginAcquireToken({
     email: row.email,
     password: row.password,
@@ -452,7 +486,7 @@ function runDashboard(base, accessToken, advisorSub) {
   const t0 = startJourneyTimer();
   const hdrs = apiHeaders(accessToken);
   const url = `${base}/api/v1/Clients/${encodeURIComponent(advisorSub)}/all`;
-  const res = http.get(url, {
+  const res = journeyHttpGet(url, {
     headers: enrichHeaders(hdrs, 'dashboard', 'dashboard'),
     tags: standardRequestTags({
       journey: 'dashboard',
@@ -508,7 +542,7 @@ function runOpenClient(base, accessToken, clientId) {
   const t0 = startJourneyTimer();
   const hdrs = apiHeaders(accessToken);
   const url = `${base}/api/v1/Clients/${encodeURIComponent(clientId)}`;
-  const res = http.get(url, {
+  const res = journeyHttpGet(url, {
     headers: enrichHeaders(hdrs, 'open_client', 'open_client'),
     tags: standardRequestTags({
       journey: 'open_client',
@@ -542,7 +576,7 @@ function runClientPlansLoad(base, accessToken, clientId) {
   const t0 = startJourneyTimer();
   const hdrs = apiHeaders(accessToken);
   const url = `${base}/api/v1/client/${encodeURIComponent(clientId)}/cashflows`;
-  const res = http.get(url, {
+  const res = journeyHttpGet(url, {
     headers: enrichHeaders(hdrs, 'client_plans', 'client_plans'),
     tags: standardRequestTags({
       journey: 'client_plans',
@@ -557,9 +591,9 @@ function runClientPlansLoad(base, accessToken, clientId) {
     method: 'GET',
     k6Name: 'journey_client_plans_get',
   });
-  const ok = res.status === 200;
-  if (ok) clientPlansResponseSize.add(responseBodyBytes(res));
-  check(res, { 'journey: client cashflows 200': () => ok });
+  const ok = res.status === 200 || res.status === 204;
+  if (ok && res.status === 200) clientPlansResponseSize.add(responseBodyBytes(res));
+  check(res, { 'journey: client cashflows ok': () => ok });
   if (!ok) {
     failJourneyStep(journeyClientPlansLoadDuration, t0, { ok: false });
     return false;
@@ -576,7 +610,7 @@ function runCashflowLoadParallel(base, accessToken, cashflowId) {
   const hdrs = apiHeaders(accessToken);
   const cf = encodeURIComponent(cashflowId);
 
-  const batch = http.batch([
+  const batch = journeyHttpBatch([
     {
       method: 'GET',
       url: `${base}/api/v1/cashflows/${cf}`,
@@ -804,91 +838,107 @@ export function teardown(data) {
 }
 
 export default function (data) {
+  beginJourneyIteration();
   const fullT0 = startJourneyTimer();
   let journeyOk = false;
+  let hardBusinessFail = false;
 
-  const row = userForVu(POOL_USERS, __VU);
-  if (!row) {
-    console.error(`[${SCRIPT_TAG}] No pool user for VU ${__VU}`);
-    recordBusinessFailure(true);
-    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
-    return;
+  try {
+    const row = userForVu(POOL_USERS, __VU);
+    if (!row) {
+      console.error(`[${SCRIPT_TAG}] No pool user for VU ${__VU}`);
+      hardBusinessFail = true;
+      recordBusinessFailure(true);
+      recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
+      return;
+    }
+
+    const normalized = {
+      email: String(row.email || '').trim(),
+      password: String(row.password || '').trim(),
+      token: row.token ? String(row.token).trim() : '',
+      advisorIdFromRow:
+        row.advisorId != null && String(row.advisorId).trim() !== ''
+          ? String(row.advisorId).trim()
+          : row.identityUserId != null && String(row.identityUserId).trim() !== ''
+            ? String(row.identityUserId).trim()
+            : '',
+    };
+
+    const seed = seedClientAndCashflow(data.base, normalized, data.runTag);
+    if (!seed) {
+      hardBusinessFail = true;
+      recordBusinessFailure(true);
+      recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
+      return;
+    }
+
+    thinkBetweenSteps();
+
+    const login = runLogin(normalized);
+    if (!login) {
+      recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
+      return;
+    }
+
+    thinkBetweenSteps();
+
+    const dashboardAdvisorSub =
+      seed.fromManifest && seed.advisorSub ? seed.advisorSub : login.advisorSub;
+    if (
+      seed.fromManifest &&
+      login.advisorSub &&
+      seed.advisorSub &&
+      login.advisorSub !== seed.advisorSub
+    ) {
+      console.warn(
+        `[${SCRIPT_TAG}] ADVISOR_ALIGNMENT: pool advisorSub=${login.advisorSub} ` +
+          `manifest advisorSub=${seed.advisorSub} VU=${__VU}`,
+      );
+    }
+
+    if (!runDashboard(data.base, login.accessToken, dashboardAdvisorSub)) {
+      recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
+      return;
+    }
+
+    thinkBetweenSteps();
+
+    if (!runOpenClient(data.base, login.accessToken, seed.clientId)) {
+      recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
+      return;
+    }
+
+    thinkBetweenSteps();
+
+    if (!runClientPlansLoad(data.base, login.accessToken, seed.clientId)) {
+      hardBusinessFail = true;
+      recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
+      return;
+    }
+
+    thinkBetweenSteps();
+
+    journeyOk = runCashflowLoadParallel(data.base, login.accessToken, seed.cashflowId);
+    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0, { recordLag: true });
+    if (!journeyOk) {
+      hardBusinessFail = true;
+      recordBusinessFailure(true);
+    }
+
+    const mt = PHASE_B_MANIFEST ? selectManifestTargetForVu(PHASE_B_MANIFEST, __VU) : null;
+    emitVolumeSignoffShardMarker('B', 'read', {
+      runTag: data.phaseBRunTag || data.runTag,
+      shardId: (mt && mt.shardId) || `advisor-${String(__VU - 1).padStart(2, '0')}`,
+      advisorEmail: normalized.email,
+    });
+  } finally {
+    recordBreakingPoint({
+      fullJourneyMs: Math.max(0, Date.now() - fullT0),
+      businessFailure: hardBusinessFail,
+    });
+    endJourneyIteration();
   }
-
-  const normalized = {
-    email: String(row.email || '').trim(),
-    password: String(row.password || '').trim(),
-    token: row.token ? String(row.token).trim() : '',
-    advisorIdFromRow:
-      row.advisorId != null && String(row.advisorId).trim() !== ''
-        ? String(row.advisorId).trim()
-        : row.identityUserId != null && String(row.identityUserId).trim() !== ''
-          ? String(row.identityUserId).trim()
-          : '',
-  };
-
-  const seed = seedClientAndCashflow(data.base, normalized, data.runTag);
-  if (!seed) {
-    recordBusinessFailure(true);
-    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
-    return;
-  }
-
-  thinkBetweenSteps();
-
-  const login = runLogin(normalized);
-  if (!login) {
-    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
-    return;
-  }
-
-  thinkBetweenSteps();
-
-  const dashboardAdvisorSub =
-    seed.fromManifest && seed.advisorSub ? seed.advisorSub : login.advisorSub;
-  if (
-    seed.fromManifest &&
-    login.advisorSub &&
-    seed.advisorSub &&
-    login.advisorSub !== seed.advisorSub
-  ) {
-    console.warn(
-      `[${SCRIPT_TAG}] ADVISOR_ALIGNMENT: pool advisorSub=${login.advisorSub} ` +
-        `manifest advisorSub=${seed.advisorSub} VU=${__VU}`,
-    );
-  }
-
-  if (!runDashboard(data.base, login.accessToken, dashboardAdvisorSub)) {
-    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
-    return;
-  }
-
-  thinkBetweenSteps();
-
-  if (!runOpenClient(data.base, login.accessToken, seed.clientId)) {
-    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
-    return;
-  }
-
-  thinkBetweenSteps();
-
-  if (!runClientPlansLoad(data.base, login.accessToken, seed.clientId)) {
-    recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0);
-    return;
-  }
-
-  thinkBetweenSteps();
-
-  journeyOk = runCashflowLoadParallel(data.base, login.accessToken, seed.cashflowId);
-  recordJourneyDuration(fullJourneyDuration, Date.now() - fullT0, { recordLag: true });
-  if (!journeyOk) recordBusinessFailure(true);
-
-  const mt = PHASE_B_MANIFEST ? selectManifestTargetForVu(PHASE_B_MANIFEST, __VU) : null;
-  emitVolumeSignoffShardMarker('B', 'read', {
-    runTag: data.phaseBRunTag || data.runTag,
-    shardId: (mt && mt.shardId) || `advisor-${String(__VU - 1).padStart(2, '0')}`,
-    advisorEmail: normalized.email,
-  });
 }
 
 const JOURNEY_METRICS = [
@@ -908,16 +958,25 @@ const JOURNEY_METRICS = [
 ];
 
 export function handleSummary(data) {
+  freezeLagBudgetsAtInit(DURATION_METRICS);
   const endpointRows = buildEndpointStatsReport(data);
+  const endpointSpeed = splitEndpointRowsBySpeed(endpointRows);
   const dashboardMeta = buildDashboardMetaReport(data);
+  const concurrency = buildConcurrencyReport(data);
   const report = buildJourneySummaryReport(data, JOURNEY_METRICS, {
     endpoints: endpointRows,
+    endpointSpeed,
     dashboardMeta,
+    concurrency,
+    breakingPoint: null,
+    capacity: null,
     phase: READ_ONLY_JOURNEY ? 'B' : undefined,
     readOnly: READ_ONLY_JOURNEY,
     manifestDriven: PHASE_B_MANIFEST != null,
     phaseBRunTag: resolvedPhaseBRunTag(data),
   });
+  report.breakingPoint = buildBreakingPointAssessment(data, report);
+  report.capacity = buildCapacityAssessment(data, report, concurrency);
   const lines = [
     '',
     '=== Advisor critical journey summary ===',
@@ -925,11 +984,33 @@ export function handleSummary(data) {
     `business_failure_rate: ${report.rates.business_failure_rate != null ? (report.rates.business_failure_rate * 100).toFixed(2) + '%' : 'n/a'}`,
     `auth_failure_rate: ${report.rates.auth_failure_rate != null ? (report.rates.auth_failure_rate * 100).toFixed(2) + '%' : 'n/a'}`,
     '',
+    '=== BREAKING POINT ASSESSMENT ===',
+    `Status: ${report.breakingPoint.status}`,
+    `Reason: ${report.breakingPoint.reasons.join('; ')}`,
+    '',
+    '=== Capacity ===',
+    `Status: ${report.capacity.status}`,
+    `Detail: ${report.capacity.detail}`,
+    '',
+    '=== Concurrency ===',
+    `Peak active users: ${concurrency.peakActiveUsers != null ? concurrency.peakActiveUsers : 'n/a'}`,
+    `Avg active users: ${concurrency.avgActiveUsers != null ? Math.round(concurrency.avgActiveUsers * 10) / 10 : 'n/a'}`,
+    `Peak in-flight requests: ${concurrency.peakInFlightRequests != null ? concurrency.peakInFlightRequests : 'n/a'}`,
+    `Avg calls per iteration: ${concurrency.avgCallsPerIteration != null ? Math.round(concurrency.avgCallsPerIteration * 10) / 10 : 'n/a'}`,
+    `Max calls per iteration: ${concurrency.maxCallsPerIteration != null ? concurrency.maxCallsPerIteration : 'n/a'}`,
+    '',
+    '=== Throughput ===',
+    `Avg req/sec: ${concurrency.avgReqPerSec != null ? Math.round(concurrency.avgReqPerSec * 100) / 100 : 'n/a'}`,
+    `Total HTTP requests: ${concurrency.totalHttpRequests != null ? concurrency.totalHttpRequests : 'n/a'}`,
+    `Requests per user (approx): ${concurrency.requestsPerUser != null ? Math.round(concurrency.requestsPerUser) : 'n/a'}`,
+    '',
     '=== Journey thresholds ===',
     formatJourneyThresholdMarkdown(report.journeyThresholdRows),
     '',
     '=== Per-endpoint timing ===',
     formatEndpointStatsMarkdown(endpointRows),
+    '',
+    formatEndpointDistributionMarkdown(endpointRows),
   ];
   if (dashboardMeta.samples > 0) {
     const c = dashboardMeta.clientsReturned;
@@ -944,8 +1025,15 @@ export function handleSummary(data) {
     const n = JOURNEY_METRICS[i];
     const j = report.journeys[n];
     if (j) {
+      const unit = j.unit === 'bytes' ? 'B' : 'ms';
+      const budget =
+        j.lagBudgetMs != null
+          ? `${j.lagBudgetMs}${unit}`
+          : j.unit === 'bytes'
+            ? 'n/a (bytes)'
+            : `${j.lagBudgetMs}ms`;
       lines.push(
-        `${n}: p95=${j.p95 != null ? Math.round(j.p95) : 'n/a'}ms p99=${j.p99 != null ? Math.round(j.p99) : 'n/a'}ms avg=${j.avg != null ? Math.round(j.avg) : 'n/a'}ms budget=${j.lagBudgetMs}ms`,
+        `${n}: p95=${j.p95 != null ? Math.round(j.p95) : 'n/a'}${unit} p99=${j.p99 != null ? Math.round(j.p99) : 'n/a'}${unit} avg=${j.avg != null ? Math.round(j.avg) : 'n/a'}${unit} budget=${budget}`,
       );
     }
   }

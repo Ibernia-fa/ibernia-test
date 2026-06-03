@@ -472,6 +472,78 @@ for (const { advisor, client, cashflow } of planRows) {
 }
 if (!mioCount) lines.push('| n/a | n/a | n/a | n/a | n/a |');
 
+const concurrency = journey?.concurrency;
+const breakingPoint = journey?.breakingPoint;
+const capacity = journey?.capacity;
+const endpointRows = journey?.endpoints || [];
+const endpointSpeed = journey?.endpointSpeed;
+
+lines.push('');
+lines.push('### 17_concurrency');
+lines.push('| metric | value |');
+lines.push('|--------|-------|');
+lines.push(`| peak_active_users | ${concurrency?.peakActiveUsers ?? 'n/a'} |`);
+lines.push(`| avg_active_users | ${concurrency?.avgActiveUsers != null ? Math.round(concurrency.avgActiveUsers * 10) / 10 : 'n/a'} |`);
+lines.push(`| peak_in_flight_requests | ${concurrency?.peakInFlightRequests ?? 'n/a'} |`);
+lines.push(`| avg_in_flight_requests | ${concurrency?.avgInFlightRequests != null ? Math.round(concurrency.avgInFlightRequests * 10) / 10 : 'n/a'} |`);
+lines.push(`| avg_calls_per_iteration | ${concurrency?.avgCallsPerIteration != null ? Math.round(concurrency.avgCallsPerIteration * 10) / 10 : 'n/a'} |`);
+lines.push(`| max_calls_per_iteration | ${concurrency?.maxCallsPerIteration ?? 'n/a'} |`);
+
+lines.push('');
+lines.push('### 18_throughput');
+lines.push('| metric | value |');
+lines.push('|--------|-------|');
+lines.push(`| avg_req_per_sec | ${concurrency?.avgReqPerSec != null ? Math.round(concurrency.avgReqPerSec * 100) / 100 : 'n/a'} |`);
+lines.push(`| total_http_requests | ${concurrency?.totalHttpRequests ?? 'n/a'} |`);
+lines.push(`| total_iterations | ${concurrency?.totalIterations ?? 'n/a'} |`);
+lines.push(`| requests_per_user | ${concurrency?.requestsPerUser != null ? Math.round(concurrency.requestsPerUser) : 'n/a'} |`);
+lines.push(`| vus_max | ${concurrency?.vusMax ?? journey?.vusMax ?? 'n/a'} |`);
+
+lines.push('');
+lines.push('### 19_breaking_point');
+lines.push('| field | value |');
+lines.push('|-------|-------|');
+lines.push(`| reached | ${breakingPoint?.reached === true ? 'yes' : breakingPoint?.reached === false ? 'no' : 'n/a'} |`);
+lines.push(`| status | ${breakingPoint?.status ?? 'n/a'} |`);
+lines.push(`| reasons | ${breakingPoint?.reasons?.join('; ') ?? 'n/a'} |`);
+
+lines.push('');
+lines.push('### 20_capacity_assessment');
+lines.push('| field | value |');
+lines.push('|-------|-------|');
+lines.push(`| status | ${capacity?.status ?? 'n/a'} |`);
+lines.push(`| detail | ${capacity?.detail ?? 'n/a'} |`);
+
+lines.push('');
+lines.push('### 21_endpoint_slowest');
+lines.push('| rank | endpoint | count | p95_ms | avg_ms | max_ms |');
+lines.push('|------|----------|------:|-------:|-------:|-------:|');
+const slowest = endpointSpeed?.slowest || endpointRows.slice().sort((a, b) => (b.p95Ms || 0) - (a.p95Ms || 0)).slice(0, 5);
+if (slowest.length) {
+  slowest.forEach((r, i) => {
+    lines.push(
+      `| ${i + 1} | ${r.method} ${r.endpoint} | ${r.count ?? 'n/a'} | ${r.p95Ms != null ? Math.round(r.p95Ms) : 'n/a'} | ${r.avgMs != null ? Math.round(r.avgMs) : 'n/a'} | ${r.maxMs != null ? Math.round(r.maxMs) : 'n/a'} |`,
+    );
+  });
+} else {
+  lines.push('| n/a | n/a | n/a | n/a | n/a | n/a |');
+}
+
+lines.push('');
+lines.push('### 22_endpoint_fastest');
+lines.push('| rank | endpoint | count | p95_ms | avg_ms | max_ms |');
+lines.push('|------|----------|------:|-------:|-------:|-------:|');
+const fastest = endpointSpeed?.fastest || [];
+if (fastest.length) {
+  fastest.forEach((r, i) => {
+    lines.push(
+      `| ${i + 1} | ${r.method} ${r.endpoint} | ${r.count ?? 'n/a'} | ${r.p95Ms != null ? Math.round(r.p95Ms) : 'n/a'} | ${r.avgMs != null ? Math.round(r.avgMs) : 'n/a'} | ${r.maxMs != null ? Math.round(r.maxMs) : 'n/a'} |`,
+    );
+  });
+} else {
+  lines.push('| n/a | n/a | n/a | n/a | n/a | n/a |');
+}
+
 const outPath = path.join(ROOT, OUT);
 fs.mkdirSync(path.dirname(outPath), { recursive: true });
 fs.writeFileSync(outPath, `${lines.join('\n')}\n`, 'utf8');
