@@ -45,7 +45,7 @@ function Resolve-PhaseAMaxDuration {
   $units = $clients * $plans
   $seconds = 900 + ($units * 75)
   $minutes = [Math]::Ceiling($seconds / 60.0)
-  $minutes = [Math]::Min(180, [Math]::Max(20, $minutes))
+  $minutes = [Math]::Min(300, [Math]::Max(20, $minutes))
   return "${minutes}m"
 }
 
@@ -70,13 +70,18 @@ Get-ChildItem -LiteralPath (Join-Path $RunOutDir 'slo-shards') -Filter '*.json' 
 $k6RestPort = 6570
 if ($AdvisorIndex -ne '') {
   $k6RestPort = 6570 + [int]$AdvisorIndex
+  $staggerSec = [Math]::Min(180, [int]$AdvisorIndex * 12)
+  if ($staggerSec -gt 0) {
+    Write-Host "[PhaseAWorker] stagger sleep ${staggerSec}s advisorIndex=$AdvisorIndex"
+    Start-Sleep -Seconds $staggerSec
+  }
 }
 
-Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort"
+Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort preRunCleanup=True"
 
 $sliceForK6 = $PoolSliceFile -replace '\\', '/'
-$sloConfig = 'config/volume-api-slo.json'
-$scenariosConfig = 'config/volume-scenarios.json'
+$sloConfig = (Join-Path $RepoRoot 'config/volume-api-slo.json') -replace '\\', '/'
+$scenariosConfig = (Join-Path $RepoRoot 'config/volume-scenarios.json') -replace '\\', '/'
 
 $k6Args = @(
   'run', 'k6/full-platform/k6-full-platform-orchestrator.js',
@@ -119,6 +124,7 @@ if ($SkipTeardown) {
 }
 $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP=1')
 if ($UseFixedAdvisors) {
+  Remove-Item Env:FULL_PLATFORM_PRE_RUN_CLEANUP_ALL -ErrorAction SilentlyContinue
   $k6Args += @('-e', 'FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1')
 }
 if ($ClientsPerAdvisor) {

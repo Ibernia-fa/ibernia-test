@@ -45,7 +45,7 @@ import {
 } from '../lib/k6-volume-realistic-data.js';
 
 test('personas are distinct and amounts are realistic', () => {
-  assert.ok(VOLUME_CLIENT_PERSONAS.length >= 5);
+  assert.ok(VOLUME_CLIENT_PERSONAS.length >= 20);
   const names = new Set(VOLUME_CLIENT_PERSONAS.map((p) => `${p.firstName} ${p.lastName}`));
   assert.equal(names.size, VOLUME_CLIENT_PERSONAS.length);
   for (const p of VOLUME_CLIENT_PERSONAS) {
@@ -107,6 +107,17 @@ test('selectPersonaForClient yields distinct personas for ten clients on one adv
     names.add(`${p.firstName} ${p.lastName}`);
   }
   assert.equal(names.size, 10, `expected 10 distinct personas, got ${[...names].join(', ')}`);
+});
+
+test('selectPersonaForClient yields distinct personas for twenty clients on one advisor (S4)', () => {
+  const base = 'S4-advisor-09';
+  const names = new Set();
+  for (let ci = 0; ci < 20; ci++) {
+    const tag = `${base}c${ci + 1}`;
+    const p = selectPersonaForClient(tag, ci, 0);
+    names.add(`${p.firstName} ${p.lastName}`);
+  }
+  assert.equal(names.size, 20, `expected 20 distinct personas, got ${[...names].join(', ')}`);
 });
 
 test('buildVolumeClientEmail embeds unique clientTag', () => {

@@ -270,6 +270,17 @@ function phaseASingleExecution() {
   );
 }
 
+/** Stable per-shard tag for Phase A volume writes — enables skip-if-exists on re-run. */
+function resolvePhaseAUniqueTag(vu, gi) {
+  if (phaseASingleExecution()) {
+    const shardId = (__ENV.PHASE_A_SHARD_ID || '').trim();
+    const scenario = (__ENV.VOLUME_SCENARIO || __ENV.SCENARIO || '').trim();
+    if (shardId && scenario) return `${scenario}-${shardId}`;
+    if (shardId) return shardId;
+  }
+  return `fp${vu}_g${gi}_${Date.now()}`;
+}
+
 function scenarioOptions() {
   const thr = thresholds();
   const rampStages = parseRampStages((__ENV.RAMP_STAGES || '30s:5,2m:20,1m:0').trim());
@@ -531,7 +542,7 @@ export default function () {
 
   const vu = typeof __VU !== 'undefined' ? __VU : 1;
   const gi = globalIterationIndex();
-  const uniqueTag = `fp${vu}_g${gi}_${Date.now()}`;
+  const uniqueTag = resolvePhaseAUniqueTag(vu, gi);
 
   initPhaseAManifestShard({
     advisorSub,
@@ -553,6 +564,8 @@ export default function () {
     skipTeardown: skipDelete,
     preRunCleanup,
     preRunCleanupDeleteAll,
+    clientsPerAdvisor: resolvePhaseAVolumeCounts().clientsPerAdvisor,
+    plansPerClient: resolvePhaseAVolumeCounts().plansPerClient,
   });
 
   emitPhaseAManifestShardMarker();

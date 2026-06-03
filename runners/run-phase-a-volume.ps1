@@ -107,7 +107,6 @@ $clientsPerAdvisor = [int]$scenarioResolved.clientsPerAdvisor
 $plansPerClient = [int]$scenarioResolved.plansPerClient
 $iterations = [int]$scenarioResolved.iterations
 $advisorsCount = if ($Advisors -gt 0) { $Advisors } else { [int]$scenarioResolved.advisors }
-$concurrency = if ($ParallelJobs -gt 0) { $ParallelJobs } else { $advisorsCount }
 $expectedClients = $advisorsCount * $clientsPerAdvisor * $iterations
 $expectedPlans = $advisorsCount * $clientsPerAdvisor * $plansPerClient * $iterations
 $expectedShards = $advisorsCount
@@ -124,11 +123,23 @@ function Resolve-PhaseAMaxDuration {
   $units = $clients * $plans
   $seconds = 900 + ($units * 75)
   $minutes = [Math]::Ceiling($seconds / 60.0)
-  $minutes = [Math]::Min(180, [Math]::Max(20, $minutes))
+  $minutes = [Math]::Min(300, [Math]::Max(20, $minutes))
   return "${minutes}m"
 }
 
 $phaseAMaxDuration = Resolve-PhaseAMaxDuration $clientsPerAdvisor $plansPerClient
+
+if ($ParallelJobs -le 0) {
+  $volumeUnits = $clientsPerAdvisor * $plansPerClient
+  if ($volumeUnits -ge 160) {
+    $ParallelJobs = 4
+  } elseif ($volumeUnits -ge 40) {
+    $ParallelJobs = 8
+  } else {
+    $ParallelJobs = $advisorsCount
+  }
+}
+$concurrency = $ParallelJobs
 
 if ($advisorsCount -lt 1) { throw 'AdvisorCount must be >= 1' }
 
@@ -257,6 +268,10 @@ try {
       [string]$i,
       $phaseAMaxDuration
     )
+
+    while (@($jobs | Where-Object { $_.State -eq 'Running' }).Count -ge $concurrency) {
+      Start-Sleep -Seconds 3
+    }
   }
 
   Write-Host "=== waiting for $($jobs.Count) advisor jobs ==="

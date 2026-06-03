@@ -110,3 +110,15 @@ test('findClientIdByVolumeClientTag matches volume-seed email tag', () => {
   assert.equal(findClientIdByVolumeClientTag(rows, tag), 'abc123');
   assert.equal(findClientIdByVolumeClientTag(rows, 'missing'), null);
 });
+
+test('findClientIdByVolumeClientTag matches notes tag when email absent', () => {
+  const tag = 'S4-advisor-09c3';
+  const rows = [
+    {
+      id: 'seed1',
+      notes: 'k6 lifecycle S4-advisor-09c3 no-partner=1',
+      clientDetails: { lastName: 'Romano' },
+    },
+  ];
+  assert.equal(findClientIdByVolumeClientTag(rows, tag), 'seed1');
+});
