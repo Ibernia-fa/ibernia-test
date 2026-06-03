@@ -114,6 +114,22 @@ $expectedShards = $advisorsCount
 $manifestProfileFile = $scenarioResolved.manifestProfileFile
 $profileOutPath = if ($manifestProfileFile) { Join-Path $RepoRoot $manifestProfileFile } else { '' }
 
+function Resolve-PhaseAMaxDuration {
+  param(
+    [int] $ClientsPerAdvisor,
+    [int] $PlansPerClient
+  )
+  $clients = [Math]::Max(1, $ClientsPerAdvisor)
+  $plans = [Math]::Max(1, $PlansPerClient)
+  $units = $clients * $plans
+  $seconds = 900 + ($units * 75)
+  $minutes = [Math]::Ceiling($seconds / 60.0)
+  $minutes = [Math]::Min(180, [Math]::Max(20, $minutes))
+  return "${minutes}m"
+}
+
+$phaseAMaxDuration = Resolve-PhaseAMaxDuration $clientsPerAdvisor $plansPerClient
+
 if ($advisorsCount -lt 1) { throw 'AdvisorCount must be >= 1' }
 
 $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
@@ -132,6 +148,7 @@ Write-Host "=== Phase A volume ==="
 Write-Host "  scenario=$VolumeScenario runTag=$RunTag userMode=$userMode"
 Write-Host "  advisors=$advisorsCount concurrency=$concurrency clientsPerAdvisor=$clientsPerAdvisor plansPerClient=$plansPerClient"
 Write-Host "  expectedClients=$expectedClients expectedPlans=$expectedPlans expectedShards=$expectedShards"
+Write-Host "  maxDurationPerAdvisor=$phaseAMaxDuration"
 if ($profileOutPath) { Write-Host "  profileOut=$profileOutPath" }
 
 $allUsers = @()
@@ -229,37 +246,48 @@ try {
       [bool](-not $NoManifest.IsPresent),
       [bool]$UseFixedAdvisors,
       [bool]$volumeSloGate,
-      [string]$i
+      [string]$i,
+      $phaseAMaxDuration
     )
   }
 
   Write-Host "=== waiting for $($jobs.Count) advisor jobs ==="
   $results = $jobs | Wait-Job
 
+  $extractCli = Join-Path $RepoRoot 'tools/extract-phase-a-manifest-from-k6-log.mjs'
+  Get-ChildItem -LiteralPath $logsRoot -Directory -ErrorAction SilentlyContinue | ForEach-Object {
+    $k6Log = Join-Path $_.FullName 'k6.log'
+    if (Test-Path -LiteralPath $k6Log) {
+      & node $extractCli --log $k6Log --repo-root $RepoRoot | Out-Null
+    }
+  }
+
   $failed = @{}
   $advisorRuns = @()
   foreach ($r in $results) {
-    # k6 writes warnings to stderr; Receive-Job must not treat them as terminating errors.
-    $exitCode = Receive-Job -Job $r -Keep -ErrorAction SilentlyContinue
-    $jobFailed = ($r.State -ne 'Completed') -or ($null -ne $exitCode -and $exitCode -ne 0)
-    if ($jobFailed) { $failed[$r.Name] = $true }
+    Receive-Job -Job $r -Keep -ErrorAction SilentlyContinue | Out-Null
 
     $workerMetaFile = Join-Path (Join-Path $workersRoot $r.Name) 'run-metadata-worker.json'
+    $metaExit = $null
     if (Test-Path -LiteralPath $workerMetaFile) {
       $wm = Get-Content -LiteralPath $workerMetaFile -Raw | ConvertFrom-Json
+      $metaExit = $wm.exitCode
       $advisorRuns += [ordered]@{
         advisorKey    = $wm.advisorKey
         shardId       = $wm.shardId
         advisorEmail  = $wm.advisorEmail
         userMode      = $wm.userMode
         poolSliceFile = $wm.poolSliceFile
-        exitCode      = $wm.exitCode
+        exitCode      = $metaExit
         jobState      = $r.State
-        jobFailed     = $jobFailed
+        jobFailed     = ($null -eq $metaExit) -or ($metaExit -ne 0)
       }
     } else {
-      $advisorRuns += [ordered]@{ advisorKey = $r.Name; exitCode = $exitCode; jobFailed = $jobFailed }
+      $advisorRuns += [ordered]@{ advisorKey = $r.Name; exitCode = $null; jobState = $r.State; jobFailed = $true }
     }
+    $exitCode = $metaExit
+    $jobFailed = ($null -eq $exitCode) -or ($exitCode -ne 0)
+    if ($jobFailed) { $failed[$r.Name] = $true }
     Write-Host "Job $($r.Name): state=$($r.State) exitCode=$exitCode failed=$jobFailed"
   }
 

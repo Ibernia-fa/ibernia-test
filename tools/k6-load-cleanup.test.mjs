@@ -5,6 +5,8 @@ import {
   clientNotesFromListRow,
   clientLastNameFromListRow,
   clientRowMatchesUniqueTag,
+  clientEmailFromListRow,
+  findClientIdByVolumeClientTag,
   lastNameMatchesUniqueTag,
   notesMatchUniqueTag,
   resolvePreRunCleanupEnabledFromEnv,
@@ -91,4 +93,20 @@ test('clientRowMatchesUniqueTag uses notes', () => {
     ),
     true,
   );
+});
+
+test('findClientIdByVolumeClientTag matches volume-seed email tag', () => {
+  const tag = 'fp1_g0_1780458287487c9';
+  const rows = [
+    {
+      id: 'abc123',
+      clientDetails: { email: `francesca.gallo.${tag}@example.com` },
+    },
+    {
+      Id: 'other',
+      ClientDetails: { Email: 'marco.rossi.fp1_g0_other@example.com' },
+    },
+  ];
+  assert.equal(findClientIdByVolumeClientTag(rows, tag), 'abc123');
+  assert.equal(findClientIdByVolumeClientTag(rows, 'missing'), null);
 });

@@ -1,0 +1,185 @@
+{
+    "reportType":  "phase-a-run-metadata",
+    "runTag":  "S3-write",
+    "volumeScenario":  "S3",
+    "userMode":  "fixed",
+    "advisors":  20,
+    "concurrency":  20,
+    "clientsPerAdvisor":  10,
+    "plansPerClient":  4,
+    "expectedClients":  200,
+    "expectedPlans":  800,
+    "manifestProfileFile":  "data/scenarios/profile_20u_10c_4p.json",
+    "runElapsedSec":  1934,
+    "manifestCollected":  2,
+    "sloCollected":  2,
+    "advisorRuns":  [
+                        {
+                            "advisorKey":  "advisor-00",
+                            "shardId":  "advisor-00",
+                            "advisorEmail":  "User01@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-00.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
+                        },
+                        {
+                            "advisorKey":  "advisor-01",
+                            "shardId":  "advisor-01",
+                            "advisorEmail":  "User02@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-01.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
+                        },
+                        {
+                            "advisorKey":  "advisor-02",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-03",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-04",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-05",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-06",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-07",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-08",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-09",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-10",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-11",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-12",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-13",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-14",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-15",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-16",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-17",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-18",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        },
+                        {
+                            "advisorKey":  "advisor-19",
+                            "exitCode":  {
+
+                                         },
+                            "jobFailed":  true
+                        }
+                    ],
+    "failedJobs":  [
+                       "advisor-06",
+                       "advisor-02",
+                       "advisor-15",
+                       "advisor-08",
+                       "advisor-16",
+                       "advisor-17",
+                       "advisor-05",
+                       "advisor-14",
+                       "advisor-10",
+                       "advisor-09",
+                       "advisor-04",
+                       "advisor-13",
+                       "manifest-merge",
+                       "advisor-12",
+                       "advisor-19",
+                       "advisor-11",
+                       "advisor-07",
+                       "advisor-03",
+                       "advisor-18"
+                   ]
+}

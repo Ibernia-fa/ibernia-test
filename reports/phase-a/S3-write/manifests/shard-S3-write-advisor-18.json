@@ -1,0 +1,18 @@
+{
+  "reportType": "phase-a-manifest-shard",
+  "generatedAt": "2026-06-03T04:15:16.443Z",
+  "runTag": "S3-write",
+  "shardId": "advisor-18",
+  "scenario": "S3",
+  "runId": "S3-write",
+  "advisorIndex": null,
+  "advisorSub": "",
+  "advisorEmail": "",
+  "vu": null,
+  "iteration": null,
+  "clients": [],
+  "counts": {
+      "clients": 0,
+      "plans": 0
+    }
+}

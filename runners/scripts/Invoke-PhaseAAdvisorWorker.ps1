@@ -22,7 +22,8 @@ param(
   [bool] $ExportManifest = $true,
   [bool] $UseFixedAdvisors = $false,
   [bool] $VolumeSloGate = $false,
-  [string] $AdvisorIndex = ''
+  [string] $AdvisorIndex = '',
+  [string] $MaxDuration = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -33,22 +34,44 @@ $workerName = $AdvisorKey
 $startTime = Get-Date
 $userMode = if ($UseFixedAdvisors) { 'fixed' } else { 'pool' }
 
+function Resolve-PhaseAMaxDuration {
+  param(
+    [int] $ClientsPerAdvisor,
+    [int] $PlansPerClient
+  )
+  $clients = [Math]::Max(1, $ClientsPerAdvisor)
+  $plans = [Math]::Max(1, $PlansPerClient)
+  # ~75s per plan build (S3 observed ~43–55s; parallel fleet adds headroom) + 15m overhead.
+  $units = $clients * $plans
+  $seconds = 900 + ($units * 75)
+  $minutes = [Math]::Ceiling($seconds / 60.0)
+  $minutes = [Math]::Min(180, [Math]::Max(20, $minutes))
+  return "${minutes}m"
+}
+
+$clientsInt = 0
+$plansInt = 0
+if ($ClientsPerAdvisor) { [void][int]::TryParse($ClientsPerAdvisor, [ref]$clientsInt) }
+if ($PlansPerClient) { [void][int]::TryParse($PlansPerClient, [ref]$plansInt) }
+$maxDuration = if ($MaxDuration) { $MaxDuration } else { Resolve-PhaseAMaxDuration $clientsInt $plansInt }
+
 New-Item -ItemType Directory -Path $RunOutDir, $LogDir -Force | Out-Null
 
-Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile"
+Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration"
 
 $sliceForK6 = $PoolSliceFile -replace '\\', '/'
-$sloConfig = '../../config/volume-api-slo.json'
-$scenariosConfig = '../../config/volume-scenarios.json'
+$sloConfig = 'config/volume-api-slo.json'
+$scenariosConfig = 'config/volume-scenarios.json'
 
 $k6Args = @(
   'run', 'k6/full-platform/k6-full-platform-orchestrator.js',
+  '--address', '',
   '-e', 'SIGNUP_ROPC_CLIENT_ID=k6-load-test-client',
   '-e', 'VUS=1',
   '-e', 'K6_DEFAULT_VUS=1',
   '-e', 'USER_COUNT=1',
   '-e', 'PHASE_A_SINGLE_EXECUTION=1',
-  '-e', 'MAX_DURATION=30m',
+  '-e', "MAX_DURATION=$maxDuration",
   '-e', 'VOLUME_SLO=1',
   '-e', 'VOLUME_SLO_PROFILE=write',
   '-e', "VOLUME_SLO_FILE=$sloConfig",
@@ -170,6 +193,7 @@ $workerMeta = [ordered]@{
   poolSliceFile  = $PoolSliceFile
   volumeScenario = $VolumeScenario
   volumeSloGate  = $VolumeSloGate
+  maxDuration    = $maxDuration
   startTime      = $startTime.ToUniversalTime().ToString('o')
   endTime        = $endTime.ToUniversalTime().ToString('o')
   elapsedSec     = $elapsedSec
