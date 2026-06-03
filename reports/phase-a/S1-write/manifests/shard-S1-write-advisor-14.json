@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f8ffa901fc6abfb096e03",
-      "uniqueTag": "fp1_g0_1780453350449",
+      "clientId": "6a203fb0d6592c9765559df4",
+      "uniqueTag": "S1-advisor-14",
       "cashflows": [
         {
-          "cashflowId": "6a1f8ffe901fc6abfb09703b",
-          "planName": "Wealth accumulation plan"
+          "cashflowId": "6a203fb1d6592c9765559e67",
+          "planName": "Business owner succession plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T02:23:28.981Z"
+  "generatedAt": "2026-06-03T14:53:06.081Z"
 }

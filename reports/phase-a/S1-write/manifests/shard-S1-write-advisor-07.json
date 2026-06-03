@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f8ff9901fc6abfb096da6",
-      "uniqueTag": "fp1_g0_1780453350568",
+      "clientId": "6a203fb2d6592c9765559f03",
+      "uniqueTag": "S1-advisor-07",
       "cashflows": [
         {
-          "cashflowId": "6a1f8ffc901fc6abfb096f01",
-          "planName": "Mid-life financial review"
+          "cashflowId": "6a203fb5d6592c976555a0a1",
+          "planName": "Remote work lifestyle plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T02:23:28.527Z"
+  "generatedAt": "2026-06-03T14:53:09.527Z"
 }

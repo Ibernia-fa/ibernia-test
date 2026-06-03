@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-03T02:23:26.584Z",
+  "generatedAt": "2026-06-03T14:53:10.479Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S1-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 4015,
+      "actualMs": 1187,
       "actualLabel": "p95",
-      "over": true,
-      "marginMs": -15,
+      "over": false,
+      "marginMs": 2813,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 4036,
+      "actualMs": 6023,
       "actualLabel": "p95",
-      "over": false,
-      "marginMs": 964,
+      "over": true,
+      "marginMs": -1023,
       "overHardMax": null,
       "note": null
     },
@@ -40,11 +40,11 @@
       "kind": "http",
       "optional": false,
       "budgetMs": 3000,
-      "maxMs": 9000,
-      "actualMs": 1009.3,
+      "maxMs": 7500,
+      "actualMs": 314,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 1991,
+      "marginMs": 2686,
       "overHardMax": false,
       "note": null
     },
@@ -53,11 +53,11 @@
       "kind": "http",
       "optional": false,
       "budgetMs": 4000,
-      "maxMs": 12000,
-      "actualMs": 4032.2,
+      "maxMs": 10000,
+      "actualMs": 6017.7,
       "actualLabel": "max",
       "over": true,
-      "marginMs": -32,
+      "marginMs": -2018,
       "overHardMax": false,
       "note": null
     },
@@ -65,12 +65,12 @@
       "metric": "journey_calculate_projection_duration",
       "kind": "step",
       "optional": true,
-      "budgetMs": 3000,
+      "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 31142,
+      "actualMs": 29025,
       "actualLabel": "p95",
       "over": true,
-      "marginMs": -28142,
+      "marginMs": -24025,
       "overHardMax": null,
       "note": null
     }
@@ -81,7 +81,7 @@
     "underBudget": 2,
     "overBudget": 3,
     "failedShard": true,
-    "worstMarginMs": 964,
-    "worstOverMs": 28142
+    "worstMarginMs": 2686,
+    "worstOverMs": 24025
   }
 }

@@ -129,17 +129,8 @@ function Resolve-PhaseAMaxDuration {
 
 $phaseAMaxDuration = Resolve-PhaseAMaxDuration $clientsPerAdvisor $plansPerClient
 
-if ($ParallelJobs -le 0) {
-  $volumeUnits = $clientsPerAdvisor * $plansPerClient
-  if ($volumeUnits -ge 160) {
-    $ParallelJobs = 4
-  } elseif ($volumeUnits -ge 40) {
-    $ParallelJobs = 8
-  } else {
-    $ParallelJobs = $advisorsCount
-  }
-}
-$concurrency = $ParallelJobs
+# Default: all advisors in parallel (same as S1–S3). Override with -ParallelJobs N if needed.
+$concurrency = if ($ParallelJobs -gt 0) { $ParallelJobs } else { $advisorsCount }
 
 if ($advisorsCount -lt 1) { throw 'AdvisorCount must be >= 1' }
 

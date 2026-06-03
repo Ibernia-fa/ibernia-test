@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f8ffa901fc6abfb096e01",
-      "uniqueTag": "fp1_g0_1780453350630",
+      "clientId": "6a203fb2d6592c9765559efe",
+      "uniqueTag": "S1-advisor-08",
       "cashflows": [
         {
-          "cashflowId": "6a1f8ffe901fc6abfb09703e",
-          "planName": "Family security plan"
+          "cashflowId": "6a203fb5d6592c976555a0a9",
+          "planName": "Late-career consolidation plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T02:23:29.491Z"
+  "generatedAt": "2026-06-03T14:53:10.525Z"
 }

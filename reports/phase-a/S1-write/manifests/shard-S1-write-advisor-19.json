@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f8ffb901fc6abfb096e86",
-      "uniqueTag": "fp1_g0_1780453349707",
+      "clientId": "6a203fb1d6592c9765559e6f",
+      "uniqueTag": "S1-advisor-19",
       "cashflows": [
         {
-          "cashflowId": "6a1f8ffe901fc6abfb097053",
-          "planName": "Flexible career plan"
+          "cashflowId": "6a203fb4d6592c9765559fb6",
+          "planName": "Long-term retirement plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T02:23:29.545Z"
+  "generatedAt": "2026-06-03T14:53:08.099Z"
 }

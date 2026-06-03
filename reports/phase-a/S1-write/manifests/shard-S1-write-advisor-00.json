@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f8f87901fc6abfb096331",
-      "uniqueTag": "fp1_g0_1780453248070",
+      "clientId": "6a203f6fd6592c9765559a46",
+      "uniqueTag": "S1-advisor-00",
       "cashflows": [
         {
-          "cashflowId": "6a1f8f88901fc6abfb09633b",
-          "planName": "Wealth accumulation plan"
+          "cashflowId": "6a203f70d6592c9765559a4e",
+          "planName": "Long-term retirement plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T02:21:09.116Z"
+  "generatedAt": "2026-06-03T14:51:41.630Z"
 }

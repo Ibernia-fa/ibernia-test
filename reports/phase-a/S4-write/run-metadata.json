@@ -1,0 +1,24 @@
+{
+    "reportType":  "phase-a-run-metadata",
+    "runTag":  "S4-write",
+    "poolEnv":  "dev",
+    "volumeScenario":  "S4",
+    "userMode":  "fixed",
+    "advisors":  20,
+    "concurrency":  20,
+    "clientsPerAdvisor":  20,
+    "plansPerClient":  8,
+    "iterations":  1,
+    "expectedClients":  400,
+    "expectedPlans":  3200,
+    "expectedShards":  20,
+    "manifestProfileFile":  "data/scenarios/profile_20u_20c_8p.json",
+    "phaseBScenario":  "phase-b-read-default",
+    "volumeSloGate":  {
+                          "IsPresent":  false
+                      },
+    "runStartTime":  "2026-06-03T12:23:42.3340010Z",
+    "advisorRuns":  [
+
+                    ]
+}

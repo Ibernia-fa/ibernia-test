@@ -70,11 +70,6 @@ Get-ChildItem -LiteralPath (Join-Path $RunOutDir 'slo-shards') -Filter '*.json' 
 $k6RestPort = 6570
 if ($AdvisorIndex -ne '') {
   $k6RestPort = 6570 + [int]$AdvisorIndex
-  $staggerSec = [Math]::Min(180, [int]$AdvisorIndex * 12)
-  if ($staggerSec -gt 0) {
-    Write-Host "[PhaseAWorker] stagger sleep ${staggerSec}s advisorIndex=$AdvisorIndex"
-    Start-Sleep -Seconds $staggerSec
-  }
 }
 
 Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort preRunCleanup=True"

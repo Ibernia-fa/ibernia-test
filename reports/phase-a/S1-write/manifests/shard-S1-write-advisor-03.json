@@ -8,12 +8,12 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f8fdf901fc6abfb0966ce",
-      "uniqueTag": "fp1_g0_1780453336733",
+      "clientId": "6a203fafd6592c9765559deb",
+      "uniqueTag": "S1-advisor-03",
       "cashflows": [
         {
-          "cashflowId": "6a1f8fe0901fc6abfb0966e2",
-          "planName": "Mid-life financial review"
+          "cashflowId": "6a203fb0d6592c9765559e10",
+          "planName": "Hospitality business plan"
         }
       ]
     }
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T02:22:43.436Z"
+  "generatedAt": "2026-06-03T14:53:06.069Z"
 }
