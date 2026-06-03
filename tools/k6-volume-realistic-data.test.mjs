@@ -86,6 +86,17 @@ test('selectPersonaForClient is stable for a tag', () => {
   assert.equal(a.firstName, b.firstName);
 });
 
+test('selectPersonaForClient yields distinct personas for five clients on one advisor', () => {
+  const base = 'fp1_g0_1780449247256';
+  const names = new Set();
+  for (let ci = 0; ci < 5; ci++) {
+    const tag = `${base}c${ci + 1}`;
+    const p = selectPersonaForClient(tag, ci, 0);
+    names.add(`${p.firstName} ${p.lastName}`);
+  }
+  assert.equal(names.size, 5, `expected 5 distinct personas, got ${[...names].join(', ')}`);
+});
+
 test('applyRealisticClientProfile uses clean name and short keyword notes', () => {
   const persona = VOLUME_CLIENT_PERSONAS[0];
   const model = applyRealisticClientProfile(

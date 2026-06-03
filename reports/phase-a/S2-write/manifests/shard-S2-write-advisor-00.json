@@ -8,72 +8,72 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a1f837d901fc6abfb06cb19",
-      "uniqueTag": "fp1_g0_1780450166106c1",
+      "clientId": "6a1f88d6901fc6abfb07fb5e",
+      "uniqueTag": "fp1_g0_1780451535085c1",
       "cashflows": [
         {
-          "cashflowId": "6a1f837e901fc6abfb06cb25",
-          "planName": "Primary financial plan ΓÇö Chiara Marini"
+          "cashflowId": "6a1f88d7901fc6abfb07fb6f",
+          "planName": "Primary financial plan ΓÇö Luca Ferrero"
         },
         {
-          "cashflowId": "6a1f838d901fc6abfb06cc9f",
+          "cashflowId": "6a1f88e9901fc6abfb07fe49",
+          "planName": "Retirement income scenario ΓÇö Chiara Marini"
+        }
+      ]
+    },
+    {
+      "clientId": "6a1f88f9901fc6abfb08013a",
+      "uniqueTag": "fp1_g0_1780451535085c2",
+      "cashflows": [
+        {
+          "cashflowId": "6a1f88fa901fc6abfb080167",
+          "planName": "Primary financial plan ΓÇö Francesca Gallo"
+        },
+        {
+          "cashflowId": "6a1f8912901fc6abfb080679",
           "planName": "Retirement income scenario ΓÇö Luca Ferrero"
         }
       ]
     },
     {
-      "clientId": "6a1f839b901fc6abfb06ced6",
-      "uniqueTag": "fp1_g0_1780450166106c2",
+      "clientId": "6a1f893e901fc6abfb081cbd",
+      "uniqueTag": "fp1_g0_1780451535085c3",
       "cashflows": [
         {
-          "cashflowId": "6a1f839c901fc6abfb06cef9",
-          "planName": "Primary financial plan ΓÇö Chiara Marini"
+          "cashflowId": "6a1f8940901fc6abfb081e9b",
+          "planName": "Primary financial plan ΓÇö Marco Rossi"
         },
         {
-          "cashflowId": "6a1f83ac901fc6abfb06d1ea",
-          "planName": "Retirement income scenario ΓÇö Luca Ferrero"
+          "cashflowId": "6a1f896b901fc6abfb083859",
+          "planName": "Retirement income scenario ΓÇö Francesca Gallo"
         }
       ]
     },
     {
-      "clientId": "6a1f83cc901fc6abfb06de17",
-      "uniqueTag": "fp1_g0_1780450166106c3",
+      "clientId": "6a1f8994901fc6abfb0850e4",
+      "uniqueTag": "fp1_g0_1780451535085c4",
       "cashflows": [
         {
-          "cashflowId": "6a1f83d0901fc6abfb06dfc1",
-          "planName": "Primary financial plan ΓÇö Chiara Marini"
+          "cashflowId": "6a1f8997901fc6abfb085266",
+          "planName": "Primary financial plan ΓÇö Elena Romano"
         },
         {
-          "cashflowId": "6a1f83fb901fc6abfb06facc",
-          "planName": "Retirement income scenario ΓÇö Luca Ferrero"
+          "cashflowId": "6a1f89c1901fc6abfb086d13",
+          "planName": "Retirement income scenario ΓÇö Marco Rossi"
         }
       ]
     },
     {
-      "clientId": "6a1f8425901fc6abfb0714c7",
-      "uniqueTag": "fp1_g0_1780450166106c4",
+      "clientId": "6a1f89eb901fc6abfb0886a2",
+      "uniqueTag": "fp1_g0_1780451535085c5",
       "cashflows": [
         {
-          "cashflowId": "6a1f842a901fc6abfb07174f",
-          "planName": "Primary financial plan ΓÇö Chiara Marini"
+          "cashflowId": "6a1f89f0901fc6abfb088952",
+          "planName": "Primary financial plan ΓÇö Matteo Russo"
         },
         {
-          "cashflowId": "6a1f8459901fc6abfb07339e",
-          "planName": "Retirement income scenario ΓÇö Luca Ferrero"
-        }
-      ]
-    },
-    {
-      "clientId": "6a1f8487901fc6abfb075066",
-      "uniqueTag": "fp1_g0_1780450166106c5",
-      "cashflows": [
-        {
-          "cashflowId": "6a1f848b901fc6abfb075288",
-          "planName": "Primary financial plan ΓÇö Chiara Marini"
-        },
-        {
-          "cashflowId": "6a1f84bb901fc6abfb076fd9",
-          "planName": "Retirement income scenario ΓÇö Luca Ferrero"
+          "cashflowId": "6a1f8a1a901fc6abfb08a2f7",
+          "planName": "Retirement income scenario ΓÇö Elena Romano"
         }
       ]
     }
@@ -82,5 +82,5 @@
     "clients": 5,
     "plans": 10
   },
-  "generatedAt": "2026-06-03T01:35:38.395Z"
+  "generatedAt": "2026-06-03T01:58:32.915Z"
 }

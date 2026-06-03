@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-03T01:38:36.862Z",
+  "generatedAt": "2026-06-03T02:01:10.114Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S2-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 3770,
+      "actualMs": 2004,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 230,
+      "marginMs": 1996,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 2952,
+      "actualMs": 1257,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 2048,
+      "marginMs": 3743,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 9000,
-      "actualMs": 959.4,
+      "actualMs": 943.7,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 2041,
+      "marginMs": 2056,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 12000,
-      "actualMs": 5051.8,
+      "actualMs": 5976.4,
       "actualLabel": "max",
       "over": true,
-      "marginMs": -1052,
+      "marginMs": -1976,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": true,
       "budgetMs": 3000,
       "maxMs": null,
-      "actualMs": 25203,
+      "actualMs": 34903,
       "actualLabel": "p95",
       "over": true,
-      "marginMs": -22203,
+      "marginMs": -31903,
       "overHardMax": null,
       "note": null
     }
@@ -81,7 +81,7 @@
     "underBudget": 3,
     "overBudget": 2,
     "failedShard": true,
-    "worstMarginMs": 230,
-    "worstOverMs": 22203
+    "worstMarginMs": 1996,
+    "worstOverMs": 31903
   }
 }

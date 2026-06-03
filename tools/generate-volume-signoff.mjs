@@ -118,21 +118,27 @@ function collectPhaseBShards(args, config, manifest) {
 
   const text = readK6LogText(logPath);
   const fromMarkers = extractAllSignoffShardsFromK6Log(text);
-  if (fromMarkers.length) {
-    const byShard = new Map();
-    for (const s of fromMarkers) {
-      if (s.shardId) byShard.set(s.shardId, s);
-    }
-    return Array.from(byShard.values());
-  }
-
+  const uniqueMarkerShards = new Set(fromMarkers.map((s) => s.shardId).filter(Boolean));
   const retro = buildPhaseBSignoffShardsFromLog(text, {
     config,
     runTag: args.phaseBRunTag,
     manifestAdvisors: manifest.advisors,
     k6ExitCode: 0,
   });
-  return retro.length ? retro : shards;
+  if (retro.length >= args.expectedShards) return retro;
+  if (fromMarkers.length && uniqueMarkerShards.size >= args.expectedShards) {
+    const byShard = new Map();
+    for (const s of fromMarkers) {
+      if (s.shardId) byShard.set(s.shardId, s);
+    }
+    return Array.from(byShard.values());
+  }
+  return retro.length ? retro : shards.length ? shards : Array.from(
+    fromMarkers.reduce((map, s) => {
+      if (s.shardId) map.set(s.shardId, s);
+      return map;
+    }, new Map()).values(),
+  );
 }
 
 function countK6Exit99(meta) {

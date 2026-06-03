@@ -1,17 +1,19 @@
 #!/usr/bin/env node
 /**
- * Generate S1-write_VOLUME_REPORT.md from on-disk artifacts.
+ * Generate volume report markdown from on-disk Phase A/B artifacts.
  * Resolves nearest files when requested run tags are missing.
+ *
+ * Usage: node tools/generate-volume-report.mjs [phaseARunTag] [phaseBRunTag] [scenario] [outPath]
  */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const REQ_A = process.argv[2] || 'S1-write-20260602-1505';
-const REQ_B = process.argv[3] || 'S1-write-20260602-1505-read-v2';
+const REQ_A = process.argv[2] || 'S1-write';
+const REQ_B = process.argv[3] || 'S1-read';
 const SCENARIO = process.argv[4] || 'S1';
-const OUT = process.argv[5] || 'reports/phase-volume/S1-write_VOLUME_REPORT.md';
+const OUT = process.argv[5] || `reports/phase-volume/${REQ_A}_VOLUME_REPORT.md`;
 
 function exists(p) {
   return fs.existsSync(path.join(ROOT, p));

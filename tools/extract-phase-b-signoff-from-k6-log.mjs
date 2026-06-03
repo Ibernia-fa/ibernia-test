@@ -41,20 +41,45 @@ function main() {
     process.exit(1);
   }
   const text = readK6LogText(resolve(args.log));
+  const config = loadSignoffConfigFromObject(
+    JSON.parse(readFileSync(join(repoRoot, DEFAULT_SIGNOFF_CONFIG_PATH), 'utf8')),
+  );
+  const phaseATag = args.phaseARunTag || args.runTag.replace(/-read$/, '');
+  const manifestPath = args.manifest
+    ? resolve(args.manifest)
+    : join(repoRoot, 'reports', 'phase-a', phaseATag, 'manifest.json');
+  const manifest = existsSync(manifestPath)
+    ? JSON.parse(readFileSync(manifestPath, 'utf8'))
+    : null;
+
   let shards = extractAllSignoffShardsFromK6Log(text);
+  const uniqueMarkerShards = new Set(shards.map((s) => s.shardId).filter(Boolean));
+  const expectedShards = manifest?.advisors?.length || 0;
+
+  if (args.retro && manifest?.advisors?.length) {
+    const retroShards = buildPhaseBSignoffShardsFromLog(text, {
+      config,
+      runTag: args.runTag,
+      manifestAdvisors: manifest.advisors,
+      k6ExitCode: 0,
+    });
+    if (!shards.length || uniqueMarkerShards.size < expectedShards) {
+      if (retroShards.length) {
+        if (shards.length && uniqueMarkerShards.size < expectedShards) {
+          console.warn(
+            `Markers cover ${uniqueMarkerShards.size}/${expectedShards} shard(s); using retro __K6_PERF_WORST__ for Phase B signoff`,
+          );
+        }
+        shards = retroShards;
+      }
+    }
+  }
+
   if (!shards.length && args.retro) {
-    const phaseATag = args.phaseARunTag || args.runTag.replace(/-read$/, '');
-    const manifestPath = args.manifest
-      ? resolve(args.manifest)
-      : join(repoRoot, 'reports', 'phase-a', phaseATag, 'manifest.json');
     if (!existsSync(manifestPath)) {
       console.error(`No markers and manifest not found: ${manifestPath}`);
       process.exit(1);
     }
-    const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
-    const config = loadSignoffConfigFromObject(
-      JSON.parse(readFileSync(join(repoRoot, DEFAULT_SIGNOFF_CONFIG_PATH), 'utf8')),
-    );
     shards = buildPhaseBSignoffShardsFromLog(text, {
       config,
       runTag: args.runTag,

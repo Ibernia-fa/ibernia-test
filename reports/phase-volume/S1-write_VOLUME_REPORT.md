@@ -5,7 +5,7 @@
 | phase_a_run_tag (requested) | S1-write |
 | phase_b_run_tag (requested) | S1-read |
 | phase_a_run_tag (resolved) | S1-write |
-| phase_b_run_tag (resolved) | S1-read |
+| phase_b_run_tag (resolved) | S2-read |
 | signoff_fleet_file (requested) | reports/phase-volume/S1-write_signoff-fleet.json |
 | signoff_fleet_file (resolved) | reports/phase-volume/S1-write_signoff-fleet.json |
 | run_metadata_file (requested) | reports/phase-a/S1-write/run-metadata.json |
@@ -296,13 +296,13 @@
 | phase | auth_failure_rate | business_failure_rate | http_req_failed |
 |-------|-------------------|----------------------|-----------------|
 | A | n/a | n/a | n/a |
-| B | 0 | 0 | 0 |
+| B | 0 | 0.23806729264475743 | 0 |
 
 ### 8_exits
 | phase | runner_exit_code | k6_exit_0 | k6_exit_99 | failed_job_ids |
 |-------|------------------|-----------|------------|----------------|
 | A | n/a | 20 | 0 |  |
-| B | 99 | 0 | 1 | |
+| B | n/a | 0 | 1 | |
 
 ### 9_fleet_slo_gate
 | phase | passed | failed | failed_shard_ids |
