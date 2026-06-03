@@ -251,6 +251,8 @@ test('buildRealisticSavingPotPayload creates two distinct non-cash pots', () => 
   assert.ok(pot0.startingPotValue.amount >= 42000);
   assert.ok(pot1.startingPotValue.amount >= 8500);
   assert.notEqual(pot0.name, pot1.name);
+  assert.equal(pot0.iconUrl, 'cashflow-investment-icon');
+  assert.equal(pot1.iconUrl, 'wallet-icon');
   assert.doesNotMatch(pot0.name, /\[vol-/);
   assert.doesNotMatch(pot1.name, /\[vol-/);
 });
