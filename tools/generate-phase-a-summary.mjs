@@ -101,7 +101,6 @@ function main() {
     `| Scenario | ${scenario} |`,
     `| Advisors | ${runMeta && runMeta.advisors != null ? runMeta.advisors : 'n/a'} |`,
     `| Parallel advisor jobs | ${runMeta && runMeta.concurrency != null ? runMeta.concurrency : 'n/a'} |`,
-    `| Top-up parallel jobs | ${runMeta && runMeta.topUpConcurrency != null ? runMeta.topUpConcurrency : runMeta && runMeta.concurrency != null ? runMeta.concurrency : 'n/a'} |`,
     `| Clients/advisor | ${runMeta && runMeta.clientsPerAdvisor != null ? runMeta.clientsPerAdvisor : 'n/a'} |`,
     `| Plans/client | ${runMeta && runMeta.plansPerClient != null ? runMeta.plansPerClient : 'n/a'} |`,
     `| Profile file | ${profilePath} |`,

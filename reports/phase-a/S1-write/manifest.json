@@ -1,6 +1,6 @@
 {
   "reportType": "phase-a-manifest",
-  "generatedAt": "2026-06-03T16:29:13.833Z",
+  "generatedAt": "2026-06-04T09:05:57.669Z",
   "runTag": "S1-write",
   "scenario": "S1",
   "phaseBScenario": "phase-b-read-default",
@@ -15,11 +15,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a2055f0d6592c976556bc11",
+          "clientId": "6a213f33217bb4e30ab01faa",
           "uniqueTag": "S1-advisor-00",
           "cashflows": [
             {
-              "cashflowId": "6a2055f1d6592c976556bc19",
+              "cashflowId": "6a213f35217bb4e30ab01fb2",
               "planName": "Long-term retirement plan"
             }
           ]
@@ -29,7 +29,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:27:39.188Z"
+      "generatedAt": "2026-06-04T09:02:54.351Z"
     },
     {
       "shardId": "advisor-01",
@@ -39,11 +39,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a2055f4d6592c976556bc9b",
+          "clientId": "6a213f5b217bb4e30ab02144",
           "uniqueTag": "S1-advisor-01",
           "cashflows": [
             {
-              "cashflowId": "6a2055f6d6592c976556bcd9",
+              "cashflowId": "6a213f5c217bb4e30ab0214c",
               "planName": "Qualification pathway plan"
             }
           ]
@@ -53,7 +53,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:27:44.487Z"
+      "generatedAt": "2026-06-04T09:03:36.807Z"
     },
     {
       "shardId": "advisor-02",
@@ -63,11 +63,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562dd6592c976556bf51",
+          "clientId": "6a213f7c217bb4e30ab022e0",
           "uniqueTag": "S1-advisor-02",
           "cashflows": [
             {
-              "cashflowId": "6a205630d6592c976556c06d",
+              "cashflowId": "6a213f7e217bb4e30ab022e8",
               "planName": "Infrastructure career plan"
             }
           ]
@@ -77,7 +77,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:03.604Z"
+      "generatedAt": "2026-06-04T09:04:11.087Z"
     },
     {
       "shardId": "advisor-03",
@@ -87,11 +87,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562ed6592c976556bf88",
+          "clientId": "6a213f83217bb4e30ab02385",
           "uniqueTag": "S1-advisor-03",
           "cashflows": [
             {
-              "cashflowId": "6a205631d6592c976556c0bf",
+              "cashflowId": "6a213f84217bb4e30ab023ab",
               "planName": "Hospitality business plan"
             }
           ]
@@ -101,7 +101,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:03.645Z"
+      "generatedAt": "2026-06-04T09:04:17.313Z"
     },
     {
       "shardId": "advisor-04",
@@ -111,11 +111,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a205630d6592c976556c061",
+          "clientId": "6a213f89217bb4e30ab024a1",
           "uniqueTag": "S1-advisor-04",
           "cashflows": [
             {
-              "cashflowId": "6a205634d6592c976556c292",
+              "cashflowId": "6a213f8a217bb4e30ab02504",
               "planName": "First-time investor plan"
             }
           ]
@@ -125,7 +125,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.561Z"
+      "generatedAt": "2026-06-04T09:04:22.831Z"
     },
     {
       "shardId": "advisor-05",
@@ -135,11 +135,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562dd6592c976556bf5b",
+          "clientId": "6a213f90217bb4e30ab02676",
           "uniqueTag": "S1-advisor-05",
           "cashflows": [
             {
-              "cashflowId": "6a20562fd6592c976556bfb5",
+              "cashflowId": "6a213f91217bb4e30ab026cb",
               "planName": "Healthcare career plan"
             }
           ]
@@ -149,7 +149,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:03.661Z"
+      "generatedAt": "2026-06-04T09:04:29.769Z"
     },
     {
       "shardId": "advisor-06",
@@ -159,11 +159,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfc5",
+          "clientId": "6a213f95217bb4e30ab02809",
           "uniqueTag": "S1-advisor-06",
           "cashflows": [
             {
-              "cashflowId": "6a205633d6592c976556c1c9",
+              "cashflowId": "6a213f97217bb4e30ab02860",
               "planName": "Variable income plan"
             }
           ]
@@ -173,7 +173,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.628Z"
+      "generatedAt": "2026-06-04T09:04:35.171Z"
     },
     {
       "shardId": "advisor-07",
@@ -183,11 +183,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a205630d6592c976556c05f",
+          "clientId": "6a213f9b217bb4e30ab02972",
           "uniqueTag": "S1-advisor-07",
           "cashflows": [
             {
-              "cashflowId": "6a205634d6592c976556c2a4",
+              "cashflowId": "6a213f9d217bb4e30ab029d4",
               "planName": "Remote work lifestyle plan"
             }
           ]
@@ -197,7 +197,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:06.667Z"
+      "generatedAt": "2026-06-04T09:04:40.628Z"
     },
     {
       "shardId": "advisor-08",
@@ -207,11 +207,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfc3",
+          "clientId": "6a213fa1217bb4e30ab02b4d",
           "uniqueTag": "S1-advisor-08",
           "cashflows": [
             {
-              "cashflowId": "6a205633d6592c976556c1d8",
+              "cashflowId": "6a213fa3217bb4e30ab02b8c",
               "planName": "Late-career consolidation plan"
             }
           ]
@@ -221,7 +221,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.723Z"
+      "generatedAt": "2026-06-04T09:04:48.167Z"
     },
     {
       "shardId": "advisor-09",
@@ -231,11 +231,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfa6",
+          "clientId": "6a213fa7217bb4e30ab02cd1",
           "uniqueTag": "S1-advisor-09",
           "cashflows": [
             {
-              "cashflowId": "6a205632d6592c976556c11b",
+              "cashflowId": "6a213fa9217bb4e30ab02d27",
               "planName": "Executive wealth plan"
             }
           ]
@@ -245,7 +245,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.583Z"
+      "generatedAt": "2026-06-04T09:04:54.690Z"
     },
     {
       "shardId": "advisor-10",
@@ -255,11 +255,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfc7",
+          "clientId": "6a213fad217bb4e30ab02e42",
           "uniqueTag": "S1-advisor-10",
           "cashflows": [
             {
-              "cashflowId": "6a205633d6592c976556c1c1",
+              "cashflowId": "6a213faf217bb4e30ab02ea2",
               "planName": "Studio succession plan"
             }
           ]
@@ -269,7 +269,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:06.688Z"
+      "generatedAt": "2026-06-04T09:05:00.864Z"
     },
     {
       "shardId": "advisor-11",
@@ -279,11 +279,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfb0",
+          "clientId": "6a213fb3217bb4e30ab02fa7",
           "uniqueTag": "S1-advisor-11",
           "cashflows": [
             {
-              "cashflowId": "6a205632d6592c976556c156",
+              "cashflowId": "6a213fb4217bb4e30ab03006",
               "planName": "Career growth savings plan"
             }
           ]
@@ -293,7 +293,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.597Z"
+      "generatedAt": "2026-06-04T09:05:07.585Z"
     },
     {
       "shardId": "advisor-12",
@@ -303,11 +303,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfa2",
+          "clientId": "6a213fb8217bb4e30ab03148",
           "uniqueTag": "S1-advisor-12",
           "cashflows": [
             {
-              "cashflowId": "6a205632d6592c976556c15b",
+              "cashflowId": "6a213fba217bb4e30ab03188",
               "planName": "Mid-life financial review"
             }
           ]
@@ -317,7 +317,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.648Z"
+      "generatedAt": "2026-06-04T09:05:12.729Z"
     },
     {
       "shardId": "advisor-13",
@@ -327,11 +327,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfa7",
+          "clientId": "6a213fbf217bb4e30ab03312",
           "uniqueTag": "S1-advisor-13",
           "cashflows": [
             {
-              "cashflowId": "6a205632d6592c976556c128",
+              "cashflowId": "6a213fc1217bb4e30ab0334b",
               "planName": "Early career wealth plan"
             }
           ]
@@ -341,7 +341,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:05.561Z"
+      "generatedAt": "2026-06-04T09:05:19.087Z"
     },
     {
       "shardId": "advisor-14",
@@ -351,11 +351,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a205630d6592c976556c065",
+          "clientId": "6a213fc4217bb4e30ab03472",
           "uniqueTag": "S1-advisor-14",
           "cashflows": [
             {
-              "cashflowId": "6a205634d6592c976556c294",
+              "cashflowId": "6a213fc6217bb4e30ab034bb",
               "planName": "Business owner succession plan"
             }
           ]
@@ -365,7 +365,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:06.289Z"
+      "generatedAt": "2026-06-04T09:05:24.463Z"
     },
     {
       "shardId": "advisor-15",
@@ -375,11 +375,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562dd6592c976556bf58",
+          "clientId": "6a213fcc217bb4e30ab0365d",
           "uniqueTag": "S1-advisor-15",
           "cashflows": [
             {
-              "cashflowId": "6a20562fd6592c976556bfb2",
+              "cashflowId": "6a213fcd217bb4e30ab036a2",
               "planName": "Flexible career plan"
             }
           ]
@@ -389,7 +389,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:03.645Z"
+      "generatedAt": "2026-06-04T09:05:31.375Z"
     },
     {
       "shardId": "advisor-16",
@@ -399,11 +399,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a205630d6592c976556c063",
+          "clientId": "6a213fd0217bb4e30ab037ba",
           "uniqueTag": "S1-advisor-16",
           "cashflows": [
             {
-              "cashflowId": "6a205634d6592c976556c28d",
+              "cashflowId": "6a213fd2217bb4e30ab037fb",
               "planName": "Family security plan"
             }
           ]
@@ -413,7 +413,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:06.583Z"
+      "generatedAt": "2026-06-04T09:05:35.509Z"
     },
     {
       "shardId": "advisor-17",
@@ -423,11 +423,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfae",
+          "clientId": "6a213fd8217bb4e30ab0399d",
           "uniqueTag": "S1-advisor-17",
           "cashflows": [
             {
-              "cashflowId": "6a205632d6592c976556c154",
+              "cashflowId": "6a213fd9217bb4e30ab039e6",
               "planName": "Pre-retirement transition plan"
             }
           ]
@@ -437,7 +437,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:06.679Z"
+      "generatedAt": "2026-06-04T09:05:42.985Z"
     },
     {
       "shardId": "advisor-18",
@@ -447,11 +447,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562dd6592c976556bf60",
+          "clientId": "6a213fdd217bb4e30ab03b22",
           "uniqueTag": "S1-advisor-18",
           "cashflows": [
             {
-              "cashflowId": "6a20562fd6592c976556bfac",
+              "cashflowId": "6a213fde217bb4e30ab03b85",
               "planName": "Wealth accumulation plan"
             }
           ]
@@ -461,7 +461,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:01.650Z"
+      "generatedAt": "2026-06-04T09:05:48.002Z"
     },
     {
       "shardId": "advisor-19",
@@ -471,11 +471,11 @@
       "iteration": 0,
       "clients": [
         {
-          "clientId": "6a20562fd6592c976556bfa9",
+          "clientId": "6a213fe3217bb4e30ab03cc8",
           "uniqueTag": "S1-advisor-19",
           "cashflows": [
             {
-              "cashflowId": "6a205632d6592c976556c130",
+              "cashflowId": "6a213fe5217bb4e30ab03d0d",
               "planName": "Long-term retirement plan"
             }
           ]
@@ -485,7 +485,7 @@
         "clients": 1,
         "plans": 1
       },
-      "generatedAt": "2026-06-03T16:29:06.575Z"
+      "generatedAt": "2026-06-04T09:05:54.144Z"
     }
   ],
   "totals": {
@@ -498,6 +498,7 @@
       "profile": "write",
       "readOnly": false,
       "advisors": 20,
+      "writeParallelJobs": 20,
       "clientsPerAdvisor": 1,
       "plansPerClient": 1,
       "iterations": 1,

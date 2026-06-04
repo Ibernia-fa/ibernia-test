@@ -8,11 +8,11 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a205630d6592c976556c061",
+      "clientId": "6a213f89217bb4e30ab024a1",
       "uniqueTag": "S1-advisor-04",
       "cashflows": [
         {
-          "cashflowId": "6a205634d6592c976556c292",
+          "cashflowId": "6a213f8a217bb4e30ab02504",
           "planName": "First-time investor plan"
         }
       ]
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T16:29:05.561Z"
+  "generatedAt": "2026-06-04T09:04:22.831Z"
 }

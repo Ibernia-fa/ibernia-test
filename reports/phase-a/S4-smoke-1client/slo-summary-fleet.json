@@ -1,0 +1,180 @@
+{
+  "reportType": "phase-a-slo-fleet",
+  "generatedAt": "2026-06-04T08:00:19.355Z",
+  "runTag": "S4-smoke-1client",
+  "shardCount": 1,
+  "shards": [
+    {
+      "reportType": "volume-slo-summary",
+      "generatedAt": "2026-06-04T08:00:17.455Z",
+      "configVersion": 1,
+      "defaultProfile": "write",
+      "gates": null,
+      "profilesUsed": [],
+      "endpoints": [],
+      "steps": [],
+      "rates": {
+        "endpointViolationRate": null,
+        "stepViolationRate": null,
+        "hardMaxViolationRate": null
+      },
+      "totals": {
+        "endpointSamples": 0,
+        "stepSamples": 0,
+        "endpointViolations": 0,
+        "stepViolations": 0,
+        "hardMaxViolations": 0
+      },
+      "enabled": true,
+      "runId": "S4-smoke-1client",
+      "scenario": "phase-a-write-default",
+      "scenarioProfile": "write",
+      "phase": "A",
+      "integration": "k6-full-platform-orchestrator",
+      "sloProfile": "write",
+      "script": "k6-full-platform-orchestrator",
+      "loadMode": "vus",
+      "htmlSignup": false,
+      "phaseARunTag": "S4-smoke-1client",
+      "phaseA": {
+        "steps": [],
+        "metrics": [
+          "journey_create_client_duration",
+          "journey_create_base_plan_duration",
+          "journey_create_timeline_events_duration",
+          "journey_add_income_expenses_duration",
+          "journey_add_saving_pots_duration",
+          "journey_add_contributions_withdrawals_duration",
+          "journey_calculate_projection_duration",
+          "journey_full_plan_build_duration"
+        ]
+      },
+      "shardId": "advisor-00"
+    }
+  ],
+  "fleet": {
+    "gatePassed": 0,
+    "gateFailed": 0
+  },
+  "validation": {
+    "expectedShards": 1,
+    "actualShards": 1,
+    "shardCountOk": true,
+    "passed": true
+  },
+  "signoff": {
+    "phase": "A",
+    "fleet": {
+      "expectedShards": 1,
+      "actualShards": 1,
+      "shardsAllUnder": 1,
+      "shardsAnyOver": 0,
+      "failedShardIds": [],
+      "byMetric": {
+        "journey_create_client_duration": {
+          "under": 1,
+          "over": 0,
+          "failedShards": [],
+          "worstMarginMs": 3678,
+          "worstOverMs": null
+        },
+        "POST /api/v1/Clients": {
+          "under": 1,
+          "over": 0,
+          "failedShards": [],
+          "worstMarginMs": 2682,
+          "worstOverMs": null
+        }
+      },
+      "shards": [
+        {
+          "reportType": "volume-signoff-shard",
+          "generatedAt": "2026-06-04T08:00:17.197Z",
+          "phase": "A",
+          "profile": "write",
+          "runTag": "S4-smoke-1client",
+          "shardId": "advisor-00",
+          "advisorEmail": "User01@gmail.com",
+          "k6ExitCode": null,
+          "source": "k6-marker",
+          "rows": [
+            {
+              "metric": "journey_create_client_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": null,
+              "actualMs": 322,
+              "actualLabel": "p95",
+              "over": false,
+              "marginMs": 3678,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_create_base_plan_duration",
+              "kind": "step",
+              "optional": false,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": null,
+              "actualLabel": "p95",
+              "over": null,
+              "marginMs": null,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/Clients",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 3000,
+              "maxMs": 7500,
+              "actualMs": 318.2,
+              "actualLabel": "max",
+              "over": false,
+              "marginMs": 2682,
+              "overHardMax": false,
+              "note": null
+            },
+            {
+              "metric": "POST /api/v1/cashflows",
+              "kind": "http",
+              "optional": false,
+              "budgetMs": 4000,
+              "maxMs": 10000,
+              "actualMs": null,
+              "actualLabel": "max",
+              "over": null,
+              "marginMs": null,
+              "overHardMax": null,
+              "note": null
+            },
+            {
+              "metric": "journey_calculate_projection_duration",
+              "kind": "step",
+              "optional": true,
+              "budgetMs": 5000,
+              "maxMs": null,
+              "actualMs": null,
+              "actualLabel": "p95",
+              "over": null,
+              "marginMs": null,
+              "overHardMax": null,
+              "note": null
+            }
+          ],
+          "summary": {
+            "totalRows": 5,
+            "rowsWithActual": 2,
+            "underBudget": 2,
+            "overBudget": 0,
+            "failedShard": false,
+            "worstMarginMs": 2682,
+            "worstOverMs": null
+          }
+        }
+      ]
+    }
+  }
+}

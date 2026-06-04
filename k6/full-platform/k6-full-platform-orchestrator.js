@@ -16,8 +16,8 @@
  * **`VOLUME_SLO_GATE=1`**. Writes **`reports/phase-a/{RunId}/slo-summary.json`** via handleSummary.
  *
  * **Pre-run cleanup (write):** before creating clients, deletes prior k6 clients/plans when
- * **`FULL_PLATFORM_PRE_RUN_CLEANUP=1`** (default on for write profile / skip-teardown). Fixed-advisor
- * Phase A sets **`FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1`** to remove every client on the advisor.
+ * **`FULL_PLATFORM_PRE_RUN_CLEANUP=1`** (Phase A volume write sets this for all scenarios). Fixed-advisor
+ * runs also set **`FULL_PLATFORM_PRE_RUN_CLEANUP_ALL=1`** to wipe every client/plan on the advisor first.
  *
  * @example PowerShell
  * cd $env:USERPROFILE\source\repos\load-testing-k6

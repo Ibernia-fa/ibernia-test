@@ -8,11 +8,11 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a205630d6592c976556c05f",
+      "clientId": "6a213f9b217bb4e30ab02972",
       "uniqueTag": "S1-advisor-07",
       "cashflows": [
         {
-          "cashflowId": "6a205634d6592c976556c2a4",
+          "cashflowId": "6a213f9d217bb4e30ab029d4",
           "planName": "Remote work lifestyle plan"
         }
       ]
@@ -22,5 +22,5 @@
     "clients": 1,
     "plans": 1
   },
-  "generatedAt": "2026-06-03T16:29:06.667Z"
+  "generatedAt": "2026-06-04T09:04:40.628Z"
 }

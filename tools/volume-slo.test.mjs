@@ -37,12 +37,11 @@ import {
   advisorSubShardId,
   buildManifestShardFromK6SummaryMetrics,
 } from '../lib/volume-manifest-core.js';
+import { normalizeVolumeConfigOpenPath } from '../lib/volume-http-retry.js';
 import {
-  isTransientHttpStatus,
-  normalizeVolumeConfigOpenPath,
-  parseVolumeMaxAttemptsEnv,
-  transientRetryBackoffSec,
-} from '../lib/volume-http-retry.js';
+  volumeFleetStaggerEnabledFromEnv,
+  volumePreRunCleanupEnabledFromEnv,
+} from '../lib/k6-load-cleanup-core.js';
 import {
   buildSignoffFleetSection,
   buildQuotaBreachSummary,
@@ -448,31 +447,6 @@ test('buildManifestShardFromK6SummaryMetrics rebuilds shard from tagged counters
   assert.equal(merged.validation.passed, true);
 });
 
-test('isTransientHttpStatus treats 5xx/429 as transient, not 401/400', () => {
-  assert.equal(isTransientHttpStatus(500), true);
-  assert.equal(isTransientHttpStatus(503), true);
-  assert.equal(isTransientHttpStatus(429), true);
-  assert.equal(isTransientHttpStatus(0), true);
-  assert.equal(isTransientHttpStatus(401), false);
-  assert.equal(isTransientHttpStatus(400), false);
-});
-
-test('normalizeVolumeConfigOpenPath strips absolute prefix to config/', () => {
-  const p = normalizeVolumeConfigOpenPath('C:/Users/me/load-testing-k6/config/volume-scenarios.json');
-  assert.equal(p, 'config/volume-scenarios.json');
-});
-
-test('parseVolumeMaxAttemptsEnv clamps and defaults', () => {
-  assert.equal(parseVolumeMaxAttemptsEnv('', 6), 6);
-  assert.equal(parseVolumeMaxAttemptsEnv('3', 6), 3);
-  assert.equal(parseVolumeMaxAttemptsEnv('99', 6), 12);
-});
-
-test('transientRetryBackoffSec grows with attempt', () => {
-  assert.ok(transientRetryBackoffSec(1) < transientRetryBackoffSec(4));
-  assert.ok(transientRetryBackoffSec(10) <= 45);
-});
-
 test('buildQuotaBreachSummary counts advisors and maps impacted journeys', () => {
   const shards = [
     {
@@ -519,4 +493,22 @@ test('formatQuotaBreachSummaryMarkdown reports no breaches when all under budget
   assert.equal(summary.advisorsOverQuota, 0);
   const md = formatQuotaBreachSummaryMarkdown(summary);
   assert.match(md, /No advisors exceeded the latency budget/);
+});
+
+test('normalizeVolumeConfigOpenPath strips absolute prefix to config/', () => {
+  const p = normalizeVolumeConfigOpenPath('C:/Users/me/load-testing-k6/config/volume-scenarios.json');
+  assert.equal(p, 'config/volume-scenarios.json');
+});
+
+test('volumePreRunCleanupEnabledFromEnv respects explicit flags for multi-client volume', () => {
+  const writeEnv = { FULL_PLATFORM_PRE_RUN_CLEANUP: '1' };
+  assert.equal(volumePreRunCleanupEnabledFromEnv(writeEnv, 1), true);
+  assert.equal(volumePreRunCleanupEnabledFromEnv(writeEnv, 20), true);
+  assert.equal(volumePreRunCleanupEnabledFromEnv({ FULL_PLATFORM_PRE_RUN_CLEANUP: '0' }, 20), false);
+});
+
+test('volumeFleetStaggerEnabledFromEnv on by default for S4-scale client counts', () => {
+  assert.equal(volumeFleetStaggerEnabledFromEnv({}, 20), true);
+  assert.equal(volumeFleetStaggerEnabledFromEnv({}, 4), true);
+  assert.equal(volumeFleetStaggerEnabledFromEnv({ VOLUME_DISABLE_FLEET_STAGGER: '1' }, 20), false);
 });

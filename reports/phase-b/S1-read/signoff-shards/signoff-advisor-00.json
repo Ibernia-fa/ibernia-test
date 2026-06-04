@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-03T16:39:28.076Z",
+  "generatedAt": "2026-06-04T09:15:58.479Z",
   "phase": "B",
   "profile": "read",
   "runTag": "S1-read",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": null,
-      "actualMs": 328,
+      "actualMs": 314,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 2172,
+      "marginMs": 2186,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 15000,
       "maxMs": null,
-      "actualMs": 15808,
+      "actualMs": 9582,
       "actualLabel": "p95",
-      "over": true,
-      "marginMs": -808,
+      "over": false,
+      "marginMs": 5418,
       "overHardMax": null,
       "note": null
     },
@@ -41,10 +41,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": 5000,
-      "actualMs": 689.2,
+      "actualMs": 694.3,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 1811,
+      "marginMs": 1806,
       "overHardMax": false,
       "note": null
     },
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 2500,
       "maxMs": 4000,
-      "actualMs": 761.5,
+      "actualMs": 328.9,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 1738,
+      "marginMs": 2171,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 4000,
-      "actualMs": 2275.7,
+      "actualMs": 2131,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 724,
+      "marginMs": 869,
       "overHardMax": false,
       "note": null
     }
@@ -78,10 +78,10 @@
   "summary": {
     "totalRows": 5,
     "rowsWithActual": 5,
-    "underBudget": 4,
-    "overBudget": 1,
-    "failedShard": true,
-    "worstMarginMs": 724,
-    "worstOverMs": 808
+    "underBudget": 5,
+    "overBudget": 0,
+    "failedShard": false,
+    "worstMarginMs": 869,
+    "worstOverMs": null
   }
 }

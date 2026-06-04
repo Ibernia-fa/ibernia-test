@@ -1,0 +1,1 @@
+{"scenarioName":"S4","profile":"write","readOnly":false,"advisors":1,"writeParallelJobs":20,"clientsPerAdvisor":1,"plansPerClient":1,"iterations":1,"manifestProfileFile":"data/scenarios/profile_20u_20c_8p.json","phaseBScenario":"phase-b-read-default","sloOverridesFile":null,"source":{"advisors":"cli","clientsPerAdvisor":"cli","plansPerClient":"cli"}}
