@@ -131,10 +131,26 @@ function Resolve-PhaseAMaxDuration {
 
 $phaseAMaxDuration = Resolve-PhaseAMaxDuration $clientsPerAdvisor $plansPerClient
 
-# Default: all advisors in parallel (same as S1–S3). Override with -ParallelJobs N if needed.
-$concurrency = if ($ParallelJobs -gt 0) { $ParallelJobs } else { $advisorsCount }
+# Default: scenario writeParallelJobs (20 for S1–S5), else all advisors in parallel.
+# Override with -ParallelJobs N if needed.
+$scenarioParallel = 0
+if ($scenarioResolved.writeParallelJobs) {
+  $scenarioParallel = [int]$scenarioResolved.writeParallelJobs
+}
+$concurrency = if ($ParallelJobs -gt 0) {
+  $ParallelJobs
+} elseif ($scenarioParallel -gt 0) {
+  $scenarioParallel
+} else {
+  $advisorsCount
+}
+if ($concurrency -gt $advisorsCount) {
+  Write-Warning "Concurrency $concurrency exceeds advisor count $advisorsCount; capping at $advisorsCount"
+  $concurrency = $advisorsCount
+}
 $autoTopUpEnabled = (-not $SkipAutoTopUp.IsPresent) -and ($VolumeScenario -in @('S4', 'S5')) -and ($clientsPerAdvisor -ge 20)
-$topUpConcurrency = 5
+# Top-up resume uses the same parallel advisor count as the initial wave (S1–S5 standard: 20).
+$topUpConcurrency = $concurrency
 $extractCli = Join-Path $RepoRoot 'tools/extract-phase-a-manifest-from-k6-log.mjs'
 
 if ($advisorsCount -lt 1) { throw 'AdvisorCount must be >= 1' }
@@ -209,6 +225,8 @@ $runMetaInit = [ordered]@{
   userMode            = $userMode
   advisors            = $advisorsCount
   concurrency         = $concurrency
+  topUpConcurrency    = $topUpConcurrency
+  writeParallelJobs   = $scenarioParallel
   clientsPerAdvisor   = $clientsPerAdvisor
   plansPerClient      = $plansPerClient
   iterations          = $iterations
@@ -472,8 +490,6 @@ try {
     Copy-Item -LiteralPath (Join-Path $runRoot 'slo-summary-fleet.json') -Destination (Join-Path $runRoot 'slo-summary.json') -Force -ErrorAction SilentlyContinue
   }
 
-  node @($summaryCli, '--run-tag', $RunTag)
-
   $signoffShardsRoot = Join-Path $runRoot 'signoff-shards'
   if (-not (Test-Path -LiteralPath $signoffShardsRoot)) {
     New-Item -ItemType Directory -Path $signoffShardsRoot -Force | Out-Null
@@ -493,6 +509,8 @@ try {
     node @($signoffGenCli, '--phase-a-run-tag', $RunTag, '--pair-run-tag', $RunTag, '--expected-shards', [string]$expectedShards)
   }
 
+  node @($summaryCli, '--run-tag', $RunTag)
+
   $runEndTime = Get-Date
   $runMetaFinal = [ordered]@{
     reportType          = 'phase-a-run-metadata'
@@ -501,6 +519,8 @@ try {
     userMode            = $userMode
     advisors            = $advisorsCount
     concurrency         = $concurrency
+    topUpConcurrency    = $topUpConcurrency
+    writeParallelJobs   = $scenarioParallel
     clientsPerAdvisor   = $clientsPerAdvisor
     plansPerClient      = $plansPerClient
     expectedClients     = $expectedClients

@@ -8,6 +8,11 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  buildQuotaBreachSummary,
+  formatQuotaBreachSummaryMarkdown,
+  buildSignoffFleetSection,
+} from '../lib/volume-signoff-core.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..');
@@ -49,6 +54,7 @@ function main() {
   const manifest = readJson(join(runRoot, 'manifest.json'));
   const runMeta = readJson(join(runRoot, 'run-metadata.json'));
   const sloFleet = readJson(join(runRoot, 'slo-summary-fleet.json'));
+  const signoffFleet = readJson(join(runRoot, 'signoff-fleet.json'));
 
   const validation = manifest && manifest.validation ? manifest.validation : null;
   const totals = manifest && manifest.totals ? manifest.totals : { clients: 0, plans: 0 };
@@ -94,6 +100,8 @@ function main() {
     `|-------|-------|`,
     `| Scenario | ${scenario} |`,
     `| Advisors | ${runMeta && runMeta.advisors != null ? runMeta.advisors : 'n/a'} |`,
+    `| Parallel advisor jobs | ${runMeta && runMeta.concurrency != null ? runMeta.concurrency : 'n/a'} |`,
+    `| Top-up parallel jobs | ${runMeta && runMeta.topUpConcurrency != null ? runMeta.topUpConcurrency : runMeta && runMeta.concurrency != null ? runMeta.concurrency : 'n/a'} |`,
     `| Clients/advisor | ${runMeta && runMeta.clientsPerAdvisor != null ? runMeta.clientsPerAdvisor : 'n/a'} |`,
     `| Plans/client | ${runMeta && runMeta.plansPerClient != null ? runMeta.plansPerClient : 'n/a'} |`,
     `| Profile file | ${profilePath} |`,
@@ -128,6 +136,20 @@ function main() {
     failedJobs.length ? failedJobs.map((f) => `- ${f}`).join('\n') : '- (none)',
     '',
   ];
+
+  const signoffSection =
+    signoffFleet?.phaseA ||
+    (signoffFleet?.shards ? buildSignoffFleetSection(signoffFleet.shards, signoffFleet.expectedShards) : null);
+  if (signoffSection?.shards?.length) {
+    lines.push('## Latency budget (sign-off)');
+    lines.push('');
+    lines.push(formatQuotaBreachSummaryMarkdown(buildQuotaBreachSummary(signoffSection), 'Phase A write'));
+  } else {
+    lines.push('## Latency budget (sign-off)');
+    lines.push('');
+    lines.push('_Sign-off fleet not found (signoff-fleet.json missing or empty)._');
+    lines.push('');
+  }
 
   const outPath = join(runRoot, 'summary.md');
   writeFileSync(outPath, `${lines.filter(Boolean).join('\n')}\n`, 'utf8');

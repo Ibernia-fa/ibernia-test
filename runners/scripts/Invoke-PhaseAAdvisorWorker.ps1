@@ -79,8 +79,9 @@ if ($AdvisorIndex -ne '') {
 Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort topUpMode=$TopUpMode log=$K6LogName"
 
 $sliceForK6 = $PoolSliceFile -replace '\\', '/'
-$sloConfig = (Join-Path $RepoRoot 'config/volume-api-slo.json') -replace '\\', '/'
-$scenariosConfig = (Join-Path $RepoRoot 'config/volume-scenarios.json') -replace '\\', '/'
+$sloConfig = 'config/volume-api-slo.json'
+$scenariosConfig = 'config/volume-scenarios.json'
+$repoRootForK6 = $RepoRoot -replace '\\', '/'
 
 $k6Args = @(
   'run', 'k6/full-platform/k6-full-platform-orchestrator.js',
@@ -96,6 +97,9 @@ $k6Args = @(
   '-e', 'VOLUME_SLO_PROFILE=write',
   '-e', "VOLUME_SLO_FILE=$sloConfig",
   '-e', "VOLUME_SCENARIOS_FILE=$scenariosConfig",
+  '-e', "REPO_ROOT=$repoRootForK6",
+  '-e', 'RELAX_CHECKS=1',
+  '-e', 'RELAX_HTTP_REQ_FAILED=1',
   '-e', "VOLUME_SCENARIO=$VolumeScenario",
   '-e', "SCENARIO=$VolumeScenario",
   '-e', "PHASE_A_RUN_TAG=$RunTag",

@@ -8,542 +8,286 @@
   "iteration": 0,
   "clients": [
     {
-      "clientId": "6a209635d6592c97657fd98f",
+      "clientId": "6a20b014d6592c97658e5f2f",
       "uniqueTag": "S4-advisor-00c1",
       "cashflows": [
         {
-          "cashflowId": "6a209636d6592c97657fd997",
+          "cashflowId": "6a20b015d6592c97658e5f38",
           "planName": "Primary financial plan"
         },
         {
-          "cashflowId": "6a209643d6592c97657fdb24",
+          "cashflowId": "6a20b024d6592c97658e6199",
           "planName": "Retirement income scenario"
         },
         {
-          "cashflowId": "6a20964fd6592c97657fdcb1",
+          "cashflowId": "6a20b033d6592c97658e64af",
           "planName": "Property & mortgage plan"
         },
         {
-          "cashflowId": "6a20965bd6592c97657fde5e",
+          "cashflowId": "6a20b042d6592c97658e67f0",
           "planName": "Education funding plan"
         },
         {
-          "cashflowId": "6a209668d6592c97657fe13d",
+          "cashflowId": "6a20b055d6592c97658e6e27",
           "planName": "Inheritance & legacy plan"
         },
         {
-          "cashflowId": "6a209678d6592c97657fe576",
+          "cashflowId": "6a20b073d6592c97658e77c6",
           "planName": "Business exit scenario"
         },
         {
-          "cashflowId": "6a209686d6592c97657fe8ef",
+          "cashflowId": "6a20b093d6592c97658e81b6",
           "planName": "Career transition plan"
         },
         {
-          "cashflowId": "6a209692d6592c97657fef06",
+          "cashflowId": "6a20b0a4d6592c97658e87a8",
           "planName": "Tax optimisation review"
         }
       ]
     },
     {
-      "clientId": "6a20969fd6592c97657ff83e",
+      "clientId": "6a20b0b1d6592c97658e8d2c",
       "uniqueTag": "S4-advisor-00c2",
       "cashflows": [
         {
-          "cashflowId": "6a2096a1d6592c97657ff9a3",
+          "cashflowId": "6a20b0b2d6592c97658e8dcf",
           "planName": "Primary financial plan"
         },
         {
-          "cashflowId": "6a2096b2d6592c9765800749",
+          "cashflowId": "6a20b0c0d6592c97658e954f",
           "planName": "Retirement income scenario"
         },
         {
-          "cashflowId": "6a2096cad6592c9765801a66",
+          "cashflowId": "6a20b0d0d6592c97658ea243",
           "planName": "Property & mortgage plan"
         },
         {
-          "cashflowId": "6a2096e9d6592c9765803509",
+          "cashflowId": "6a20b0e2d6592c97658eb166",
           "planName": "Education funding plan"
         },
         {
-          "cashflowId": "6a20970cd6592c976580542b",
+          "cashflowId": "6a20b0fbd6592c97658ec699",
           "planName": "Inheritance & legacy plan"
         },
         {
-          "cashflowId": "6a20972ed6592c97658072cd",
+          "cashflowId": "6a20b11ed6592c97658ee451",
           "planName": "Business exit scenario"
         },
         {
-          "cashflowId": "6a209753d6592c9765809325",
+          "cashflowId": "6a20b13ed6592c97658f0044",
           "planName": "Career transition plan"
         },
         {
-          "cashflowId": "6a209776d6592c976580b2ae",
+          "cashflowId": "6a20b161d6592c97658f1f7d",
           "planName": "Tax optimisation review"
         }
       ]
     },
     {
-      "clientId": "6a209798d6592c976580d080",
+      "clientId": "6a20b181d6592c97658f3d03",
       "uniqueTag": "S4-advisor-00c3",
       "cashflows": [
         {
-          "cashflowId": "6a20979cd6592c976580d317",
+          "cashflowId": "6a20b186d6592c97658f40b8",
           "planName": "Primary financial plan"
         },
         {
-          "cashflowId": "6a2097bdd6592c976580f07c",
+          "cashflowId": "6a20b1a8d6592c97658f5f35",
           "planName": "Retirement income scenario"
         },
         {
-          "cashflowId": "6a2097e1d6592c9765810fee",
+          "cashflowId": "6a20b1cbd6592c97658f7e77",
           "planName": "Property & mortgage plan"
         },
         {
-          "cashflowId": "6a209804d6592c9765812f06",
+          "cashflowId": "6a20b1f0d6592c97658f9efe",
           "planName": "Education funding plan"
         },
         {
-          "cashflowId": "6a209827d6592c9765814e1e",
+          "cashflowId": "6a20b211d6592c97658fbca2",
           "planName": "Inheritance & legacy plan"
         },
         {
-          "cashflowId": "6a20984ad6592c9765816d64",
+          "cashflowId": "6a20b233d6592c97658fdae7",
           "planName": "Business exit scenario"
         },
         {
-          "cashflowId": "6a20986ed6592c9765818db8",
+          "cashflowId": "6a20b255d6592c97658ff98e",
           "planName": "Career transition plan"
         },
         {
-          "cashflowId": "6a209893d6592c976581ae94",
+          "cashflowId": "6a20b279d6592c97659019a5",
           "planName": "Tax optimisation review"
         }
       ]
     },
     {
-      "clientId": "6a2098b3d6592c976581cbdb",
+      "clientId": "6a20b29dd6592c97659039b6",
       "uniqueTag": "S4-advisor-00c4",
       "cashflows": [
         {
-          "cashflowId": "6a2098b8d6592c976581cfdf",
+          "cashflowId": "6a20b2a1d6592c9765903d58",
           "planName": "Primary financial plan"
         },
         {
-          "cashflowId": "6a2098dad6592c976581ed50",
+          "cashflowId": "6a20b2c5d6592c9765905d24",
           "planName": "Retirement income scenario"
         },
         {
-          "cashflowId": "6a2098fdd6592c9765820c7d",
+          "cashflowId": "6a20b2e6d6592c9765907a6e",
           "planName": "Property & mortgage plan"
         },
         {
-          "cashflowId": "6a20991ed6592c97658229d8",
+          "cashflowId": "6a20b305d6592c9765909688",
           "planName": "Education funding plan"
         },
         {
-          "cashflowId": "6a209943d6592c9765824b20",
+          "cashflowId": "6a20b329d6592c976590b602",
           "planName": "Inheritance & legacy plan"
         },
         {
-          "cashflowId": "6a209966d6592c9765826a0f",
+          "cashflowId": "6a20b34dd6592c976590d65c",
           "planName": "Business exit scenario"
         },
         {
-          "cashflowId": "6a209988d6592c9765828826",
+          "cashflowId": "6a20b373d6592c976590f6f4",
           "planName": "Career transition plan"
         },
         {
-          "cashflowId": "6a2099acd6592c976582a823",
+          "cashflowId": "6a20b395d6592c97659115f0",
           "planName": "Tax optimisation review"
         }
       ]
     },
     {
-      "clientId": "6a2099cdd6592c976582c5be",
+      "clientId": "6a20b3b7d6592c9765913453",
       "uniqueTag": "S4-advisor-00c5",
       "cashflows": [
         {
-          "cashflowId": "6a2099d0d6592c976582c871",
+          "cashflowId": "6a20b3bbd6592c9765913779",
           "planName": "Primary financial plan"
         },
         {
-          "cashflowId": "6a2099f3d6592c976582e66b",
+          "cashflowId": "6a20b3ddd6592c97659155ed",
           "planName": "Retirement income scenario"
         },
         {
-          "cashflowId": "6a209a16d6592c976583053e",
+          "cashflowId": "6a20b400d6592c976591747d",
           "planName": "Property & mortgage plan"
         },
         {
-          "cashflowId": "6a209a38d6592c9765832378",
+          "cashflowId": "6a20b424d6592c97659194aa",
           "planName": "Education funding plan"
         },
         {
-          "cashflowId": "6a209a59d6592c9765834118",
+          "cashflowId": "6a20b446d6592c976591b290",
           "planName": "Inheritance & legacy plan"
         },
         {
-          "cashflowId": "6a209a7cd6592c9765836022",
+          "cashflowId": "6a20b468d6592c976591d0f1",
           "planName": "Business exit scenario"
         },
         {
-          "cashflowId": "6a209a9cd6592c9765837d12",
+          "cashflowId": "6a20b488d6592c976591ed41",
           "planName": "Career transition plan"
         },
         {
-          "cashflowId": "6a209ac0d6592c9765839d0b",
+          "cashflowId": "6a20b4aad6592c9765920bd0",
           "planName": "Tax optimisation review"
         }
       ]
     },
     {
-      "clientId": "6a209ae5d6592c976583bdaa",
+      "clientId": "6a20b4cbd6592c97659229d2",
       "uniqueTag": "S4-advisor-00c6",
       "cashflows": [
         {
-          "cashflowId": "6a209aead6592c976583c1d1",
+          "cashflowId": "6a20b4cfd6592c9765922c1d",
           "planName": "Primary financial plan"
         },
         {
-          "cashflowId": "6a209b0ed6592c976583e16c",
+          "cashflowId": "6a20b4efd6592c97659248d5",
           "planName": "Retirement income scenario"
         },
         {
-          "cashflowId": "6a209b31d6592c976583fffd",
+          "cashflowId": "6a20b511d6592c9765926738",
           "planName": "Property & mortgage plan"
         },
         {
-          "cashflowId": "6a209b52d6592c9765841cea",
+          "cashflowId": "6a20b534d6592c9765928676",
           "planName": "Education funding plan"
         },
         {
-          "cashflowId": "6a209b74d6592c9765843b6c",
+          "cashflowId": "6a20b555d6592c976592a3a1",
           "planName": "Inheritance & legacy plan"
         },
         {
-          "cashflowId": "6a209b99d6592c9765845c4d",
+          "cashflowId": "6a20b578d6592c976592c2d9",
           "planName": "Business exit scenario"
         },
         {
-          "cashflowId": "6a209bbad6592c9765847981",
+          "cashflowId": "6a20b59ad6592c976592e0d6",
           "planName": "Career transition plan"
         },
         {
-          "cashflowId": "6a209bddd6592c9765849878",
+          "cashflowId": "6a20b5bed6592c9765930097",
           "planName": "Tax optimisation review"
         }
       ]
     },
     {
-      "clientId": "6a209bfed6592c976584b56e",
+      "clientId": "6a20b5e0d6592c9765931fff",
       "uniqueTag": "S4-advisor-00c7",
-      "cashflows": [
-        {
-          "cashflowId": "6a209c01d6592c976584b84a",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a209c21d6592c976584d472",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a209c44d6592c976584f3c6",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a209c6ad6592c97658514e9",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a209c8bd6592c97658532c9",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a209cacd6592c976585505c",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a209ccfd6592c9765856faa",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a209cf0d6592c9765858d1e",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "plan_seed_failed"
     },
     {
-      "clientId": "6a209d14d6592c976585ad78",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c8",
-      "cashflows": [
-        {
-          "cashflowId": "6a209d19d6592c976585b1b8",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a209d3bd6592c976585d042",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a209d5dd6592c976585ee12",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a209d80d6592c9765860c96",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a209da2d6592c9765862a75",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a209dc5d6592c97658648b1",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a209dead6592c9765866905",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a209e0dd6592c976586881f",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
-      "clientId": "6a209e2fd6592c976586a711",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c9",
-      "cashflows": [
-        {
-          "cashflowId": "6a209e33d6592c976586aa91",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a209e55d6592c976586c896",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a209e7ad6592c976586e8e7",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a209e9cd6592c976587071d",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a209ebfd6592c976587264c",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a209ee2d6592c97658745b3",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a209f06d6592c97658765dc",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a209f2bd6592c9765878713",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
-      "clientId": "6a209f4fd6592c976587a729",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c10",
-      "cashflows": [
-        {
-          "cashflowId": "6a209f54d6592c976587ab7a",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a209f78d6592c976587ca57",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a209f9ed6592c976587eb88",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a209fc1d6592c9765880af8",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a209fe7d6592c9765882bca",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a20a00ad6592c9765884b7b",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a20a02dd6592c976588694c",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a20a050d6592c97658887d9",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
-      "clientId": "6a20a075d6592c976588a8a1",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c11",
-      "cashflows": [
-        {
-          "cashflowId": "6a20a077d6592c976588ab6f",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a20a09ad6592c976588c968",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a20a0bbd6592c976588e6a0",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a20a0ded6592c97658905e9",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a20a101d6592c9765892544",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a20a121d6592c976589417b",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a20a145d6592c976589611a",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a20a168d6592c9765897fb5",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
-      "clientId": "6a20a18ed6592c976589a0da",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c12",
-      "cashflows": [
-        {
-          "cashflowId": "6a20a190d6592c976589a383",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a20a1b1d6592c976589bfbb",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a20a1d0d6592c976589dbc3",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a20a1f3d6592c976589fadf",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a20a217d6592c97658a1acd",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a20a23ad6592c97658a39fc",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a20a25bd6592c97658a56fc",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a20a27ed6592c97658a7691",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
-      "clientId": "6a20a2a6d6592c97658a99d3",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c13",
-      "cashflows": [
-        {
-          "cashflowId": "6a20a2a9d6592c97658a9cba",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a20a2ccd6592c97658abb8f",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a20a2edd6592c97658ad91c",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a20a311d6592c97658af902",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a20a333d6592c97658b1774",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a20a355d6592c97658b3542",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a20a374d6592c97658b50ee",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a20a394d6592c97658b6db3",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
-      "clientId": "6a20a3bed6592c97658b92cc",
+      "clientId": "",
       "uniqueTag": "S4-advisor-00c14",
-      "cashflows": [
-        {
-          "cashflowId": "6a20a3c2d6592c97658b9669",
-          "planName": "Primary financial plan"
-        },
-        {
-          "cashflowId": "6a20a3e6d6592c97658bb562",
-          "planName": "Retirement income scenario"
-        },
-        {
-          "cashflowId": "6a20a408d6592c97658bd3ac",
-          "planName": "Property & mortgage plan"
-        },
-        {
-          "cashflowId": "6a20a42bd6592c97658bf2b8",
-          "planName": "Education funding plan"
-        },
-        {
-          "cashflowId": "6a20a44dd6592c97658c1106",
-          "planName": "Inheritance & legacy plan"
-        },
-        {
-          "cashflowId": "6a20a46ed6592c97658c2dd5",
-          "planName": "Business exit scenario"
-        },
-        {
-          "cashflowId": "6a20a491d6592c97658c4d6d",
-          "planName": "Career transition plan"
-        },
-        {
-          "cashflowId": "6a20a4b2d6592c97658c6a55",
-          "planName": "Tax optimisation review"
-        }
-      ]
+      "cashflows": [],
+      "error": "client_create_failed"
     },
     {
       "clientId": "",
       "uniqueTag": "S4-advisor-00c15",
       "cashflows": [],
-      "error": "client_resolve_failed"
+      "error": "client_create_failed"
     },
     {
       "clientId": "",
@@ -577,8 +321,8 @@
     }
   ],
   "counts": {
-    "clients": 14,
-    "plans": 112
+    "clients": 6,
+    "plans": 48
   },
-  "generatedAt": "2026-06-03T22:20:04.179Z"
+  "generatedAt": "2026-06-03T23:39:08.534Z"
 }

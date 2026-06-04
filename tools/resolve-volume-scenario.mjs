@@ -96,6 +96,10 @@ function main() {
     profile: resolved.scenario.profile || 'write',
     readOnly: !!resolved.scenario.readOnly,
     advisors,
+    writeParallelJobs:
+      resolved.scenario.writeParallelJobs != null && resolved.scenario.writeParallelJobs > 0
+        ? Number(resolved.scenario.writeParallelJobs)
+        : advisors,
     clientsPerAdvisor,
     plansPerClient,
     iterations,

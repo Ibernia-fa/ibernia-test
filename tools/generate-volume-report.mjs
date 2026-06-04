@@ -8,6 +8,11 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  buildQuotaBreachSummary,
+  formatQuotaBreachSummaryMarkdown,
+  SIGNOFF_JOURNEY_LABELS,
+} from '../lib/volume-signoff-core.js';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const REQ_A = process.argv[2] || 'S1-write';
@@ -375,6 +380,36 @@ lines.push(
   `| B | ${pbSignoff?.shardsAllUnder ?? 'n/a'} | ${pbSignoff?.shardsAnyOver ?? 'n/a'} | ${(pbSignoff?.failedShardIds || []).join(', ') || 'n/a'} |`,
 );
 
+const quotaA = buildQuotaBreachSummary(fleet?.phaseA);
+const quotaB = buildQuotaBreachSummary(fleet?.phaseB);
+
+lines.push('');
+lines.push('### 9a_quota_breach_phase_a');
+lines.push(formatQuotaBreachSummaryMarkdown(quotaA, 'Phase A write'));
+
+lines.push('');
+lines.push('### 9b_quota_breach_phase_b');
+lines.push(formatQuotaBreachSummaryMarkdown(quotaB, 'Phase B read'));
+
+lines.push('');
+lines.push('### 9c_quota_breach_table');
+lines.push('| phase | advisors_over_quota | total_advisors | impacted_journey_steps |');
+lines.push('|-------|---------------------|----------------|------------------------|');
+const journeyStepsA =
+  quotaA.byJourney.length > 0
+    ? quotaA.byJourney.map((j) => `${j.journeyName} (${j.usersOverQuota})`).join('; ')
+    : quotaA.totalAdvisors
+      ? 'none'
+      : 'n/a';
+const journeyStepsB =
+  quotaB.byJourney.length > 0
+    ? quotaB.byJourney.map((j) => `${j.journeyName} (${j.usersOverQuota})`).join('; ')
+    : quotaB.totalAdvisors
+      ? 'none'
+      : 'n/a';
+lines.push(`| A (write) | ${quotaA.totalAdvisors ? quotaA.advisorsOverQuota : 'n/a'} | ${quotaA.totalAdvisors || 'n/a'} | ${journeyStepsA} |`);
+lines.push(`| B (read) | ${quotaB.totalAdvisors ? quotaB.advisorsOverQuota : 'n/a'} | ${quotaB.totalAdvisors || 'n/a'} | ${journeyStepsB} |`);
+
 lines.push('');
 lines.push('### 10_top5_slowest_phase_a');
 lines.push('| rank | shard_id | metric | actual_ms | budget_ms | margin_ms |');
@@ -395,18 +430,7 @@ lines.push('');
 lines.push('### 12_friendly_names_map');
 lines.push('| api_metric | plain_name |');
 lines.push('|------------|------------|');
-const names = {
-  'journey_create_client_duration': 'Create client (write step)',
-  'journey_create_base_plan_duration': 'Create base plan (write step)',
-  'POST /api/v1/Clients': 'Create client API',
-  'POST /api/v1/cashflows': 'Create cashflow/plan API',
-  'GET /api/v1/Reports/{cashflowId}': 'Get reports/projection API',
-  'journey_dashboard_load_duration': 'Dashboard clients list load',
-  full_journey_duration: 'End-to-end advisor journey',
-  'GET /api/v1/Clients/{advisorId}/all': 'List all clients for advisor',
-  'GET /api/v1/client/{clientId}/cashflows': 'List client plans',
-  'GET /api/v1/cashflows/{cashflowId}': 'Open cashflow/plan',
-};
+const names = { ...SIGNOFF_JOURNEY_LABELS };
 for (const [k, v] of Object.entries(names)) lines.push(`| ${k} | ${v} |`);
 
 const planRows = iterProfilePlans(profile);

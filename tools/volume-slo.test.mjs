@@ -37,6 +37,18 @@ import {
   advisorSubShardId,
   buildManifestShardFromK6SummaryMetrics,
 } from '../lib/volume-manifest-core.js';
+import {
+  isTransientHttpStatus,
+  normalizeVolumeConfigOpenPath,
+  parseVolumeMaxAttemptsEnv,
+  transientRetryBackoffSec,
+} from '../lib/volume-http-retry.js';
+import {
+  buildSignoffFleetSection,
+  buildQuotaBreachSummary,
+  formatQuotaBreachSummaryMarkdown,
+  signoffJourneyLabel,
+} from '../lib/volume-signoff-core.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const configPath = join(__dirname, '..', 'config', 'volume-api-slo.json');
@@ -382,6 +394,7 @@ test('S1 scenario resolves 20 advisors and profile path', () => {
   const { name, scenario } = resolveVolumeScenario(repoScenarios, 'S1');
   assert.equal(name, 'S1');
   assert.equal(scenario.advisors, 20);
+  assert.equal(scenario.writeParallelJobs, 20);
   assert.equal(scenario.manifestProfileFile, 'data/scenarios/profile_20u_1c_1p.json');
 });
 
@@ -398,6 +411,7 @@ test('S2–S5 volume ladder matches expected user/client/plan totals', () => {
     assert.equal(scenario.advisors, row.advisors);
     assert.equal(scenario.clientsPerAdvisor, row.clientsPerAdvisor);
     assert.equal(scenario.plansPerClient, row.plansPerClient);
+    assert.equal(scenario.writeParallelJobs, 20, `${row.id} writeParallelJobs`);
     const clients = row.advisors * row.clientsPerAdvisor;
     const plans = clients * row.plansPerClient;
     assert.equal(clients, row.totalClients);
@@ -432,4 +446,77 @@ test('buildManifestShardFromK6SummaryMetrics rebuilds shard from tagged counters
     expectedShards: 1,
   });
   assert.equal(merged.validation.passed, true);
+});
+
+test('isTransientHttpStatus treats 5xx/429 as transient, not 401/400', () => {
+  assert.equal(isTransientHttpStatus(500), true);
+  assert.equal(isTransientHttpStatus(503), true);
+  assert.equal(isTransientHttpStatus(429), true);
+  assert.equal(isTransientHttpStatus(0), true);
+  assert.equal(isTransientHttpStatus(401), false);
+  assert.equal(isTransientHttpStatus(400), false);
+});
+
+test('normalizeVolumeConfigOpenPath strips absolute prefix to config/', () => {
+  const p = normalizeVolumeConfigOpenPath('C:/Users/me/load-testing-k6/config/volume-scenarios.json');
+  assert.equal(p, 'config/volume-scenarios.json');
+});
+
+test('parseVolumeMaxAttemptsEnv clamps and defaults', () => {
+  assert.equal(parseVolumeMaxAttemptsEnv('', 6), 6);
+  assert.equal(parseVolumeMaxAttemptsEnv('3', 6), 3);
+  assert.equal(parseVolumeMaxAttemptsEnv('99', 6), 12);
+});
+
+test('transientRetryBackoffSec grows with attempt', () => {
+  assert.ok(transientRetryBackoffSec(1) < transientRetryBackoffSec(4));
+  assert.ok(transientRetryBackoffSec(10) <= 45);
+});
+
+test('buildQuotaBreachSummary counts advisors and maps impacted journeys', () => {
+  const shards = [
+    {
+      shardId: 'advisor-00',
+      advisorEmail: 'a0@test.com',
+      rows: [
+        { metric: 'journey_create_client_duration', optional: false, over: true, actualMs: 5000, budgetMs: 4000, marginMs: -1000 },
+        { metric: 'POST /api/v1/Clients', optional: false, over: false, actualMs: 800, budgetMs: 2000, marginMs: 1200 },
+      ],
+    },
+    {
+      shardId: 'advisor-01',
+      advisorEmail: 'a1@test.com',
+      rows: [
+        { metric: 'journey_create_client_duration', optional: false, over: false, actualMs: 900, budgetMs: 4000, marginMs: 3100 },
+        { metric: 'POST /api/v1/cashflows', optional: false, over: true, actualMs: 6000, budgetMs: 5000, marginMs: -1000 },
+      ],
+    },
+  ];
+  const section = buildSignoffFleetSection(shards, 2);
+  const summary = buildQuotaBreachSummary(section);
+  assert.equal(summary.totalAdvisors, 2);
+  assert.equal(summary.advisorsOverQuota, 2);
+  assert.equal(summary.byAdvisor.length, 2);
+  assert.equal(summary.byJourney.length, 2);
+  assert.equal(signoffJourneyLabel('journey_create_client_duration'), 'Create client (write step)');
+  const md = formatQuotaBreachSummaryMarkdown(summary, 'Phase A write');
+  assert.match(md, /Advisors over latency budget.*2\/2/);
+  assert.match(md, /Create client \(write step\)/);
+  assert.match(md, /advisor-00/);
+});
+
+test('formatQuotaBreachSummaryMarkdown reports no breaches when all under budget', () => {
+  const section = buildSignoffFleetSection(
+    [
+      {
+        shardId: 'advisor-00',
+        rows: [{ metric: 'journey_create_client_duration', optional: false, over: false, actualMs: 100, budgetMs: 4000, marginMs: 3900 }],
+      },
+    ],
+    1,
+  );
+  const summary = buildQuotaBreachSummary(section);
+  assert.equal(summary.advisorsOverQuota, 0);
+  const md = formatQuotaBreachSummaryMarkdown(summary);
+  assert.match(md, /No advisors exceeded the latency budget/);
 });
