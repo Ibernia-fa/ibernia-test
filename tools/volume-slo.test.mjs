@@ -582,13 +582,16 @@ test('buildPhaseAAdvisorExecutionSummary flags partial seed and process failures
     },
   };
   const exec = buildPhaseAAdvisorExecutionSummary({ runMeta, manifest, signoffSection, sloGate: { passed: true } });
-  assert.equal(exec.overallPass, false);
+  assert.equal(exec.overallResult, 'FAIL');
+  assert.equal(exec.dimensions.dataSeeding, false);
+  assert.equal(exec.dimensions.manifestValidation, false);
   assert.equal(exec.categories.failedAdvisorJobs, 1);
   assert.equal(exec.categories.partialAdvisorResults, 2);
   assert.equal(exec.categories.successfulAdvisors, 1);
   assert.equal(exec.categories.advisorsOverLatency, 1);
-  assert.match(exec.failureReasons.join(' '), /Manifest validation failed/);
-  assert.match(exec.failureReasons.join(' '), /Clients seeded: 16\/30/);
+  assert.match(exec.dataFailureReasons.join(' '), /Manifest validation failed/);
+  assert.match(exec.dataFailureReasons.join(' '), /Clients seeded: 16\/30/);
+  assert.match(exec.performanceFailureReasons.join(' '), /1 advisors exceeded latency budgets/);
 });
 
 test('buildPhaseASummaryMarkdown never shows failed jobs none when manifest failed', () => {
@@ -629,7 +632,10 @@ test('buildPhaseASummaryMarkdown never shows failed jobs none when manifest fail
     generatedAt: '2026-01-01T00:00:00.000Z',
   });
   assert.match(md, /# Overall Result: FAIL/);
-  assert.match(md, /## Failure reasons/);
+  assert.match(md, /## Result summary/);
+  assert.match(md, /\| Data seeding \| FAIL \|/);
+  assert.match(md, /\| Manifest validation \| FAIL \|/);
+  assert.match(md, /## Data failures/);
   assert.match(md, /Failed advisor jobs \| 1/);
   assert.match(md, /Partial advisor results \| 2/);
   assert.match(md, /Advisor latency compliance: \*\*PASS/);
@@ -637,4 +643,111 @@ test('buildPhaseASummaryMarkdown never shows failed jobs none when manifest fail
   assert.doesNotMatch(md, /Failed advisor jobs\n\n- \(none\)/);
   assert.match(md, /## Failed advisor jobs/);
   assert.match(md, /advisor-00/);
+});
+
+test('buildPhaseASummaryMarkdown distinguishes data failure from performance-only failure (S3 failed seed)', () => {
+  const md = buildPhaseASummaryMarkdown({
+    runTag: 'S3-write',
+    runMeta: {
+      advisors: 20,
+      concurrency: 20,
+      clientsPerAdvisor: 10,
+      plansPerClient: 4,
+      runElapsedSec: 4320,
+      volumeScenario: 'S3',
+    },
+    manifest: {
+      totals: { clients: 106, plans: 424 },
+      validation: {
+        passed: false,
+        expectedClients: 200,
+        expectedPlans: 800,
+        expectedShards: 20,
+        actualShards: 20,
+        clientCountOk: false,
+        planCountOk: false,
+        shardCountOk: true,
+      },
+      advisors: [],
+    },
+    sloGate: { passed: true },
+    signoffSection: { expectedShards: 20, actualShards: 20, shards: [], byMetric: {} },
+    generatedAt: '2026-01-01T00:00:00.000Z',
+  });
+  assert.match(md, /# Overall Result: FAIL/);
+  assert.match(md, /\| Data seeding \| FAIL \|/);
+  assert.match(md, /\| Manifest validation \| FAIL \|/);
+  assert.match(md, /## Data failures/);
+  assert.match(md, /Clients seeded: 106\/200/);
+  assert.match(md, /Plans seeded: 424\/800/);
+  assert.doesNotMatch(md, /PASS WITH PERFORMANCE VIOLATIONS/);
+});
+
+test('buildPhaseASummaryMarkdown reports PASS WITH PERFORMANCE VIOLATIONS for successful S3 seed with latency breaches', () => {
+  const manifestAdvisors = Array.from({ length: 20 }, (_, i) => ({
+    shardId: `advisor-${String(i).padStart(2, '0')}`,
+    advisorEmail: `u${i}@test.com`,
+    clients: Array.from({ length: 10 }, () => ({ clientId: 'c', cashflows: [{}, {}, {}, {}] })),
+    counts: { clients: 10, plans: 40 },
+  }));
+  const md = buildPhaseASummaryMarkdown({
+    runTag: 'S3-write',
+    runMeta: {
+      advisors: 20,
+      concurrency: 20,
+      clientsPerAdvisor: 10,
+      plansPerClient: 4,
+      runElapsedSec: 1625,
+      volumeScenario: 'S3',
+    },
+    manifest: {
+      totals: { clients: 200, plans: 800 },
+      validation: {
+        passed: true,
+        expectedClients: 200,
+        expectedPlans: 800,
+        expectedShards: 20,
+        actualShards: 20,
+        clientCountOk: true,
+        planCountOk: true,
+        shardCountOk: true,
+      },
+      advisors: manifestAdvisors,
+    },
+    sloGate: { passed: true },
+    signoffSection: {
+      expectedShards: 20,
+      actualShards: 20,
+      shardsAnyOver: 14,
+      shardsAllUnder: 6,
+      shards: Array.from({ length: 14 }, (_, i) => ({
+        shardId: `advisor-${String(i).padStart(2, '0')}`,
+        advisorEmail: `u${i}@test.com`,
+        rows: [
+          {
+            metric: 'journey_create_client_duration',
+            optional: false,
+            over: true,
+            actualMs: 116670,
+            budgetMs: 4000,
+            marginMs: -112670,
+          },
+        ],
+      })),
+      byMetric: {
+        journey_create_client_duration: { over: 14, worstOverMs: 116670, failedShards: [] },
+      },
+    },
+    generatedAt: '2026-01-01T00:00:00.000Z',
+  });
+  assert.match(md, /# Overall Result: PASS WITH PERFORMANCE VIOLATIONS/);
+  assert.match(md, /\| Data seeding \| PASS \|/);
+  assert.match(md, /\| Manifest validation \| PASS \|/);
+  assert.match(md, /\| Fleet SLO gate \| PASS \|/);
+  assert.match(md, /\| Advisor latency compliance \| FAIL \|/);
+  assert.match(md, /\| Performance certification \| FAIL \|/);
+  assert.match(md, /## Performance failures/);
+  assert.match(md, /14 advisors exceeded latency budgets/);
+  assert.match(md, /Worst create-client latency: 116670 ms/);
+  assert.doesNotMatch(md, /## Data failures/);
 });

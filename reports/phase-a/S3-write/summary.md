@@ -1,10 +1,26 @@
 # Phase A volume summary — S3-write
 
-# Overall Result: FAIL
+# Overall Result: PASS WITH PERFORMANCE VIOLATIONS
 
-Generated: 2026-06-04T16:08:24.112Z
+Data seeding completed successfully.
+Manifest validation passed.
 
-## Failure reasons
+However:
+- Fleet and/or advisor latency requirements were not met.
+
+## Result summary
+
+| Dimension | Result |
+|------------|---------|
+| Data seeding | PASS |
+| Manifest validation | PASS |
+| Fleet SLO gate | PASS |
+| Advisor latency compliance | FAIL |
+| Performance certification | FAIL |
+
+Generated: 2026-06-04T16:24:46.970Z
+
+## Performance failures
 
 - 14 advisors exceeded latency budgets
 
