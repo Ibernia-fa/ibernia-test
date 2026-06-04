@@ -157,7 +157,19 @@ if ($concurrency -gt $advisorsCount) {
   Write-Warning "Concurrency $concurrency exceeds advisor count $advisorsCount; capping at $advisorsCount"
   $concurrency = $advisorsCount
 }
-$advisorStartStaggerSec = if ($clientsPerAdvisor -ge 15) { 12 } elseif ($clientsPerAdvisor -ge 10) { 8 } else { 0 }
+$disableFleetStagger = $false
+if ($scenarioResolved.PSObject.Properties['disableFleetStagger'] -and $scenarioResolved.disableFleetStagger) {
+  $disableFleetStagger = $true
+}
+$advisorStartStaggerSec = if ($disableFleetStagger) {
+  0
+} elseif ($clientsPerAdvisor -ge 15) {
+  12
+} elseif ($clientsPerAdvisor -ge 10) {
+  8
+} else {
+  0
+}
 $extractCli = Join-Path $RepoRoot 'tools/extract-phase-a-manifest-from-k6-log.mjs'
 
 if ($advisorsCount -lt 1) { throw 'AdvisorCount must be >= 1' }
@@ -184,7 +196,7 @@ Get-ChildItem -LiteralPath $signoffShardsRoot -Filter '*.json' -File -ErrorActio
 $userMode = if ($UseFixedAdvisors) { 'fixed' } else { 'pool' }
 Write-Host "=== Phase A volume ==="
 Write-Host "  scenario=$VolumeScenario runTag=$RunTag userMode=$userMode"
-Write-Host "  advisors=$advisorsCount concurrency=$concurrency clientsPerAdvisor=$clientsPerAdvisor plansPerClient=$plansPerClient"
+Write-Host "  advisors=$advisorsCount concurrency=$concurrency clientsPerAdvisor=$clientsPerAdvisor plansPerClient=$plansPerClient disableFleetStagger=$disableFleetStagger advisorStartStaggerSec=$advisorStartStaggerSec"
 Write-Host "  expectedClients=$expectedClients expectedPlans=$expectedPlans expectedShards=$expectedShards"
 Write-Host "  maxDurationPerAdvisor=$phaseAMaxDuration"
 if ($profileOutPath) { Write-Host "  profileOut=$profileOutPath" }
@@ -289,7 +301,8 @@ try {
       [bool]$UseFixedAdvisors,
       [bool]$volumeSloGate,
       [string]$i,
-      $phaseAMaxDuration
+      $phaseAMaxDuration,
+      [bool]$disableFleetStagger
     )
 
     while (@($jobs | Where-Object { $_.State -eq 'Running' }).Count -ge $concurrency) {

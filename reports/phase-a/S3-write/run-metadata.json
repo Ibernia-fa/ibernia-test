@@ -11,9 +11,9 @@
     "expectedClients":  200,
     "expectedPlans":  800,
     "manifestProfileFile":  "data/scenarios/profile_20u_10c_4p.json",
-    "runElapsedSec":  4351.5,
-    "manifestCollected":  13,
-    "sloCollected":  13,
+    "runElapsedSec":  1625,
+    "manifestCollected":  20,
+    "sloCollected":  20,
     "advisorRuns":  [
                         {
                             "advisorKey":  "advisor-00",
@@ -21,9 +21,9 @@
                             "advisorEmail":  "User01@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-00.json",
-                            "exitCode":  2,
+                            "exitCode":  0,
                             "jobState":  "Completed",
-                            "jobFailed":  true
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-01",
@@ -57,33 +57,53 @@
                         },
                         {
                             "advisorKey":  "advisor-04",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-04",
+                            "advisorEmail":  "User05@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-04.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-05",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-05",
+                            "advisorEmail":  "User06@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-05.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-06",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-06",
+                            "advisorEmail":  "User07@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-06.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-07",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-07",
+                            "advisorEmail":  "User08@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-07.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-08",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-08",
+                            "advisorEmail":  "User09@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-08.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-09",
@@ -97,9 +117,13 @@
                         },
                         {
                             "advisorKey":  "advisor-10",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-10",
+                            "advisorEmail":  "User11@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-10.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-11",
@@ -143,9 +167,13 @@
                         },
                         {
                             "advisorKey":  "advisor-15",
-                            "exitCode":  null,
-                            "jobState":  "Failed",
-                            "jobFailed":  true
+                            "shardId":  "advisor-15",
+                            "advisorEmail":  "User16@gmail.com",
+                            "userMode":  "fixed",
+                            "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-15.json",
+                            "exitCode":  0,
+                            "jobState":  "Completed",
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-16",
@@ -153,9 +181,9 @@
                             "advisorEmail":  "User17@gmail.com",
                             "userMode":  "fixed",
                             "poolSliceFile":  "C:\\Users\\gulle\\source\\repos\\load-testing-k6\\data\\scenarios\\user-slices-fixed-dev\\slice-advisor-16.json",
-                            "exitCode":  2,
+                            "exitCode":  0,
                             "jobState":  "Completed",
-                            "jobFailed":  true
+                            "jobFailed":  false
                         },
                         {
                             "advisorKey":  "advisor-17",
@@ -189,15 +217,6 @@
                         }
                     ],
     "failedJobs":  [
-                       "advisor-10",
-                       "advisor-06",
-                       "advisor-05",
-                       "advisor-07",
-                       "advisor-15",
-                       "advisor-16",
-                       "advisor-08",
-                       "manifest-merge",
-                       "advisor-04",
-                       "advisor-00"
+
                    ]
 }

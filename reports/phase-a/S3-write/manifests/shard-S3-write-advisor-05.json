@@ -1,18 +1,236 @@
 {
   "reportType": "phase-a-manifest-shard",
-  "generatedAt": "2026-06-04T10:49:07.252Z",
   "runTag": "S3-write",
   "shardId": "advisor-05",
-  "scenario": "S3",
-  "runId": "S3-write",
-  "advisorIndex": null,
-  "advisorSub": "",
-  "advisorEmail": "",
-  "vu": null,
-  "iteration": null,
-  "clients": [],
-  "counts": {
-      "clients": 0,
-      "plans": 0
+  "advisorSub": "43f0ec86-a91c-48cb-907e-3e046da61b3d",
+  "advisorEmail": "User06@gmail.com",
+  "vu": 1,
+  "iteration": 0,
+  "clients": [
+    {
+      "clientId": "6a219d74ef213fe0ec890d04",
+      "uniqueTag": "S3-advisor-05c1",
+      "cashflows": [
+        {
+          "cashflowId": "6a219d77ef213fe0ec890dd5",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a219d94ef213fe0ec891ebb",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a219db6ef213fe0ec893c27",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a219dd6ef213fe0ec89583f",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a219df5ef213fe0ec8973f2",
+      "uniqueTag": "S3-advisor-05c2",
+      "cashflows": [
+        {
+          "cashflowId": "6a219df9ef213fe0ec89773a",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a219e1cef213fe0ec899606",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a219e3fef213fe0ec89b4d3",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a219e61ef213fe0ec89d366",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a219e81ef213fe0ec89f02f",
+      "uniqueTag": "S3-advisor-05c3",
+      "cashflows": [
+        {
+          "cashflowId": "6a219e84ef213fe0ec89f347",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a219ea3ef213fe0ec8a0eda",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a219ec3ef213fe0ec8a2af8",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a219ee5ef213fe0ec8a4936",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a219f07ef213fe0ec8a6773",
+      "uniqueTag": "S3-advisor-05c4",
+      "cashflows": [
+        {
+          "cashflowId": "6a219f0aef213fe0ec8a6a32",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a219f2aef213fe0ec8a864f",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a219f4bef213fe0ec8aa339",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a219f6fef213fe0ec8ac25e",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a219f90ef213fe0ec8ae049",
+      "uniqueTag": "S3-advisor-05c5",
+      "cashflows": [
+        {
+          "cashflowId": "6a219f95ef213fe0ec8ae450",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a219fb3ef213fe0ec8aff31",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a219fd3ef213fe0ec8b1a65",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a219ff4ef213fe0ec8b380f",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a21a011ef213fe0ec8b52c6",
+      "uniqueTag": "S3-advisor-05c6",
+      "cashflows": [
+        {
+          "cashflowId": "6a21a015ef213fe0ec8b5621",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a21a036ef213fe0ec8b730e",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a21a057ef213fe0ec8b8f8b",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a21a076ef213fe0ec8baaf4",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a21a097ef213fe0ec8bc8e3",
+      "uniqueTag": "S3-advisor-05c7",
+      "cashflows": [
+        {
+          "cashflowId": "6a21a09aef213fe0ec8bcbb6",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a21a0b8ef213fe0ec8be5ba",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a21a0d5ef213fe0ec8bfef6",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a21a0f1ef213fe0ec8c1793",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a21a10cef213fe0ec8c2fe9",
+      "uniqueTag": "S3-advisor-05c8",
+      "cashflows": [
+        {
+          "cashflowId": "6a21a110ef213fe0ec8c3234",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a21a129ef213fe0ec8c493a",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a21a144ef213fe0ec8c615b",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a21a161ef213fe0ec8c7a10",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a21a17def213fe0ec8c930e",
+      "uniqueTag": "S3-advisor-05c9",
+      "cashflows": [
+        {
+          "cashflowId": "6a21a181ef213fe0ec8c95b4",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a21a19eef213fe0ec8cb00d",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a21a1baef213fe0ec8cc870",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a21a1daef213fe0ec8ce480",
+          "planName": "Education funding plan"
+        }
+      ]
+    },
+    {
+      "clientId": "6a21a1f7ef213fe0ec8cfe74",
+      "uniqueTag": "S3-advisor-05c10",
+      "cashflows": [
+        {
+          "cashflowId": "6a21a1fdef213fe0ec8d02b3",
+          "planName": "Primary financial plan"
+        },
+        {
+          "cashflowId": "6a21a219ef213fe0ec8d1c38",
+          "planName": "Retirement income scenario"
+        },
+        {
+          "cashflowId": "6a21a236ef213fe0ec8d3566",
+          "planName": "Property & mortgage plan"
+        },
+        {
+          "cashflowId": "6a21a251ef213fe0ec8d4d1c",
+          "planName": "Education funding plan"
+        }
+      ]
     }
+  ],
+  "counts": {
+    "clients": 10,
+    "plans": 40
+  },
+  "generatedAt": "2026-06-04T16:06:04.846Z"
 }

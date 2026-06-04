@@ -23,7 +23,8 @@ param(
   [bool] $UseFixedAdvisors = $false,
   [bool] $VolumeSloGate = $false,
   [string] $AdvisorIndex = '',
-  [string] $MaxDuration = ''
+  [string] $MaxDuration = '',
+  [bool] $DisableFleetStagger = $false
 )
 
 $ErrorActionPreference = 'Stop'
@@ -73,10 +74,10 @@ if ($AdvisorIndex -ne '') {
   $k6RestPort = 6570 + [int]$AdvisorIndex
 }
 
-# Multi-client volume (S2+): disable fleet stagger; pre-run delete-all still runs before write.
+# Multi-client volume (S2+): one k6 process seeds all clients/plans for the advisor sequentially.
 $multiClientVolume = $clientsInt -ge 2
 
-Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort multiClientVolume=$multiClientVolume clientsPerAdvisor=$clientsInt log=$k6LogFile"
+Write-Host "[PhaseAWorker] START mode=$userMode advisorKey=$AdvisorKey shardId=$ShardId runTag=$RunTag email=$UserEmail slice=$PoolSliceFile maxDuration=$maxDuration k6RestPort=$k6RestPort multiClientVolume=$multiClientVolume disableFleetStagger=$DisableFleetStagger clientsPerAdvisor=$clientsInt log=$k6LogFile"
 
 $sliceForK6 = $PoolSliceFile -replace '\\', '/'
 $repoRootForK6 = $RepoRoot -replace '\\', '/'
@@ -143,6 +144,9 @@ if ($PlansPerClient) {
     '-e', "PHASE_A_PLANS_PER_CLIENT=$PlansPerClient",
     '-e', "FULL_PLATFORM_PLANS_PER_CLIENT=$PlansPerClient"
   )
+}
+if ($DisableFleetStagger) {
+  $k6Args += @('-e', 'VOLUME_DISABLE_FLEET_STAGGER=1')
 }
 if ($Secret) { $k6Args += @('-e', "SIGNUP_ROPC_CLIENT_SECRET=$Secret") }
 

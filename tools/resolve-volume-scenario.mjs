@@ -100,6 +100,7 @@ function main() {
       resolved.scenario.writeParallelJobs != null && resolved.scenario.writeParallelJobs > 0
         ? Number(resolved.scenario.writeParallelJobs)
         : advisors,
+    disableFleetStagger: resolved.scenario.disableFleetStagger === true,
     clientsPerAdvisor,
     plansPerClient,
     iterations,

@@ -411,6 +411,11 @@ test('S2–S5 volume ladder matches expected user/client/plan totals', () => {
   for (const row of table) {
     const { name, scenario } = resolveVolumeScenario(repoScenarios, row.id);
     assert.equal(name, row.id);
+    if (row.id === 'S3' || row.id === 'S4') {
+      assert.equal(scenario.disableFleetStagger, true, `${row.id} should disable fleet stagger`);
+    } else if (row.id === 'S5') {
+      assert.notEqual(scenario.disableFleetStagger, true, 'S5 keeps fleet stagger by default');
+    }
     assert.equal(scenario.advisors, row.advisors);
     assert.equal(scenario.clientsPerAdvisor, row.clientsPerAdvisor);
     assert.equal(scenario.plansPerClient, row.plansPerClient);

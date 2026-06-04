@@ -1,6 +1,6 @@
 {
   "reportType": "volume-signoff-shard",
-  "generatedAt": "2026-06-04T11:30:24.689Z",
+  "generatedAt": "2026-06-04T15:58:38.530Z",
   "phase": "A",
   "profile": "write",
   "runTag": "S3-write",
@@ -15,10 +15,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": null,
-      "actualMs": 5030,
+      "actualMs": 2065,
       "actualLabel": "p95",
-      "over": true,
-      "marginMs": -1030,
+      "over": false,
+      "marginMs": 1935,
       "overHardMax": null,
       "note": null
     },
@@ -28,10 +28,10 @@
       "optional": false,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 706,
+      "actualMs": 3019,
       "actualLabel": "p95",
       "over": false,
-      "marginMs": 4294,
+      "marginMs": 1981,
       "overHardMax": null,
       "note": null
     },
@@ -41,11 +41,11 @@
       "optional": false,
       "budgetMs": 3000,
       "maxMs": 7500,
-      "actualMs": 7940.4,
+      "actualMs": 975.4,
       "actualLabel": "max",
-      "over": true,
-      "marginMs": -4940,
-      "overHardMax": true,
+      "over": false,
+      "marginMs": 2025,
+      "overHardMax": false,
       "note": null
     },
     {
@@ -54,10 +54,10 @@
       "optional": false,
       "budgetMs": 4000,
       "maxMs": 10000,
-      "actualMs": 2936.7,
+      "actualMs": 3962.7,
       "actualLabel": "max",
       "over": false,
-      "marginMs": 1063,
+      "marginMs": 37,
       "overHardMax": false,
       "note": null
     },
@@ -67,10 +67,10 @@
       "optional": true,
       "budgetMs": 5000,
       "maxMs": null,
-      "actualMs": 26303,
+      "actualMs": 30026,
       "actualLabel": "p95",
       "over": true,
-      "marginMs": -21303,
+      "marginMs": -25026,
       "overHardMax": null,
       "note": null
     }
@@ -78,10 +78,10 @@
   "summary": {
     "totalRows": 5,
     "rowsWithActual": 5,
-    "underBudget": 2,
-    "overBudget": 3,
-    "failedShard": true,
-    "worstMarginMs": 1063,
-    "worstOverMs": 21303
+    "underBudget": 4,
+    "overBudget": 1,
+    "failedShard": false,
+    "worstMarginMs": 37,
+    "worstOverMs": 25026
   }
 }
