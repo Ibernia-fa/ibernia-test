@@ -9,6 +9,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import {
+  buildPhaseAAdvisorExecutionSummary,
+  buildPhaseASummaryMarkdown,
+} from '../lib/phase-a-summary-core.js';
+import {
   parseVolumeSloConfig,
   parseVolumeScenariosConfig,
   applyScenarioToSloConfig,
@@ -511,4 +515,121 @@ test('volumeFleetStaggerEnabledFromEnv on by default for S4-scale client counts'
   assert.equal(volumeFleetStaggerEnabledFromEnv({}, 20), true);
   assert.equal(volumeFleetStaggerEnabledFromEnv({}, 4), true);
   assert.equal(volumeFleetStaggerEnabledFromEnv({ VOLUME_DISABLE_FLEET_STAGGER: '1' }, 20), false);
+});
+
+test('buildPhaseAAdvisorExecutionSummary flags partial seed and process failures', () => {
+  const runMeta = {
+    advisors: 3,
+    clientsPerAdvisor: 10,
+    plansPerClient: 4,
+    expectedClients: 30,
+    expectedPlans: 120,
+    manifestCollected: 2,
+    failedJobs: ['advisor-00', 'manifest-merge'],
+    advisorRuns: [
+      { advisorKey: 'advisor-00', advisorEmail: 'a0@test.com', exitCode: 2, jobFailed: true },
+      { advisorKey: 'advisor-01', advisorEmail: 'a1@test.com', exitCode: 0, jobFailed: false },
+      { advisorKey: 'advisor-02', advisorEmail: 'a2@test.com', exitCode: 0, jobFailed: false },
+    ],
+  };
+  const manifest = {
+    totals: { clients: 16, plans: 64 },
+    validation: {
+      passed: false,
+      expectedClients: 30,
+      expectedPlans: 120,
+      expectedShards: 3,
+      actualShards: 3,
+      clientCountOk: false,
+      planCountOk: false,
+      shardCountOk: true,
+    },
+    advisors: [
+      { shardId: 'advisor-00', advisorEmail: 'a0@test.com', clients: [], counts: { clients: 0, plans: 0 } },
+      {
+        shardId: 'advisor-01',
+        advisorEmail: 'a1@test.com',
+        clients: [{ clientId: 'c1', cashflows: [{}, {}, {}, {}] }],
+        counts: { clients: 1, plans: 4 },
+      },
+      {
+        shardId: 'advisor-02',
+        advisorEmail: 'a2@test.com',
+        clients: Array.from({ length: 10 }, () => ({ clientId: 'c', cashflows: [{}, {}, {}, {}] })),
+        counts: { clients: 10, plans: 40 },
+      },
+    ],
+  };
+  const signoffSection = {
+    expectedShards: 3,
+    actualShards: 3,
+    shardsAnyOver: 1,
+    shardsAllUnder: 2,
+    shards: [
+      {
+        shardId: 'advisor-02',
+        advisorEmail: 'a2@test.com',
+        rows: [{ metric: 'journey_create_client_duration', optional: false, over: true, actualMs: 5000, budgetMs: 4000, marginMs: -1000 }],
+      },
+    ],
+    byMetric: {
+      journey_create_client_duration: { over: 1, worstOverMs: 5000, failedShards: ['advisor-02'] },
+    },
+  };
+  const exec = buildPhaseAAdvisorExecutionSummary({ runMeta, manifest, signoffSection, sloGate: { passed: true } });
+  assert.equal(exec.overallPass, false);
+  assert.equal(exec.categories.failedAdvisorJobs, 1);
+  assert.equal(exec.categories.partialAdvisorResults, 2);
+  assert.equal(exec.categories.successfulAdvisors, 1);
+  assert.equal(exec.categories.advisorsOverLatency, 1);
+  assert.match(exec.failureReasons.join(' '), /Manifest validation failed/);
+  assert.match(exec.failureReasons.join(' '), /Clients seeded: 16\/30/);
+});
+
+test('buildPhaseASummaryMarkdown never shows failed jobs none when manifest failed', () => {
+  const md = buildPhaseASummaryMarkdown({
+    runTag: 'S3-write',
+    runMeta: {
+      advisors: 2,
+      concurrency: 20,
+      clientsPerAdvisor: 10,
+      plansPerClient: 4,
+      runElapsedSec: 100,
+      volumeScenario: 'S3',
+      failedJobs: ['advisor-00'],
+      advisorRuns: [
+        { advisorKey: 'advisor-00', jobFailed: true, exitCode: 2 },
+        { advisorKey: 'advisor-01', jobFailed: false, exitCode: 0 },
+      ],
+    },
+    manifest: {
+      totals: { clients: 5, plans: 20 },
+      validation: {
+        passed: false,
+        expectedClients: 20,
+        expectedPlans: 80,
+        expectedShards: 2,
+        actualShards: 2,
+        clientCountOk: false,
+        planCountOk: false,
+        shardCountOk: true,
+      },
+      advisors: [
+        { shardId: 'advisor-00', clients: [], counts: { clients: 0, plans: 0 } },
+        { shardId: 'advisor-01', clients: [{ clientId: 'x', cashflows: [{}, {}, {}, {}] }], counts: { clients: 1, plans: 4 } },
+      ],
+    },
+    sloGate: { passed: true },
+    signoffSection: { expectedShards: 2, actualShards: 2, shards: [], byMetric: {} },
+    generatedAt: '2026-01-01T00:00:00.000Z',
+  });
+  assert.match(md, /# Overall Result: FAIL/);
+  assert.match(md, /## Failure reasons/);
+  assert.match(md, /Failed advisor jobs \| 1/);
+  assert.match(md, /Partial advisor results \| 2/);
+  assert.match(md, /Advisor latency compliance: \*\*PASS/);
+  assert.match(md, /Fleet SLO gate: \*\*PASS\*\*/);
+  assert.doesNotMatch(md, /Failed advisor jobs\n\n- \(none\)/);
+  assert.match(md, /## Failed advisor jobs/);
+  assert.match(md, /advisor-00/);
 });

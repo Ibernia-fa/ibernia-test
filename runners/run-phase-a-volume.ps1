@@ -418,8 +418,6 @@ try {
     node @($signoffGenCli, '--phase-a-run-tag', $RunTag, '--pair-run-tag', $RunTag, '--expected-shards', [string]$expectedShards)
   }
 
-  node @($summaryCli, '--run-tag', $RunTag)
-
   $runEndTime = Get-Date
   $runMetaFinal = [ordered]@{
     reportType          = 'phase-a-run-metadata'
@@ -441,6 +439,8 @@ try {
     failedJobs          = @($failed.Keys)
   }
   [System.IO.File]::WriteAllText($runMetadataPath, ($runMetaFinal | ConvertTo-Json -Depth 8) + "`n", $utf8NoBom)
+
+  node @($summaryCli, '--run-tag', $RunTag)
 
   if ($failed.Keys.Count -gt 0) {
     Write-Error "Phase A completed with failures: $($failed.Keys -join ', ')"
