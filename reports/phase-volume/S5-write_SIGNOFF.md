@@ -1,6 +1,6 @@
 # Volume sign-off — S5-write
 
-Generated: 2026-06-05T03:38:41.380Z
+Generated: 2026-06-05T05:07:35.072Z
 
 ## Run pair
 
@@ -8,7 +8,7 @@ Generated: 2026-06-05T03:38:41.380Z
 |-------|-------|
 | Pair run tag | `S5-write` |
 | Phase A (write) | `S5-write` |
-| Phase B (read) | _pending — run Phase B read_ |
+| Phase B (read) | `S5-read` |
 | SLO config | `config/volume-api-slo.json` |
 
 ## Data gates
@@ -177,7 +177,128 @@ Phase B profile/manifest binding: `data/scenarios/profile_20u_30c_8p.json`
 
 ## Phase B — read profile
 
-_N/A — no sign-off shard data._
+### Fleet summary
+
+| Metric | Under budget | Over budget | Failed shards | Worst margin (ms) | Worst over (ms) |
+|--------|--------------|-------------|---------------|-------------------|-----------------|
+| `full_journey_duration` | 20/20 | 0/20 | — | 6119 | n/a |
+| `GET /api/v1/cashflows/{cashflowId}` | 20/20 | 0/20 | — | 2413 | n/a |
+| `GET /api/v1/client/{clientId}/cashflows` | 20/20 | 0/20 | — | 1951 | n/a |
+| `GET /api/v1/Clients/{advisorId}/all` | 20/20 | 0/20 | — | 1102 | n/a |
+| `journey_dashboard_load_duration` | 20/20 | 0/20 | — | 1102 | n/a |
+
+**Shards all required metrics under budget:** 20/20 · **Any over:** 0/20
+
+### Quota breach summary
+
+**Advisors over latency budget:** 0/20 · **All required metrics under budget:** 20/20
+
+_No advisors exceeded the latency budget — all monitored journey steps are within quota._
+
+### Per-advisor budget table
+
+| shardId | email | metric | budgetMs | maxMs | actualMs | over? | marginMs |
+|--------|-------|--------|----------|-------|----------|-------|----------|
+| advisor-00 | User01@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 450.9 (max (retro)) | no | 2049 |
+| advisor-00 | User01@gmail.com | `full_journey_duration` | 15000 | — | 6521 (max (retro)) | no | 8479 |
+| advisor-00 | User01@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 450.9 (max (retro)) | no | 2049 |
+| advisor-00 | User01@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 449 (max (retro)) | no | 2051 |
+| advisor-00 | User01@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 490.2 (max (retro)) | no | 2510 |
+| advisor-01 | User02@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 323.1 (max (retro)) | no | 2177 |
+| advisor-01 | User02@gmail.com | `full_journey_duration` | 15000 | — | 8881 (max (retro)) | no | 6119 |
+| advisor-01 | User02@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 323.1 (max (retro)) | no | 2177 |
+| advisor-01 | User02@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 523.5 (max (retro)) | no | 1977 |
+| advisor-01 | User02@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 316.3 (max (retro)) | no | 2684 |
+| advisor-02 | User03@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 485.8 (max (retro)) | no | 2014 |
+| advisor-02 | User03@gmail.com | `full_journey_duration` | 15000 | — | 7646 (max (retro)) | no | 7354 |
+| advisor-02 | User03@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 485.8 (max (retro)) | no | 2014 |
+| advisor-02 | User03@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 280.7 (max (retro)) | no | 2219 |
+| advisor-02 | User03@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 359.4 (max (retro)) | no | 2641 |
+| advisor-03 | User04@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 309.9 (max (retro)) | no | 2190 |
+| advisor-03 | User04@gmail.com | `full_journey_duration` | 15000 | — | 8598 (max (retro)) | no | 6402 |
+| advisor-03 | User04@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 309.9 (max (retro)) | no | 2190 |
+| advisor-03 | User04@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 277.4 (max (retro)) | no | 2223 |
+| advisor-03 | User04@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 303.9 (max (retro)) | no | 2696 |
+| advisor-04 | User05@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 717.1 (max (retro)) | no | 1783 |
+| advisor-04 | User05@gmail.com | `full_journey_duration` | 15000 | — | 8759 (max (retro)) | no | 6241 |
+| advisor-04 | User05@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 717.1 (max (retro)) | no | 1783 |
+| advisor-04 | User05@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 282.3 (max (retro)) | no | 2218 |
+| advisor-04 | User05@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 390.8 (max (retro)) | no | 2609 |
+| advisor-05 | User06@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 486.3 (max (retro)) | no | 2014 |
+| advisor-05 | User06@gmail.com | `full_journey_duration` | 15000 | — | 6483 (max (retro)) | no | 8517 |
+| advisor-05 | User06@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 486.3 (max (retro)) | no | 2014 |
+| advisor-05 | User06@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 285.5 (max (retro)) | no | 2215 |
+| advisor-05 | User06@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 455.1 (max (retro)) | no | 2545 |
+| advisor-06 | User07@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 306.2 (max (retro)) | no | 2194 |
+| advisor-06 | User07@gmail.com | `full_journey_duration` | 15000 | — | 6528 (max (retro)) | no | 8472 |
+| advisor-06 | User07@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 306.2 (max (retro)) | no | 2194 |
+| advisor-06 | User07@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 549 (max (retro)) | no | 1951 |
+| advisor-06 | User07@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 429.6 (max (retro)) | no | 2570 |
+| advisor-07 | User08@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 457.7 (max (retro)) | no | 2042 |
+| advisor-07 | User08@gmail.com | `full_journey_duration` | 15000 | — | 6410 (max (retro)) | no | 8590 |
+| advisor-07 | User08@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 457.7 (max (retro)) | no | 2042 |
+| advisor-07 | User08@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 405.9 (max (retro)) | no | 2094 |
+| advisor-07 | User08@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 586.8 (max (retro)) | no | 2413 |
+| advisor-08 | User09@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 324 (max (retro)) | no | 2176 |
+| advisor-08 | User09@gmail.com | `full_journey_duration` | 15000 | — | 8104 (max (retro)) | no | 6896 |
+| advisor-08 | User09@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 324 (max (retro)) | no | 2176 |
+| advisor-08 | User09@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 291.9 (max (retro)) | no | 2208 |
+| advisor-08 | User09@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 464.9 (max (retro)) | no | 2535 |
+| advisor-09 | User10@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 454.3 (max (retro)) | no | 2046 |
+| advisor-09 | User10@gmail.com | `full_journey_duration` | 15000 | — | 8867 (max (retro)) | no | 6133 |
+| advisor-09 | User10@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 454.3 (max (retro)) | no | 2046 |
+| advisor-09 | User10@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 286.5 (max (retro)) | no | 2214 |
+| advisor-09 | User10@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 284.5 (max (retro)) | no | 2715 |
+| advisor-10 | User11@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 444.1 (max (retro)) | no | 2056 |
+| advisor-10 | User11@gmail.com | `full_journey_duration` | 15000 | — | 5885 (max (retro)) | no | 9115 |
+| advisor-10 | User11@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 444.1 (max (retro)) | no | 2056 |
+| advisor-10 | User11@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 436.7 (max (retro)) | no | 2063 |
+| advisor-10 | User11@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 300.1 (max (retro)) | no | 2700 |
+| advisor-11 | User12@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 426.3 (max (retro)) | no | 2074 |
+| advisor-11 | User12@gmail.com | `full_journey_duration` | 15000 | — | 6903 (max (retro)) | no | 8097 |
+| advisor-11 | User12@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 426.3 (max (retro)) | no | 2074 |
+| advisor-11 | User12@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 266.4 (max (retro)) | no | 2234 |
+| advisor-11 | User12@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 296.9 (max (retro)) | no | 2703 |
+| advisor-12 | User13@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 437.7 (max (retro)) | no | 2062 |
+| advisor-12 | User13@gmail.com | `full_journey_duration` | 15000 | — | 8733 (max (retro)) | no | 6267 |
+| advisor-12 | User13@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 437.7 (max (retro)) | no | 2062 |
+| advisor-12 | User13@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 268.3 (max (retro)) | no | 2232 |
+| advisor-12 | User13@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 284.8 (max (retro)) | no | 2715 |
+| advisor-13 | User14@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 320.3 (max (retro)) | no | 2180 |
+| advisor-13 | User14@gmail.com | `full_journey_duration` | 15000 | — | 7194 (max (retro)) | no | 7806 |
+| advisor-13 | User14@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 320.3 (max (retro)) | no | 2180 |
+| advisor-13 | User14@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 291 (max (retro)) | no | 2209 |
+| advisor-13 | User14@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 534.8 (max (retro)) | no | 2465 |
+| advisor-14 | User15@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 324.4 (max (retro)) | no | 2176 |
+| advisor-14 | User15@gmail.com | `full_journey_duration` | 15000 | — | 8613 (max (retro)) | no | 6387 |
+| advisor-14 | User15@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 324.4 (max (retro)) | no | 2176 |
+| advisor-14 | User15@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 336.7 (max (retro)) | no | 2163 |
+| advisor-14 | User15@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 331.6 (max (retro)) | no | 2668 |
+| advisor-15 | User16@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 1397.8 (max (retro)) | no | 1102 |
+| advisor-15 | User16@gmail.com | `full_journey_duration` | 15000 | — | 7422 (max (retro)) | no | 7578 |
+| advisor-15 | User16@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 1397.8 (max (retro)) | no | 1102 |
+| advisor-15 | User16@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 286.1 (max (retro)) | no | 2214 |
+| advisor-15 | User16@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 398.3 (max (retro)) | no | 2602 |
+| advisor-16 | User17@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 440.7 (max (retro)) | no | 2059 |
+| advisor-16 | User17@gmail.com | `full_journey_duration` | 15000 | — | 7927 (max (retro)) | no | 7073 |
+| advisor-16 | User17@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 440.7 (max (retro)) | no | 2059 |
+| advisor-16 | User17@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 271.6 (max (retro)) | no | 2228 |
+| advisor-16 | User17@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 285 (max (retro)) | no | 2715 |
+| advisor-17 | User18@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 469.7 (max (retro)) | no | 2030 |
+| advisor-17 | User18@gmail.com | `full_journey_duration` | 15000 | — | 7779 (max (retro)) | no | 7221 |
+| advisor-17 | User18@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 469.7 (max (retro)) | no | 2030 |
+| advisor-17 | User18@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 308.7 (max (retro)) | no | 2191 |
+| advisor-17 | User18@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 298.2 (max (retro)) | no | 2702 |
+| advisor-18 | User19@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 849.8 (max (retro)) | no | 1650 |
+| advisor-18 | User19@gmail.com | `full_journey_duration` | 15000 | — | 6572 (max (retro)) | no | 8428 |
+| advisor-18 | User19@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 849.8 (max (retro)) | no | 1650 |
+| advisor-18 | User19@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 328.9 (max (retro)) | no | 2171 |
+| advisor-18 | User19@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 442.4 (max (retro)) | no | 2558 |
+| advisor-19 | User20@gmail.com | `journey_dashboard_load_duration` | 2500 | — | 461 (max (retro)) | no | 2039 |
+| advisor-19 | User20@gmail.com | `full_journey_duration` | 15000 | — | 7862 (max (retro)) | no | 7138 |
+| advisor-19 | User20@gmail.com | `GET /api/v1/Clients/{advisorId}/all` | 2500 | 5000 | 461 (max (retro)) | no | 2039 |
+| advisor-19 | User20@gmail.com | `GET /api/v1/client/{clientId}/cashflows` | 2500 | 4000 | 471.7 (max (retro)) | no | 2028 |
+| advisor-19 | User20@gmail.com | `GET /api/v1/cashflows/{cashflowId}` | 3000 | 4000 | 448.6 (max (retro)) | no | 2551 |
 
 ## Errors & runner
 
@@ -186,12 +307,13 @@ _N/A — no sign-off shard data._
 | Auth failure rate | not measured |
 | Business failure rate | not measured |
 | HTTP failure rate | not measured |
-| Phase A k6 exit 0 | 0 |
+| Phase A k6 exit 0 | 20 |
 | Phase A k6 exit 99 | 0 _(k6 thresholds, not functional fail)_ |
 
 ## Fleet custom SLO gate
 
 - Phase A fleet gate: **PASS** (passed 0, failed 0)
+- Phase B gate: _pending_
 
 ## Recommendation
 

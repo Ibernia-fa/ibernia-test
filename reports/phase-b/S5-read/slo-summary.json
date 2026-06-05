@@ -1,0 +1,37 @@
+{
+  "reportType": "volume-slo-summary",
+  "generatedAt": "2026-06-05T05:02:06.436Z",
+  "configVersion": 1,
+  "defaultProfile": "read",
+  "gates": null,
+  "profilesUsed": [],
+  "endpoints": [],
+  "steps": [],
+  "rates": {
+          "endpointViolationRate": null,
+          "stepViolationRate": null,
+          "hardMaxViolationRate": null
+        },
+  "totals": {
+          "endpointSamples": 0,
+          "stepSamples": 0,
+          "endpointViolations": 0,
+          "stepViolations": 0,
+          "hardMaxViolations": 0
+        },
+  "enabled": true,
+  "runId": "S5-read",
+  "scenario": "phase-b-read-S5",
+  "scenarioProfile": "read",
+  "phase": "B",
+  "integration": "k6-journey-advisor-critical",
+  "sloProfile": "read",
+  "readOnly": true,
+  "manifestDriven": true,
+  "userLagRate": 0,
+  "scenarioMetadata": {
+          "scenario": "phase-b-read-S5",
+          "phaseBScenario": null,
+          "profile": "read"
+        }
+}
