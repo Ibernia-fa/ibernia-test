@@ -57,6 +57,7 @@
       "profile": "write",
       "advisors": 20,
       "writeParallelJobs": 20,
+      "disableFleetStagger": true,
       "clientsPerAdvisor": 30,
       "plansPerClient": 8,
       "manifestProfileFile": "data/scenarios/profile_20u_30c_8p.json",
